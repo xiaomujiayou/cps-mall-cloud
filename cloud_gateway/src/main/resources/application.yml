@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: gateway-server
+  profiles:
+    active: dev
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  mvc:
+    date-format: yyyy-MM-dd HH:mm:ss
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8101/eureka/
+zuul:
+  sensitive-headers:
+    - Cookie,Set-Cookie,Authorization
+  host:
+    connect-timeout-millis: 15000
+    socket-timeout-millis: 60000
+
+ribbon:
+  ReadTimeout: 10000
+  ConnectTimeout: 10000
+feign:
+  hystrix:
+    enabled: true
+
+logging:
+  config: classpath:log/logback-spring.xml

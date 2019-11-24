@@ -1,0 +1,52 @@
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8101/eureka/
+    registry-fetch-interval-seconds: 5
+server:
+  port: 8102
+  servlet:
+    context-path: /
+spring:
+  datasource:
+    druid:
+      min-idle: 1
+      test-on-borrow: true
+      stat-view-servlet:
+        allow: true
+      max-active: 20
+      initial-size: 1
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://47.92.6.56:3306/mall_user?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: xm123456
+  rabbitmq:
+    host: 47.92.6.56
+    port: 5672
+    username: guest
+    password: guest
+    listener:
+      simple:
+        acknowledge-mode: manual  #消费确认置为手动
+  redis:
+    host: 47.92.6.56
+    port: 6379
+    password: kxy521yu
+    database: 0
+    timeout: 25000
+    jedis:
+      pool:
+        max-active: 8
+        max-wait: -1
+        max-idle: 8
+        min-idle: 0
+  zipkin:
+    base-url: http://47.92.6.56:9411
+    sender:
+      type: web
+  sleuth:
+    sampler:
+      probability: 1
+logging:
+  logPath: D:\java\data\log\share\gateway-server
+  logLevel: debug
