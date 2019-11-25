@@ -1,14 +1,8 @@
 package com.xm.api_mall.service.impl;
 
 import com.pdd.pop.sdk.http.PopHttpClient;
-import com.pdd.pop.sdk.http.api.request.PddDdkGoodsDetailRequest;
-import com.pdd.pop.sdk.http.api.request.PddDdkGoodsPidGenerateRequest;
-import com.pdd.pop.sdk.http.api.request.PddDdkGoodsPromotionUrlGenerateRequest;
-import com.pdd.pop.sdk.http.api.request.PddDdkGoodsSearchRequest;
-import com.pdd.pop.sdk.http.api.response.PddDdkGoodsDetailResponse;
-import com.pdd.pop.sdk.http.api.response.PddDdkGoodsPidGenerateResponse;
-import com.pdd.pop.sdk.http.api.response.PddDdkGoodsPromotionUrlGenerateResponse;
-import com.pdd.pop.sdk.http.api.response.PddDdkGoodsSearchResponse;
+import com.pdd.pop.sdk.http.api.request.*;
+import com.pdd.pop.sdk.http.api.response.*;
 import com.xm.api_mall.service.ConfigService;
 import com.xm.api_mall.service.ProductApiService;
 import com.xm.comment.exception.GlobleException;
@@ -18,13 +12,16 @@ import com.xm.comment_serialize.module.mall.bo.ShareLinkBo;
 import com.xm.comment_serialize.module.mall.constant.*;
 import com.xm.comment_serialize.module.mall.entity.SmConfigEntity;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
+import com.xm.comment_serialize.module.user.entity.SuOrderEntity;
 import com.xm.comment_utils.enu.EnumUtils;
 import com.xm.comment_utils.mybatis.PageBean;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -119,6 +116,71 @@ public class PddProductApiServiceImpl implements ProductApiService {
         PddDdkGoodsPidGenerateResponse response = popHttpClient.syncInvoke(request);
         log.info("pdd 剩余推广位：[{}]",response.getPIdGenerateResponse().getRemainPidCount());
         return response.getPIdGenerateResponse().getPIdList().get(0).getPId();
+    }
+
+    @Override
+    public PageBean<SuOrderEntity> getOrderByIncrement(Date startUpdateTime, Date endUpdateTime, Integer pageNum, Integer pageSize) throws Exception {
+        PddDdkOrderListIncrementGetRequest request = new PddDdkOrderListIncrementGetRequest();
+        request.setStartUpdateTime(startUpdateTime.getTime()/1000);
+        request.setEndUpdateTime(endUpdateTime.getTime()/1000);
+        request.setPage(pageNum);
+        request.setPageSize(pageSize);
+        request.setReturnCount(true);
+        PddDdkOrderListIncrementGetResponse response = popHttpClient.syncInvoke(request);
+        List<PddDdkOrderListIncrementGetResponse.OrderListGetResponseOrderListItem> listItem = response.getOrderListGetResponse().getOrderList();
+        List<SuOrderEntity> orderEntities = null;
+        if(listItem != null) {
+            orderEntities = listItem.stream().map(o -> {
+                return convertOrder(o);
+            }).collect(Collectors.toList());
+        }
+//        orderEntities = moke();
+
+        PageBean<SuOrderEntity> pageBean = new PageBean<>(orderEntities);
+        pageBean.setList(orderEntities);
+        pageBean.setPageNum(pageNum);
+        pageBean.setPageSize(pageSize);
+        pageBean.setTotal(response.getOrderListGetResponse().getTotalCount());
+//        pageBean.setTotal(111);
+        return pageBean;
+    }
+
+//    private List<SuOrderEntity> moke(){
+//        List<SuOrderEntity> suOrderEntities = new ArrayList<>();
+//        for (int i = 0; i < 40; i++) {
+//            SuOrderEntity suOrderEntity = new SuOrderEntity();
+//            suOrderEntity.setNum(i+"");
+//            suOrderEntities.add(suOrderEntity);
+//        }
+//        return suOrderEntities;
+//    }
+
+    @Override
+    public Date getTime() throws Exception {
+        PddTimeGetRequest request = new PddTimeGetRequest();
+        PddTimeGetResponse response = popHttpClient.syncInvoke(request);
+        return DateUtils.parseDate(response.getTimeGetResponse().getTime(),"yyyy-MM-dd HH:mm:ss");
+    }
+
+    private SuOrderEntity convertOrder(PddDdkOrderListIncrementGetResponse.OrderListGetResponseOrderListItem item){
+        SuOrderEntity orderEntity = new SuOrderEntity();
+        orderEntity.setNum(item.getOrderId());
+        orderEntity.setProductId(item.getOrderSn());
+        orderEntity.setProductName(item.getGoodsName());
+        orderEntity.setImgUrl(item.getGoodsThumbnailUrl());
+        orderEntity.setPlatformType(PlatformTypeConstant.PDD);
+        orderEntity.setState(item.getOrderStatus());
+        orderEntity.setFailReason(item.getFailReason());
+        orderEntity.setPId(item.getPId());
+        orderEntity.setOriginalPrice(item.getGoodsPrice().intValue());
+        orderEntity.setQuantity(item.getGoodsQuantity().intValue());
+        orderEntity.setAmount(item.getOrderAmount().intValue());
+        orderEntity.setPromotionRate(item.getPromotionRate().intValue());
+        orderEntity.setPromotionAmount(item.getPromotionAmount().intValue());
+        orderEntity.setType(item.getType());
+        orderEntity.setCustomParameters(item.getCustomParameters());
+        orderEntity.setOrderModifyAt(new Date(item.getOrderModifyAt()));
+        return orderEntity;
     }
 
     private SmProductEntity convertListDetail(PddDdkGoodsSearchResponse.GoodsSearchResponseGoodsListItem goodsListItem) {

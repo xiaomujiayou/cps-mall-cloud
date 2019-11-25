@@ -1,9 +1,11 @@
 package com.xm.comment_utils.mybatis;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -14,7 +16,9 @@ public class PageBean<T> implements Serializable {
     private int pageSize;    // 每页记录数
     private int pages;        // 总页数
     private List<T> list;    //结果集
-    
+
+    public PageBean() {}
+
     /**
      * 包装Page对象，因为直接返回Page对象，在JSON处理以及其他情况下会被当成List来处理，
      * 而出现一些问题。
@@ -28,6 +32,8 @@ public class PageBean<T> implements Serializable {
             this.total = page.getTotal();
             this.pages = page.getPages();
             this.list = page;
+        }else {
+            this.list = list;
         }
     }
 }

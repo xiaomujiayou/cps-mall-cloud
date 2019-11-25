@@ -3,9 +3,11 @@ package com.xm.api_mall.service;
 import com.xm.comment_serialize.module.mall.bo.ProductCriteriaBo;
 import com.xm.comment_serialize.module.mall.bo.ShareLinkBo;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
+import com.xm.comment_serialize.module.user.entity.SuOrderEntity;
 import com.xm.comment_serialize.module.user.entity.SuUserEntity;
 import com.xm.comment_utils.mybatis.PageBean;
 
+import java.util.Date;
 import java.util.List;
 
 public interface ProductApiService {
@@ -48,4 +50,17 @@ public interface ProductApiService {
      */
     public String generatePid(Integer userId) throws Exception;
 
+    /**
+     * 按最后更新时间查询订单
+     * @param startUpdateTime
+     * @param endUpdateTime
+     * @return
+     */
+    public PageBean<SuOrderEntity> getOrderByIncrement(Date startUpdateTime,Date endUpdateTime,Integer pageNum,Integer pageSize) throws Exception;
+
+    /**
+     * 获取系统时间
+     * @return
+     */
+    public Date getTime() throws Exception;
 }

@@ -7,9 +7,12 @@ import com.xm.comment.response.R;
 import com.xm.comment_serialize.module.mall.entity.SmConfigEntity;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
 import com.xm.comment_serialize.module.mall.form.ProductDetailForm;
+import com.xm.comment_serialize.module.user.entity.SuOrderEntity;
+import com.xm.comment_utils.mybatis.PageBean;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 
+import java.util.Date;
 import java.util.List;
 
 @Component
@@ -27,6 +30,16 @@ public class MallFeignClientFallBack implements MallFeignClient {
 
     @Override
     public Msg<String> generatePid(Integer userId, Integer platformType) {
+        return R.error(MsgEnum.SERVICE_AVAILABLE);
+    }
+
+    @Override
+    public Msg<PageBean<SuOrderEntity>> getIncrement(Date startUpdateTime, Date endUpdateTime, Integer pageNum, Integer pageSize) {
+        return R.error(MsgEnum.SERVICE_AVAILABLE);
+    }
+
+    @Override
+    public Msg<Date> getTime() {
         return R.error(MsgEnum.SERVICE_AVAILABLE);
     }
 

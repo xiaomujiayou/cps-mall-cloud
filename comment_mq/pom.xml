@@ -19,6 +19,12 @@
 
     <dependencies>
 
+        <dependency>
+            <groupId>com.xm</groupId>
+            <artifactId>comment_serialize</artifactId>
+            <version>${project.current.version}</version>
+        </dependency>
+
         <!-- 消息组件 -->
         <dependency>
             <groupId>com.rabbitmq</groupId>

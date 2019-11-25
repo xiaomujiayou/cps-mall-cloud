@@ -3,17 +3,23 @@
 <mapper namespace="com.xm.api_user.mapper.SuOrderMapper" >
   <resultMap id="BaseResultMap" type="com.xm.comment_serialize.module.user.entity.SuOrderEntity" >
     <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
     <result column="num" property="num" jdbcType="VARCHAR" />
     <result column="product_id" property="productId" jdbcType="VARCHAR" />
     <result column="product_name" property="productName" jdbcType="VARCHAR" />
-    <result column="fro" property="fro" jdbcType="INTEGER" />
+    <result column="img_url" property="imgUrl" jdbcType="VARCHAR" />
+    <result column="platform_type" property="platformType" jdbcType="INTEGER" />
     <result column="state" property="state" jdbcType="INTEGER" />
-    <result column="order_price" property="orderPrice" jdbcType="INTEGER" />
+    <result column="fail_reason" property="failReason" jdbcType="VARCHAR" />
+    <result column="p_id" property="pId" jdbcType="VARCHAR" />
+    <result column="original_price" property="originalPrice" jdbcType="INTEGER" />
+    <result column="quantity" property="quantity" jdbcType="INTEGER" />
+    <result column="amount" property="amount" jdbcType="INTEGER" />
     <result column="promotion_rate" property="promotionRate" jdbcType="INTEGER" />
     <result column="promotion_amount" property="promotionAmount" jdbcType="INTEGER" />
     <result column="type" property="type" jdbcType="INTEGER" />
     <result column="custom_parameters" property="customParameters" jdbcType="VARCHAR" />
-    <result column="img_url" property="imgUrl" jdbcType="VARCHAR" />
+    <result column="order_modify_at" property="orderModifyAt" jdbcType="TIMESTAMP" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
   </resultMap>
 </mapper>

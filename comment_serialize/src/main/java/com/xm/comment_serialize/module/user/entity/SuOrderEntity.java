@@ -13,6 +13,11 @@ public class SuOrderEntity implements Serializable{
 	private Integer id;
 
 	/**
+	 * 所属用户
+	 */
+	private Integer userId;
+
+	/**
 	 * 订单号
 	 */
 	private String num;
@@ -28,9 +33,14 @@ public class SuOrderEntity implements Serializable{
 	private String productName;
 
 	/**
-	 * 订单来源(1:拼多多)
+	 * 商品简介
 	 */
-	private Integer fro;
+	private String imgUrl;
+
+	/**
+	 * 所属平台
+	 */
+	private Integer platformType;
 
 	/**
 	 * 订单状态(-1 未支付; 0-已支付；1-已成团；2-确认收货；3-审核成功；4-审核失败（不可提现）；5-已经结算；8-非多多进宝商品（无佣金订单）;10-已处罚)
@@ -38,9 +48,29 @@ public class SuOrderEntity implements Serializable{
 	private Integer state;
 
 	/**
-	 * 订单金额(单位:分)
+	 * 审核失败原因
 	 */
-	private Integer orderPrice;
+	private String failReason;
+
+	/**
+	 * 推广位id
+	 */
+	private String pId;
+
+	/**
+	 * 单品原始价格(分)
+	 */
+	private Integer originalPrice;
+
+	/**
+	 * 购买数量
+	 */
+	private Integer quantity;
+
+	/**
+	 * 实际支付金额(分)
+	 */
+	private Integer amount;
 
 	/**
 	 * 佣金比例(千分比)
@@ -63,9 +93,9 @@ public class SuOrderEntity implements Serializable{
 	private String customParameters;
 
 	/**
-	 * 商品简介
+	 * 最后更新时间
 	 */
-	private String imgUrl;
+	private java.util.Date orderModifyAt;
 
 	/**
 	 * 创建时间
