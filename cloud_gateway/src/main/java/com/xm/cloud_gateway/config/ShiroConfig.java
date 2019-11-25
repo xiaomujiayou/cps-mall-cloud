@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.apache.shiro.mgt.SecurityManager;
+import org.springframework.context.annotation.Primary;
 
 import javax.servlet.Filter;
 import java.util.HashMap;
@@ -56,7 +57,8 @@ public class ShiroConfig {
      * @return
      */
     @Bean
-    public RedisCacheManager cacheManager(RedisManager redisManager) {
+    @Primary
+    public RedisCacheManager redisCacheManager(RedisManager redisManager) {
         RedisCacheManager redisCacheManager = new RedisCacheManager();
         redisCacheManager.setRedisManager(redisManager);
         redisCacheManager.setPrincipalIdFieldName("openId");

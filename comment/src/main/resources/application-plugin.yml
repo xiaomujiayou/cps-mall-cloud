@@ -1,0 +1,25 @@
+#插件配置
+
+#mybatis
+mybatis:
+  mapper-locations:
+    - classpath:mapper/*.xml
+    - classpath:mapper/custom/*.xml
+  type-aliases-package: tk.mybatis.springboot.model
+
+#通用mapper
+mapper:
+  mappers:
+    - tk.mybatis.mapper.common.Mapper
+  notEmpty: true
+  identity: MYSQL
+
+#分页插件
+pagehelper:
+  supportMethodsArguments: false
+  reasonable: false
+  helperDialect: mysql
+  params: count=countSql
+
+logging:
+  config: classpath:log/logback-spring.xml

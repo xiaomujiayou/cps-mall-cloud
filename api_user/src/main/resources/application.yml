@@ -2,43 +2,10 @@ spring:
   application:
     name: api-user
   profiles:
-    active: dev
-  jackson:
-    date-format: yyyy-MM-dd HH:mm:ss
-    time-zone: GMT+8
-  mvc:
-    date-format: yyyy-MM-dd HH:mm:ss
-
-mapper:
-  mappers:
-  - tk.mybatis.mapper.common.Mapper
-  notEmpty: true
-  identity: MYSQL
-
-mybatis:
-  mapper-locations:
-    - classpath:mapper/*.xml
-    - classpath:mapper/custom/*.xml
-  type-aliases-package: tk.mybatis.springboot.model
-
-pagehelper:
-  supportMethodsArguments: false
-  reasonable: false
-  helperDialect: mysql
-  params: count=countSql
-
-logging:
-  config: classpath:log/logback-spring.xml
+    active: assembly,plugin,dev
 
 wx:
   appId: wx77c95d4a2f1bfab0
   secret: acecbd89a9dd3009a80052a0905f5b52
 #  token: GiOleLZJjps03G4dLq3Ogj0ooT2d3DKI
 #  encodingAESKey: y45Ljp45d5DQIt42TzL0iJPZePDoeIjd5jHoTQEQLe2
-
-oss:
-  ali:
-    endpoint: http://oss-cn-hangzhou.aliyuncs.com
-    accessKeyId: LTAI4Fsu8LS6dfkSgk9qe6h1
-    accessKeySecret: epYBonCerRq2V1QWR6CJ5yaFfjg1A5
-    bucketName: mall-share

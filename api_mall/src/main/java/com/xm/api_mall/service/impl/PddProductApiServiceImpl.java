@@ -197,7 +197,7 @@ public class PddProductApiServiceImpl implements ProductApiService {
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (EnumConstantNotPresentException e){
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
         return null;
     }

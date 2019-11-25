@@ -174,35 +174,18 @@
     -->
     <root level="info">
         <appender-ref ref="CONSOLE" />
+        <appender-ref ref="DEBUG_FILE" />
+        <appender-ref ref="INFO_FILE" />
+        <appender-ref ref="ERROR_FILE" />
+        <appender-ref ref="WARN_FILE" />
     </root>
+    <logger name="com.xm" level="${log.level}"/>
+    <!--开发环境-->
+<!--    <springProfile name="dev">-->
+<!--    </springProfile>-->
 
-    <!--开发环境:打印控制台-->
-    <springProfile name="dev">
+    <!--生产环境-->
+<!--    <springProfile name="prod">-->
 <!--        <logger name="com.xm" level="${log.level}"/>-->
-        <logger name="com.xm" level="${log.level}"/>
-<!--        <logger name="org.springframework" level="${log.level}"/>-->
-        <root level="info">
-            <appender-ref ref="CONSOLE" />
-            <appender-ref ref="DEBUG_FILE" />
-            <appender-ref ref="INFO_FILE" />
-            <appender-ref ref="WARN_FILE" />
-            <appender-ref ref="ERROR_FILE" />
-        </root>
-    </springProfile>
-
-
-
-    <!--生产环境:输出到文件-->
-    <springProfile name="prod">
-        <logger name="com.xm" level="${log.level}"/>
-        <logger name="com.haoait.client.UserServiceClient" level="${log.level}"/>
-        <root level="info">
-            <appender-ref ref="CONSOLE" />
-            <appender-ref ref="DEBUG_FILE" />
-            <appender-ref ref="INFO_FILE" />
-            <appender-ref ref="ERROR_FILE" />
-            <appender-ref ref="WARN_FILE" />
-        </root>
-    </springProfile>
-
+<!--    </springProfile>-->
 </configuration>

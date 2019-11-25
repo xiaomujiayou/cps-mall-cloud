@@ -2,30 +2,4 @@ spring:
   application:
     name: cron-service
   profiles:
-    active: dev
-  jackson:
-    date-format: yyyy-MM-dd HH:mm:ss
-    time-zone: GMT+8
-  mvc:
-    date-format: yyyy-MM-dd HH:mm:ss
-
-#mapper:
-#  mappers:
-#  - tk.mybatis.mapper.common.Mapper
-#  notEmpty: true
-#  identity: MYSQL
-#
-#mybatis:
-#  mapper-locations:
-#    - classpath:mapper/*.xml
-#    - classpath:mapper/custom/*.xml
-#  type-aliases-package: tk.mybatis.springboot.model
-
-pagehelper:
-  supportMethodsArguments: false
-  reasonable: false
-  helperDialect: mysql
-  params: count=countSql
-
-logging:
-  config: classpath:log/logback-spring.xml
+    active: assembly,plugin,dev

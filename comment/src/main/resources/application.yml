@@ -1,10 +1,9 @@
 spring:
-  profiles:
-    active: dev
-
-oss:
-  ali:
-    endpoint: http://oss-cn-hangzhou.aliyuncs.com
-    accessKeyId: LTAI4Fsu8LS6dfkSgk9qe6h1
-    accessKeySecret: epYBonCerRq2V1QWR6CJ5yaFfjg1A5
-    bucketName: mall-share
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  mvc:
+    date-format: yyyy-MM-dd HH:mm:ss
+server:
+  servlet:
+    context-path: /

@@ -2,17 +2,8 @@ spring:
   application:
     name: gateway-server
   profiles:
-    active: dev
-  jackson:
-    date-format: yyyy-MM-dd HH:mm:ss
-    time-zone: GMT+8
-  mvc:
-    date-format: yyyy-MM-dd HH:mm:ss
+    active: assembly,plugin,dev
 
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8101/eureka/
 zuul:
   sensitive-headers:
     - Cookie,Set-Cookie,Authorization
@@ -26,6 +17,3 @@ ribbon:
 feign:
   hystrix:
     enabled: true
-
-logging:
-  config: classpath:log/logback-spring.xml

@@ -10,12 +10,14 @@ import com.xm.comment_serialize.module.mall.form.GetProductSaleInfoForm;
 import com.xm.comment_serialize.module.mall.form.ProductDetailForm;
 import com.xm.comment_serialize.module.mall.form.ProductListForm;
 import com.xm.comment_utils.mybatis.PageBean;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+@Slf4j
 @RestController
 @RequestMapping("/product")
 public class ProductController {
@@ -44,6 +46,7 @@ public class ProductController {
      */
     @GetMapping("/detail")
     public Msg<SmProductEntity> getProductDetail(@Valid ProductDetailForm productDetailForm, BindingResult bindingResult, @LoginUser(necessary = false) Integer userId) throws Exception {
+        log.error("hahahahhaahahah");
         userFeignClient.addProductHistory(userId,productDetailForm.getPlatformType(),productDetailForm.getGoodsId());
         return R.sucess(productContext
                 .platformType(productDetailForm.getPlatformType())

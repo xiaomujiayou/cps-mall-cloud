@@ -1,8 +1,9 @@
-package com.xm.api_user.config;
+package com.xm.comment.config;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -18,8 +19,8 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
-//@EnableCaching
-//@Configuration
+@EnableCaching
+@Configuration
 public class RedisCacheConfig extends CachingConfigurerSupport {
 
 //    @Bean
@@ -40,7 +41,8 @@ public class RedisCacheConfig extends CachingConfigurerSupport {
 //    }
 
     @Bean
-    public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
+    @ConditionalOnMissingBean
+    public RedisCacheManager cacheManager1(RedisConnectionFactory connectionFactory) {
         return new RedisCacheManager(
                 RedisCacheWriter.nonLockingRedisCacheWriter(connectionFactory),
                 this.getRedisCacheConfigurationWithTtl(24*60*60), // 默认策略，未配置的 key 会使用这个
@@ -51,7 +53,6 @@ public class RedisCacheConfig extends CachingConfigurerSupport {
     private Map<String, RedisCacheConfiguration> getRedisCacheConfigurationMap() {
         Map<String, RedisCacheConfiguration> redisCacheConfigurationMap = new HashMap<>();
         redisCacheConfigurationMap.put("pdd:pdStopWordService:stopWords", this.getRedisCacheConfigurationWithTtl(120));
-
         return redisCacheConfigurationMap;
     }
 

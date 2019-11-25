@@ -17,7 +17,7 @@ import java.net.URISyntaxException;
  * 配置jackson序列化
  */
 @Slf4j
-@Configuration
+//@Configuration
 public class RabbitMqConfig {
 
     @Bean
