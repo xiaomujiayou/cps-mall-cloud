@@ -46,7 +46,6 @@ public class ProductController {
      */
     @GetMapping("/detail")
     public Msg<SmProductEntity> getProductDetail(@Valid ProductDetailForm productDetailForm, BindingResult bindingResult, @LoginUser(necessary = false) Integer userId) throws Exception {
-        log.error("hahahahhaahahah");
         userFeignClient.addProductHistory(userId,productDetailForm.getPlatformType(),productDetailForm.getGoodsId());
         return R.sucess(productContext
                 .platformType(productDetailForm.getPlatformType())
