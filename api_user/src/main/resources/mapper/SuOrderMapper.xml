@@ -4,7 +4,7 @@
   <resultMap id="BaseResultMap" type="com.xm.comment_serialize.module.user.entity.SuOrderEntity" >
     <result column="id" property="id" jdbcType="INTEGER" />
     <result column="user_id" property="userId" jdbcType="INTEGER" />
-    <result column="num" property="num" jdbcType="VARCHAR" />
+    <result column="order_sn" property="orderSn" jdbcType="VARCHAR" />
     <result column="product_id" property="productId" jdbcType="VARCHAR" />
     <result column="product_name" property="productName" jdbcType="VARCHAR" />
     <result column="img_url" property="imgUrl" jdbcType="VARCHAR" />

@@ -6,7 +6,7 @@
     <result column="img" property="img" jdbcType="VARCHAR" />
     <result column="name" property="name" jdbcType="VARCHAR" />
     <result column="sort" property="sort" jdbcType="INTEGER" />
-    <result column="targrt" property="targrt" jdbcType="INTEGER" />
+    <result column="target" property="target" jdbcType="INTEGER" />
     <result column="url" property="url" jdbcType="VARCHAR" />
     <result column="type" property="type" jdbcType="INTEGER" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />

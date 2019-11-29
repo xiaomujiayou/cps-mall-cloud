@@ -8,6 +8,8 @@ public enum ConfigEnmu {
     MAIN_OPTION_SORT("main_option_sort","主option默认排序"),
     PRODUCT_SHARE_USER_RATE("product_share_user_rate","商品分享者默认佣金比例(千分比)"),
     PRODUCT_SHARE_BUY_RATE("product_share_buy_rate","购买分享商品的用户佣金比例(千分比)"),
+    PRODUCT_BUY_RATE("product_buy_rate","商品购买默认佣金比例(千分比)"),
+    PRODUCT_PROXY_RATE("product_proxy_rate","商品购买代理人佣金比例(千分比)"),
     PROXY_LEVEL("proxy_level","代理层级")
     ;
     ConfigEnmu(String name, String desc) {

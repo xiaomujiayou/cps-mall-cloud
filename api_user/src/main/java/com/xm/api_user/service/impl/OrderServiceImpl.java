@@ -1,5 +1,7 @@
 package com.xm.api_user.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.codingapi.txlcn.tc.annotation.LcnTransaction;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
@@ -12,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -56,7 +59,7 @@ public class OrderServiceImpl implements OrderService {
     private SuOrderEntity getOldOrder(SuOrderEntity order){
         PageHelper.startPage(1,1,false);
         SuOrderEntity example = new SuOrderEntity();
-        example.setNum(order.getNum());
+        example.setOrderSn(order.getOrderSn());
         example = suOrderMapper.selectOne(example);
         if(example == null)
             return null;
@@ -74,6 +77,10 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void onOrderCreate(SuOrderEntity order) {
         //保存订单
+        JSONObject params = JSON.parseObject(order.getCustomParameters());
+        Integer userId = params.getInteger("userId");
+        order.setUserId(userId);
+        order.setCreateTime(new Date());
         suOrderMapper.insertUseGeneratedKeys(order);
         //创建订单收益账单
         billService.createByOrder(order);

@@ -22,6 +22,7 @@ public class BillReceiver {
             value = @Queue(BillMqConfig.QUEUE)
     ))
     public void onMessage(SuBillEntity suBillEntity){
+        log.debug("发放佣金");
         log.debug(JSON.toJSONString(suBillEntity));
     }
 }

@@ -5,10 +5,7 @@ import com.xm.comment.annotation.LoginUser;
 import com.xm.comment.response.Msg;
 import com.xm.comment.response.R;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
-import com.xm.comment_serialize.module.mall.form.GetProductForm;
-import com.xm.comment_serialize.module.mall.form.ProductCollectForm;
-import com.xm.comment_serialize.module.mall.form.ProductCollectIsForm;
-import com.xm.comment_serialize.module.mall.form.ProductHistoryDelForm;
+import com.xm.comment_serialize.module.mall.form.*;
 import com.xm.comment_utils.mybatis.PageBean;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,20 +80,22 @@ public class ProductController {
      */
     @GetMapping
     public Msg<PageBean<SmProductEntity>> get(@LoginUser Integer userId, @Valid GetProductForm getProductForm,BindingResult bindingResult){
-        return R.sucess(productService.getUserProduct(userId,getProductForm.getPageNum(),getProductForm.getPageSize(),getProductForm.getSuProductType()));
+        return R.sucess(productService.getUserProduct(
+                userId,
+                getProductForm.getPageNum(),
+                getProductForm.getPageSize(),
+                getProductForm.getSuProductType()));
     }
 
     /**
      * 添加一条历史记录
      * @param userId
-     * @param platformType
-     * @param goodsId
      * @return
      */
     @PostMapping("/history")
-    public Msg get(@LoginUser Integer userId, Integer platformType, String goodsId){
+    public Msg get(@LoginUser Integer userId,@RequestBody @Valid AddUserHistoryForm addUserHistoryForm,BindingResult bindingResult){
         if(userId != null) {
-            productService.addHistory(userId,platformType,goodsId);
+            productService.addHistory(userId,addUserHistoryForm.getPlatformType(),addUserHistoryForm.getGoodsId());
         }
         return R.sucess();
     }

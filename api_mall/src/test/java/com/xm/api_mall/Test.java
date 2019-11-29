@@ -8,9 +8,9 @@ import com.pdd.pop.sdk.http.PopHttpClient;
 import com.pdd.pop.sdk.http.api.request.*;
 import com.pdd.pop.sdk.http.api.response.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class Test {
     public static void main(String[] args) throws Exception {
@@ -18,8 +18,18 @@ public class Test {
         String clientSecret = "702bee4684121e512392cb0405b9292fbc624234";
         PopClient client = new PopHttpClient(clientId, clientSecret);
 
-        PddDdkOrderDetailGetRequest request = new PddDdkOrderDetailGetRequest();
-        request.setOrderSn("191124-380393554933775");
+//        PddDdkOrderDetailGetRequest request = new PddDdkOrderDetailGetRequest();
+//        request.setOrderSn("191124-380393554933775");
+//        System.out.println(JSON.toJSONString(client.syncInvoke(request),SerializerFeature.PrettyFormat));
+
+//        DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//        System.out.println(format.format(new Date(1574769744000l - 10000000)));
+        PddDdkOrderListIncrementGetRequest request = new PddDdkOrderListIncrementGetRequest();
+        request.setPage(1);
+        request.setPageSize(10);
+        request.setReturnCount(true);
+        request.setStartUpdateTime(1574755252L);
+        request.setEndUpdateTime(1574819221L);
         System.out.println(JSON.toJSONString(client.syncInvoke(request),SerializerFeature.PrettyFormat));
 
 //        PddDdkGoodsDetailRequest request = new PddDdkGoodsDetailRequest();
@@ -82,6 +92,17 @@ public class Test {
 //        request.setGoodsIdList(pIds);
 //        PddDdkGoodsSearchResponse response = client.syncInvoke(request);
 //        System.out.println(JsonUtil.transferToJson(response));
+
+    }
+
+    public static String getTimeZone(){
+        Calendar cal = Calendar.getInstance();
+        int offset = cal.get(Calendar.ZONE_OFFSET);
+        cal.add(Calendar.MILLISECOND, -offset);
+        Long timeStampUTC = cal.getTimeInMillis();
+        Long timeStamp = System.currentTimeMillis();
+        Long timeZone = (timeStamp - timeStampUTC) / (1000 * 3600); System.out.println(timeZone.intValue());
+        return String.valueOf(timeZone);
 
     }
 }

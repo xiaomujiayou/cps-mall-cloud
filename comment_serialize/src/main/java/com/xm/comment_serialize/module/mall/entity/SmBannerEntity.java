@@ -30,7 +30,7 @@ public class SmBannerEntity implements Serializable{
 	/**
 	 * 目标(1:普通url跳转,2:小程序跳转,3:唤醒其他小程序,4:唤醒app)
 	 */
-	private Integer targrt;
+	private Integer target;
 
 	/**
 	 * 包含的信息

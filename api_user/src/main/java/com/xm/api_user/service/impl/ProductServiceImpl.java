@@ -37,7 +37,9 @@ public class ProductServiceImpl implements ProductService {
         OrderByHelper.orderBy("create_time desc");
         List<SuProductEntity> suProductEntities = suProductMapper.select(suProductEntity);
         List<SmProductEntity> smProductEntities = suProductEntities.stream().map(o ->{
-            return mallFeignClient.getProductDetail(o.getPlatformType(),o.getGoodsId(),null,userId).getData();
+            SmProductEntity smProductEntity = mallFeignClient.getProductDetail(o.getPlatformType(),o.getGoodsId(),null,userId).getData();
+            smProductEntity.setId(o.getId());
+            return smProductEntity;
         }).collect(Collectors.toList());
         PageBean pageBean = new PageBean(suProductEntities);
         pageBean.setList(smProductEntities);
@@ -50,8 +52,8 @@ public class ProductServiceImpl implements ProductService {
         suProductEntity.setUserId(userId);
         suProductEntity.setGoodsId(goodsId);
         suProductEntity.setPlatformType(platformType);
-        suProductMapper.delete(suProductEntity);
         suProductEntity.setType(2);
+        suProductMapper.delete(suProductEntity);
         suProductEntity.setDel(1);
         suProductEntity.setCreateTime(new Date(System.currentTimeMillis()));
         suProductMapper.insert(suProductEntity);
@@ -73,8 +75,7 @@ public class ProductServiceImpl implements ProductService {
                 throw new GlobleException(MsgEnum.PARAM_VALID_ERROR,"id不能为空");
             example.createCriteria()
                     .andEqualTo("userId",userId)
-                    .andEqualTo("id",id)
-                    .andEqualTo("type",2);
+                    .andEqualTo("id",id);
             suProductEntity.setDel(0);
             suProductMapper.updateByExampleSelective(suProductEntity,example);
         }

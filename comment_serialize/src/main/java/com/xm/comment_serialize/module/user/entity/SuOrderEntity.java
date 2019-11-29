@@ -18,9 +18,9 @@ public class SuOrderEntity implements Serializable{
 	private Integer userId;
 
 	/**
-	 * 订单号
+	 * 订单编号
 	 */
-	private String num;
+	private String orderSn;
 
 	/**
 	 * 商品id
@@ -88,7 +88,7 @@ public class SuOrderEntity implements Serializable{
 	private Integer type;
 
 	/**
-	 * 自定义参数
+	 * 自定义参数(userId:购买用户,fromUser:分享的用户,appType:app来源)
 	 */
 	private String customParameters;
 

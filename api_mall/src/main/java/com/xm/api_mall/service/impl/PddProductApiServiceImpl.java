@@ -21,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.InvocationTargetException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -134,14 +136,11 @@ public class PddProductApiServiceImpl implements ProductApiService {
                 return convertOrder(o);
             }).collect(Collectors.toList());
         }
-//        orderEntities = moke();
-
         PageBean<SuOrderEntity> pageBean = new PageBean<>(orderEntities);
         pageBean.setList(orderEntities);
         pageBean.setPageNum(pageNum);
         pageBean.setPageSize(pageSize);
         pageBean.setTotal(response.getOrderListGetResponse().getTotalCount());
-//        pageBean.setTotal(111);
         return pageBean;
     }
 
@@ -164,8 +163,8 @@ public class PddProductApiServiceImpl implements ProductApiService {
 
     private SuOrderEntity convertOrder(PddDdkOrderListIncrementGetResponse.OrderListGetResponseOrderListItem item){
         SuOrderEntity orderEntity = new SuOrderEntity();
-        orderEntity.setNum(item.getOrderId());
-        orderEntity.setProductId(item.getOrderSn());
+        orderEntity.setOrderSn(item.getOrderSn());
+        orderEntity.setProductId(item.getGoodsId().toString());
         orderEntity.setProductName(item.getGoodsName());
         orderEntity.setImgUrl(item.getGoodsThumbnailUrl());
         orderEntity.setPlatformType(PlatformTypeConstant.PDD);
@@ -179,7 +178,7 @@ public class PddProductApiServiceImpl implements ProductApiService {
         orderEntity.setPromotionAmount(item.getPromotionAmount().intValue());
         orderEntity.setType(item.getType());
         orderEntity.setCustomParameters(item.getCustomParameters());
-        orderEntity.setOrderModifyAt(new Date(item.getOrderModifyAt()));
+        orderEntity.setOrderModifyAt(new Date(item.getOrderModifyAt() * 1000));
         return orderEntity;
     }
 
