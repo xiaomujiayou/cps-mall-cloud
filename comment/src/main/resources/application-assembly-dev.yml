@@ -2,7 +2,12 @@
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8101/eureka/
+      defaultZone: http://127.0.0.1:8101/eureka/
+    registry-fetch-interval-seconds: 3      #eureka client刷新本地缓存时间,默认30s
+  instance:
+    lease-renewal-interval-in-seconds: 1    #每间隔1s，向服务端发送一次心跳，证明自己依然”存活“，默认30秒
+    lease-expiration-duration-in-seconds: 2 #告诉服务端，如果我2s之内没有给你发心跳，就代表我“死”了，将我踢出掉。默认为90秒
+
 
 spring:
   rabbitmq:
@@ -46,3 +51,4 @@ oss:
     accessKeyId: LTAI4Fsu8LS6dfkSgk9qe6h1
     accessKeySecret: epYBonCerRq2V1QWR6CJ5yaFfjg1A5
     bucketName: mall-share
+

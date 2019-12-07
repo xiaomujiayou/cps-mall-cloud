@@ -10,7 +10,7 @@ public enum ConfigEnmu {
     PRODUCT_SHARE_BUY_RATE("product_share_buy_rate","购买分享商品的用户佣金比例(千分比)"),
     PRODUCT_BUY_RATE("product_buy_rate","商品购买默认佣金比例(千分比)"),
     PRODUCT_PROXY_RATE("product_proxy_rate","商品购买代理人佣金比例(千分比)"),
-    PRODUCT_SEARCH_SUGGEST("product_search_suggest","搜索页推荐搜索"),
+    PRODUCT_SEARCH_RECOMMEND("product_search_recommend","搜索页推荐搜索"),
     PROXY_LEVEL("proxy_level","代理层级")
 
     ;

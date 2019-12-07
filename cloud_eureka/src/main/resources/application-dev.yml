@@ -1,0 +1,5 @@
+eureka:
+  server:
+    response-cache-update-interval-ms: 3000 #eureka server刷新readCacheMap的时间，注意，client读取的是readCacheMap，这个时间决定了多久会把readWriteCacheMap的缓存更新到readCacheMap上,默认30s
+    enable-self-preservation: false         # 测试时关闭自我保护机制，保证不可用服务及时踢出【生成环境不要关闭】
+    eviction-interval-timer-in-ms: 3000     # 续期时间，即扫描失效服务的间隔时间，清理无效节点的时间间隔，默认60000毫秒，即60秒

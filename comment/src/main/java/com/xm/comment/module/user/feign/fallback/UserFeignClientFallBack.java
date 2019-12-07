@@ -8,6 +8,7 @@ import com.xm.comment_serialize.module.user.entity.SuConfigEntity;
 import com.xm.comment_serialize.module.user.entity.SuPidEntity;
 import com.xm.comment_serialize.module.user.entity.SuUserEntity;
 import com.xm.comment_serialize.module.user.ex.RolePermissionEx;
+import com.xm.comment_serialize.module.user.form.AddSearchForm;
 import com.xm.comment_serialize.module.user.form.GetUserInfoForm;
 import org.springframework.stereotype.Component;
 
@@ -50,4 +51,10 @@ public class UserFeignClientFallBack implements UserFeignClient {
     public Msg<SuPidEntity> getPid(Integer userId, Integer platformType) {
         return R.error(MsgEnum.SERVICE_AVAILABLE);
     }
+
+    @Override
+    public Msg addSearch(Integer userId, AddSearchForm addSearchForm) {
+        return R.error(MsgEnum.SERVICE_AVAILABLE);
+    }
+
 }

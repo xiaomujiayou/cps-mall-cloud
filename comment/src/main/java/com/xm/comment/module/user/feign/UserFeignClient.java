@@ -4,19 +4,23 @@ import com.xm.comment.annotation.LoginUser;
 import com.xm.comment.config.FeignConfiguration;
 import com.xm.comment.module.user.feign.fallback.UserFeignClientFallBack;
 import com.xm.comment.response.Msg;
+import com.xm.comment.response.R;
 import com.xm.comment_serialize.module.mall.constant.ConfigEnmu;
 import com.xm.comment_serialize.module.user.entity.SuConfigEntity;
 import com.xm.comment_serialize.module.user.entity.SuPidEntity;
 import com.xm.comment_serialize.module.user.entity.SuUserEntity;
 import com.xm.comment_serialize.module.user.ex.RolePermissionEx;
+import com.xm.comment_serialize.module.user.form.AddSearchForm;
 import com.xm.comment_serialize.module.user.form.GetUserInfoForm;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @FeignClient(value = "api-user",fallback = UserFeignClientFallBack.class,configuration = FeignConfiguration.class)
@@ -42,4 +46,7 @@ public interface UserFeignClient {
 
     @GetMapping("/pid")
     public Msg<SuPidEntity> getPid(@RequestParam Integer userId,@RequestParam Integer platformType);
+
+    @PostMapping(value = "/search",consumes = "application/json")
+    public Msg addSearch(@RequestParam Integer userId,@RequestBody AddSearchForm addSearchForm);
 }

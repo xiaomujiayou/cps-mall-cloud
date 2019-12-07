@@ -48,9 +48,9 @@ public class SearchController {
         return R.sucess();
     }
 
-    @GetMapping("/suggest")
-    public Msg<String[]> getSuggest(@LoginUser(necessary = false) Integer userId, Integer pageNum, Integer pageSize){
-        String suggestStr = mallFeignClient.getOneConfig(userId, ConfigEnmu.PRODUCT_SEARCH_SUGGEST.getName(),ConfigTypeConstant.SYS_CONFIG).getData().getVal();
+    @GetMapping("/recommend")
+    public Msg<String[]> getRecommend(@LoginUser(necessary = false) Integer userId, Integer pageNum, Integer pageSize){
+        String suggestStr = mallFeignClient.getOneConfig(userId, ConfigEnmu.PRODUCT_SEARCH_RECOMMEND.getName(),ConfigTypeConstant.SYS_CONFIG).getData().getVal();
         return R.sucess(suggestStr.split(","));
     }
 }

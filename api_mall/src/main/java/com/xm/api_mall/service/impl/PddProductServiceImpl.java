@@ -13,6 +13,7 @@ import com.xm.comment_serialize.module.mall.constant.PlatformTypeConstant;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
 import com.xm.comment_serialize.module.mall.form.ProductListForm;
 import com.xm.comment_serialize.module.user.entity.SuPidEntity;
+import com.xm.comment_serialize.module.user.form.AddSearchForm;
 import com.xm.comment_utils.mybatis.PageBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -67,6 +68,14 @@ public class PddProductServiceImpl implements ProductService {
     public PageBean<SmProductEntity> keywordList(Integer userId, ProductListForm productListForm) throws Exception {
         if(productListForm.getKeywords() == null || productListForm.getKeywords().trim().equals(""))
             throw new GlobleException(MsgEnum.PARAM_VALID_ERROR,"keywords 不能为空");
+        //添加搜索历史
+        if(productListForm.getPageNum() == 1 && userId != null){
+            //只在搜索第一页添加
+            AddSearchForm addSearchForm = new AddSearchForm();
+            addSearchForm.setKeyWords(productListForm.getKeywords());
+            userFeignClient.addSearch(userId,addSearchForm);
+        }
+
         ProductCriteriaBo productCriteriaBo = new ProductCriteriaBo();
         productCriteriaBo.setUserId(userId);
         productCriteriaBo.setPageNum(productListForm.getPageNum());

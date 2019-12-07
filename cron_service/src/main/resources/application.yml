@@ -2,4 +2,4 @@ spring:
   application:
     name: cron-service
   profiles:
-    active: assembly,plugin,dev
+    active: assembly-dev,plugin,dev

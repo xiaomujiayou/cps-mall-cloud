@@ -2,4 +2,4 @@ spring:
   application:
     name: api-mall
   profiles:
-    active: assembly,plugin,dev
+    active: assembly-dev,plugin,dev

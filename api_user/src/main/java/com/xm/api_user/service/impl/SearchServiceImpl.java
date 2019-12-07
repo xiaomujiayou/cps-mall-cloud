@@ -8,6 +8,7 @@ import com.xm.comment_serialize.module.user.entity.SuSearchEntity;
 import com.xm.comment_utils.mybatis.PageBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 import tk.mybatis.orderbyhelper.OrderByHelper;
 
@@ -33,13 +34,25 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void add(Integer userId, String keyword) {
-        SuSearchEntity entity = new SuSearchEntity();
-        entity.setUserId(userId);
-        entity.setKeyword(keyword);
-        entity.setDel(1);
-        entity.setCreateTime(new Date());
-        suSearchMapper.insertSelective(entity);
+        SuSearchEntity criteria = new SuSearchEntity();
+        criteria.setUserId(userId);
+        criteria.setKeyword(keyword);
+        PageHelper.startPage(1,1,false);
+        SuSearchEntity suSearchEntity = suSearchMapper.selectOne(criteria);
+        if(suSearchEntity != null){
+            suSearchEntity.setDel(1);
+            suSearchEntity.setCreateTime(new Date());
+            suSearchMapper.updateByPrimaryKeySelective(suSearchEntity);
+        }else {
+            SuSearchEntity entity = new SuSearchEntity();
+            entity.setUserId(userId);
+            entity.setKeyword(keyword);
+            entity.setDel(1);
+            entity.setCreateTime(new Date());
+            suSearchMapper.insertSelective(entity);
+        }
     }
 
     @Override
@@ -48,6 +61,6 @@ public class SearchServiceImpl implements SearchService {
         entity.setDel(0);
         Example example = new Example(SuSearchEntity.class);
         example.createCriteria().andEqualTo("userId",userId);
-        suSearchMapper.updateByExample(entity,example);
+        suSearchMapper.updateByExampleSelective(entity,example);
     }
 }

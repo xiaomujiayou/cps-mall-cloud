@@ -37,8 +37,6 @@ public class LoginController {
 
     @Autowired
     private UserFeignClient userFeignClient;
-    @Autowired
-    private MallFeignClient mallFeignClient;
 
     @PostMapping("/login")
     public Object login(@Valid @RequestBody WechatLoginForm wechatLoginForm, BindingResult bindingResult){

@@ -2,7 +2,7 @@ spring:
   application:
     name: gateway-server
   profiles:
-    active: assembly,plugin,dev
+    active: assembly-dev,plugin,dev
 
 zuul:
   sensitive-headers:
