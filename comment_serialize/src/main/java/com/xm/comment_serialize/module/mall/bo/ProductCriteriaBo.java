@@ -12,6 +12,9 @@ public class ProductCriteriaBo {
 
     private Integer optionId;
     private String keyword;
+    private Integer orderBy;
+    private Integer minPrice;
+    private Integer maxPrice;
     private List<Long> goodsIdList;
 
 }

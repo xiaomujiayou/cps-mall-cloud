@@ -1,0 +1,53 @@
+package com.xm.api_user.service.impl;
+
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.xm.api_user.mapper.SuSearchMapper;
+import com.xm.api_user.service.SearchService;
+import com.xm.comment_serialize.module.user.entity.SuSearchEntity;
+import com.xm.comment_utils.mybatis.PageBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import tk.mybatis.mapper.entity.Example;
+import tk.mybatis.orderbyhelper.OrderByHelper;
+
+import java.util.Date;
+import java.util.List;
+
+@Service("searchService")
+public class SearchServiceImpl implements SearchService {
+
+    @Autowired
+    private SuSearchMapper suSearchMapper;
+
+
+    @Override
+    public PageBean<SuSearchEntity> get(Integer userId, Integer pageNum, Integer pageSize) {
+        PageHelper.startPage(pageNum,pageSize);
+        OrderByHelper.orderBy("create_time desc");
+        SuSearchEntity entity = new SuSearchEntity();
+        entity.setUserId(userId);
+        entity.setDel(1);
+        Page page = (Page)suSearchMapper.select(entity);
+        return new PageBean<>(page);
+    }
+
+    @Override
+    public void add(Integer userId, String keyword) {
+        SuSearchEntity entity = new SuSearchEntity();
+        entity.setUserId(userId);
+        entity.setKeyword(keyword);
+        entity.setDel(1);
+        entity.setCreateTime(new Date());
+        suSearchMapper.insertSelective(entity);
+    }
+
+    @Override
+    public void deleteAll(Integer userId) {
+        SuSearchEntity entity = new SuSearchEntity();
+        entity.setDel(0);
+        Example example = new Example(SuSearchEntity.class);
+        example.createCriteria().andEqualTo("userId",userId);
+        suSearchMapper.updateByExample(entity,example);
+    }
+}

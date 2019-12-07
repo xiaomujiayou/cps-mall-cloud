@@ -1,5 +1,6 @@
 package com.xm.api_mall.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.pdd.pop.sdk.http.PopHttpClient;
 import com.pdd.pop.sdk.http.api.request.*;
 import com.pdd.pop.sdk.http.api.response.*;
@@ -23,10 +24,7 @@ import org.springframework.stereotype.Service;
 import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -55,6 +53,20 @@ public class PddProductApiServiceImpl implements ProductApiService {
         request.setOptId(criteria.getOptionId() != null?criteria.getOptionId().longValue():null);
         request.setKeyword(criteria.getKeyword());
         request.setGoodsIdList(criteria.getGoodsIdList());
+        request.setSortType(criteria.getOrderBy());
+        //筛选器
+        List<Map<String,Object>> rangeList = new ArrayList<>();
+        //价格区间
+        if(criteria.getMaxPrice() != null && criteria.getMinPrice() != null){
+            Map<String,Object> range = new HashMap<>();
+            range.put("range_id",0);
+            range.put("range_from",criteria.getMinPrice());
+            range.put("range_to",criteria.getMaxPrice());
+            rangeList.add(range);
+        }
+        if(!rangeList.isEmpty()){
+            request.setRangeList(JSON.toJSONString(rangeList));
+        }
         PddDdkGoodsSearchResponse response = popHttpClient.syncInvoke(request);
         List<PddDdkGoodsSearchResponse.GoodsSearchResponseGoodsListItem> goodsList = response.getGoodsSearchResponse().getGoodsList();
         List<SmProductEntity> smProductEntityList = goodsList.stream().map(o ->{return convertListDetail(o);}).collect(Collectors.toList());

@@ -65,13 +65,19 @@ public class PddProductServiceImpl implements ProductService {
 
     @Override
     public PageBean<SmProductEntity> keywordList(Integer userId, ProductListForm productListForm) throws Exception {
-        if(productListForm.getKeyword() == null || productListForm.getKeyword().trim().equals(""))
+        if(productListForm.getKeywords() == null || productListForm.getKeywords().trim().equals(""))
             throw new GlobleException(MsgEnum.PARAM_VALID_ERROR,"keywords 不能为空");
         ProductCriteriaBo productCriteriaBo = new ProductCriteriaBo();
         productCriteriaBo.setUserId(userId);
         productCriteriaBo.setPageNum(productListForm.getPageNum());
         productCriteriaBo.setPageSize(productListForm.getPageSize());
-        productCriteriaBo.setKeyword(productListForm.getKeyword());
+        productCriteriaBo.setOrderBy(productListForm.getSort());
+        if(productListForm.getMinPrice() != null && productListForm.getMaxPrice() != null){
+            productCriteriaBo.setMinPrice(productListForm.getMinPrice());
+            productCriteriaBo.setMaxPrice(productListForm.getMaxPrice());
+        }
+        productCriteriaBo.setKeyword(productListForm.getKeywords());
+
         return productApiService.getProductByCriteria(productCriteriaBo);
     }
 
