@@ -16,6 +16,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -51,6 +52,18 @@ public class ProductController {
                 .platformType(productDetailForm.getPlatformType())
                 .getService()
                 .detail(productDetailForm.getGoodsId()));
+    }
+
+    /**
+     * 批量获取商品详情
+     * @return
+     */
+    @GetMapping("/details")
+    public Msg<List<SmProductEntity>> getProductDetails(Integer platformType,@RequestParam("goodsIds") List<String> goodsIds) throws Exception {
+        return R.sucess(productContext
+                .platformType(platformType)
+                .getService()
+                .details(goodsIds));
     }
 
     @GetMapping("/sale")

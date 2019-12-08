@@ -43,4 +43,9 @@ public class MallFeignClientFallBack implements MallFeignClient {
         return R.error(MsgEnum.SERVICE_AVAILABLE);
     }
 
+    @Override
+    public Msg<List<SmProductEntity>> getProductDetails(Integer platformType, List<String> goodsIds) {
+        return R.error(MsgEnum.SERVICE_AVAILABLE);
+    }
+
 }

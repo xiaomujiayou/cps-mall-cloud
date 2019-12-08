@@ -24,13 +24,13 @@ public class Test {
 
 //        DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 //        System.out.println(format.format(new Date(1574769744000l - 10000000)));
-        PddDdkOrderListIncrementGetRequest request = new PddDdkOrderListIncrementGetRequest();
-        request.setPage(1);
-        request.setPageSize(10);
-        request.setReturnCount(true);
-        request.setStartUpdateTime(1574755252L);
-        request.setEndUpdateTime(1574819221L);
-        System.out.println(JSON.toJSONString(client.syncInvoke(request),SerializerFeature.PrettyFormat));
+//        PddDdkOrderListIncrementGetRequest request = new PddDdkOrderListIncrementGetRequest();
+//        request.setPage(1);
+//        request.setPageSize(10);
+//        request.setReturnCount(true);
+//        request.setStartUpdateTime(1574755252L);
+//        request.setEndUpdateTime(1574819221L);
+//        System.out.println(JSON.toJSONString(client.syncInvoke(request),SerializerFeature.PrettyFormat));
 
 //        PddDdkGoodsDetailRequest request = new PddDdkGoodsDetailRequest();
 //        request.setGoodsIdList(Arrays.asList(39747417643l));
@@ -40,9 +40,9 @@ public class Test {
 //        request.setGoodsIdList(Arrays.asList(18286407756l,397475984543l));
 //        System.out.println(JSON.toJSONString(client.syncInvoke(request), SerializerFeature.PrettyFormat));
 
-//        PddDdkGoodsSearchRequest request = new PddDdkGoodsSearchRequest();
-//        request.setGoodsIdList(Arrays.asList(18286407756l,39747417643l));
-//        System.out.println(JSON.toJSONString(client.syncInvoke(request), SerializerFeature.PrettyFormat));
+        PddDdkGoodsSearchRequest request = new PddDdkGoodsSearchRequest();
+        request.setGoodsIdList(Arrays.asList(68385598599l,45793598207l));
+        System.out.println(JSON.toJSONString(client.syncInvoke(request), SerializerFeature.PrettyFormat));
 
 //        PddDdkTopGoodsListQueryRequest request = new PddDdkTopGoodsListQueryRequest();
 //        request.setGoodsIdList(Arrays.asList(64820789754l,39747417643l,3974417643l));

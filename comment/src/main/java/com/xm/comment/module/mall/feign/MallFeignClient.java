@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
 import java.util.Date;
+import java.util.List;
 
 @FeignClient(value = "api-mall",fallback = MallFeignClientFallBack.class)
 public interface MallFeignClient {
@@ -35,4 +36,7 @@ public interface MallFeignClient {
 
     @GetMapping("/order/time")
     public Msg<Date> getTime();
+
+    @GetMapping("/product/details")
+    public Msg<List<SmProductEntity>> getProductDetails(@RequestParam Integer platformType,@RequestParam List<String> goodsIds);
 }

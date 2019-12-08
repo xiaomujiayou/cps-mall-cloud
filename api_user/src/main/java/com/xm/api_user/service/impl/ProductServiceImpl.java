@@ -16,7 +16,7 @@ import tk.mybatis.mapper.entity.Example;
 import tk.mybatis.orderbyhelper.OrderByHelper;
 
 import java.sql.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service("productService")
@@ -36,11 +36,18 @@ public class ProductServiceImpl implements ProductService {
         PageHelper.startPage(pageNum,pageSize);
         OrderByHelper.orderBy("create_time desc");
         List<SuProductEntity> suProductEntities = suProductMapper.select(suProductEntity);
-        List<SmProductEntity> smProductEntities = suProductEntities.stream().map(o ->{
-            SmProductEntity smProductEntity = mallFeignClient.getProductDetail(o.getPlatformType(),o.getGoodsId(),null,userId).getData();
-            smProductEntity.setId(o.getId());
-            return smProductEntity;
-        }).collect(Collectors.toList());
+        Map<String, java.util.Date> timeMap = suProductEntities.stream().collect(Collectors.toMap(SuProductEntity::getGoodsId,SuProductEntity::getCreateTime));
+        Map<String, Integer> idMap = suProductEntities.stream().collect(Collectors.toMap(SuProductEntity::getGoodsId,SuProductEntity::getId));
+        Map<Integer,List<SuProductEntity>> groups = suProductEntities.stream().collect(Collectors.groupingBy(SuProductEntity::getPlatformType));
+        List<SmProductEntity> smProductEntities = groups.entrySet().stream().map(o->{
+            List<String> goodsIds = o.getValue().stream().map(SuProductEntity::getGoodsId).collect(Collectors.toList());
+            return mallFeignClient.getProductDetails(o.getKey(),goodsIds).getData();
+        }).flatMap(o-> o.stream().map(i->{
+            i.setId(idMap.get(i.getGoodsId()));
+            return i;
+        })).collect(Collectors.toList());
+        smProductEntities = smProductEntities.stream().sorted(Comparator.comparing(o->timeMap.get(o.getGoodsId()))).collect(Collectors.toList());
+        Collections.reverse(smProductEntities);
         PageBean pageBean = new PageBean(suProductEntities);
         pageBean.setList(smProductEntities);
         return pageBean;
