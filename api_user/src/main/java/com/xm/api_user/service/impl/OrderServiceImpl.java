@@ -6,13 +6,17 @@ import com.codingapi.txlcn.tc.annotation.LcnTransaction;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
 import com.xm.api_user.mapper.SuOrderMapper;
+import com.xm.api_user.mapper.custom.SuBillMapperEx;
 import com.xm.api_user.service.BillService;
 import com.xm.api_user.service.OrderService;
 import com.xm.comment_serialize.module.user.constant.OrderStateConstant;
+import com.xm.comment_serialize.module.user.dto.OrderBillDto;
 import com.xm.comment_serialize.module.user.entity.SuOrderEntity;
+import com.xm.comment_utils.mybatis.PageBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tk.mybatis.orderbyhelper.OrderByHelper;
 
 import java.util.Date;
 import java.util.List;
@@ -31,6 +35,8 @@ public class OrderServiceImpl implements OrderService {
     private SuOrderMapper suOrderMapper;
     @Autowired
     private BillService billService;
+    @Autowired
+    private SuBillMapperEx suBillMapperEx;
 
     /**
      * 处理订单消息
@@ -104,6 +110,14 @@ public class OrderServiceImpl implements OrderService {
             //达到失败状态，更新状态
             billService.invalidOrderBill(newOrder);
         }
+    }
+
+    @Override
+    public PageBean<OrderBillDto> getOrderBill(Integer userId,Integer type, Integer platformType, Integer state, Integer pageNum, Integer pageSize) {
+        PageHelper.startPage(pageNum,pageSize);
+        OrderByHelper.orderBy("sb.create_time desc");
+        List<OrderBillDto> list = suBillMapperEx.getOrderBill(userId ,type,platformType,state);
+        return new PageBean<>(list);
     }
 
     /**
