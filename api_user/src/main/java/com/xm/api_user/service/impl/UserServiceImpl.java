@@ -2,8 +2,10 @@ package com.xm.api_user.service.impl;
 
 import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
+import com.github.pagehelper.PageHelper;
 import com.xm.api_user.mapper.*;
 import com.xm.api_user.mapper.custom.SuRoleMapperEx;
+import com.xm.api_user.mapper.custom.SuUserMapperEx;
 import com.xm.api_user.service.UserService;
 import com.xm.comment.exception.GlobleException;
 import com.xm.comment.module.mall.feign.MallFeignClient;
@@ -11,17 +13,20 @@ import com.xm.comment.response.MsgEnum;
 import com.xm.comment_serialize.module.mall.constant.ConfigEnmu;
 import com.xm.comment_serialize.module.mall.constant.ConfigTypeConstant;
 import com.xm.comment_serialize.module.user.constant.UserTypeConstant;
+import com.xm.comment_serialize.module.user.dto.ProxyProfitDto;
 import com.xm.comment_serialize.module.user.entity.*;
 import com.xm.comment_serialize.module.user.ex.RolePermissionEx;
 import com.xm.comment_serialize.module.user.ex.UserRoleEx;
 import com.xm.comment_serialize.module.user.form.GetUserInfoForm;
 import com.xm.comment_serialize.module.user.form.UpdateUserInfoForm;
 import com.xm.comment_utils.encry.MD5;
+import com.xm.comment_utils.mybatis.PageBean;
 import me.chanjar.weixin.common.error.WxErrorException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Example;
+import tk.mybatis.orderbyhelper.OrderByHelper;
 
 import java.util.Date;
 import java.util.List;
@@ -32,6 +37,8 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private SuUserMapper suUserMapper;
+    @Autowired
+    private SuUserMapperEx suUserMapperEx;
     @Autowired
     private SuRoleMapperEx suRoleMapperEx;
     @Autowired
@@ -151,5 +158,34 @@ public class UserServiceImpl implements UserService {
             }
         }
         throw new GlobleException(MsgEnum.TYPE_NOTFOUND_ERROR);
+    }
+
+    @Override
+    public PageBean<ProxyProfitDto> getProxyProfit(Integer userId, Integer state, Integer orderColumn, Integer orderBy, Integer pageNum, Integer pageSize) {
+        if(orderBy != null && orderColumn != null && orderBy != 0){
+            String order = orderBy == 1?"asc":"desc";
+            switch (orderColumn){
+                case 1:{
+                    OrderByHelper.orderBy("nickname " + order);
+                    break;
+                }
+                case 2:{
+                    OrderByHelper.orderBy("proxy_profit " + order);
+                    break;
+                }
+                case 3:{
+                    OrderByHelper.orderBy("proxy_num " + order);
+                    break;
+                }
+                case 4:{
+                    OrderByHelper.orderBy("create_time " + order);
+                    break;
+                }
+            }
+
+        }
+         PageHelper.startPage(pageNum,pageSize);
+        List<ProxyProfitDto> proxyProfitDtos = suUserMapperEx.getProxyProfit(userId,state);
+        return new PageBean<>(proxyProfitDtos);
     }
 }

@@ -18,22 +18,27 @@ public class SuBillEntity implements Serializable{
 	private Integer userId;
 
 	/**
+	 * 账单来源用户，因为哪个用户而产生的订单(订单类型为2/3时)
+	 */
+	private Integer fromUserId;
+
+	/**
 	 * 账单金额(分)
 	 */
 	private Integer money;
 
 	/**
-	 * 账单类型(1:订单)
+	 * 账单类型(1:普通自购,2:代理收益,3:分享自购,4:分享收益)
 	 */
 	private Integer type;
 
 	/**
-	 * 订单id(账单类型为[1:订单])
+	 * 订单id(账单类型为[1,2,3,4])
 	 */
 	private Integer orderId;
 
 	/**
-	 * 佣金比例(千分比 账单类型为[1:订单])
+	 * 佣金比例(千分比 账单类型为[1,2,3,4])
 	 */
 	private Integer promotionRate;
 

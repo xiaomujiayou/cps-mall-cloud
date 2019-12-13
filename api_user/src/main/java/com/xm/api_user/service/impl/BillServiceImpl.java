@@ -49,7 +49,7 @@ public class BillServiceImpl implements BillService {
         if(userRelatedBills != null && userRelatedBills.size() > 0)
             return;
         JSONObject params = JSON.parseObject(order.getCustomParameters());
-        Integer shareUserId = params.getInteger("fromUser");
+        Integer shareUserId = params.getInteger("shareUserId");
         if(shareUserId == null){
             //生成正常下单账单
             createNormalOrderBill(order);
@@ -61,6 +61,7 @@ public class BillServiceImpl implements BillService {
 
     /**
      * 创建正常购买流程账单
+     * 获取系统自购费率 -> 计算购买用户收益账单 -> 获取系统代理费率 -> 计算上级代理收益账单
      * @param order
      */
     private void createNormalOrderBill(SuOrderEntity order){
@@ -70,7 +71,7 @@ public class BillServiceImpl implements BillService {
                 order.getUserId(),
                 ConfigEnmu.PRODUCT_BUY_RATE.getName(),
                 ConfigTypeConstant.SYS_CONFIG).getData().getVal());
-        SuBillEntity buyUserBill = createOrderBill(order.getUserId(),order,buyUserRate);
+        SuBillEntity buyUserBill = createOrderBill(order.getUserId(),order,1,buyUserRate,null);
         suBillMapper.insertSelective(buyUserBill);
         //生成代理账单
         //获取代理层级
@@ -90,13 +91,14 @@ public class BillServiceImpl implements BillService {
         for (int i = 0; i < proxyLevel; i++) {
             if(proxyUsers == null || proxyUsers.size() <= 0 || proxyUsers.get(i) == null)
                 break;
-            SuBillEntity proxyBill = createOrderBill(proxyUsers.get(i).getId(),order,proxyRate.get(i));
+            SuBillEntity proxyBill = createOrderBill(proxyUsers.get(i).getId(),order,2,proxyRate.get(i),i==0?order.getUserId():proxyUsers.get(i-1).getId());
             suBillMapper.insertSelective(proxyBill);
         }
     }
 
     /**
      * 创建分享订单所属账单
+     * 获取系统购买者分享订单费率 -> 计算购买者收益账单 -> 获取系统分享者订单费率 -> 计算分享者收益账单
      * @param shareUserId
      * @param order
      */
@@ -107,14 +109,14 @@ public class BillServiceImpl implements BillService {
                 shareUserId,
                 ConfigEnmu.PRODUCT_SHARE_USER_RATE.getName(),
                 ConfigTypeConstant.SYS_CONFIG).getData().getVal());
-        SuBillEntity shareUserBill = createOrderBill(shareUserId,order,shareUserRate);
+        SuBillEntity shareUserBill = createOrderBill(shareUserId,order,4,shareUserRate,order.getUserId());
         suBillMapper.insertSelective(shareUserBill);
         //生成购买者订单
         Integer buyUserRate = Integer.valueOf(mallFeignClient.getOneConfig(
                 order.getUserId(),
                 ConfigEnmu.PRODUCT_SHARE_BUY_RATE.getName(),
                 ConfigTypeConstant.SYS_CONFIG).getData().getVal());
-        SuBillEntity buyUserBill = createOrderBill(order.getUserId(),order,buyUserRate);
+        SuBillEntity buyUserBill = createOrderBill(order.getUserId(),order,3,buyUserRate,null);
         suBillMapper.insertSelective(buyUserBill);
     }
 
@@ -144,11 +146,12 @@ public class BillServiceImpl implements BillService {
      * @param rate
      * @return
      */
-    private SuBillEntity createOrderBill(Integer userId,SuOrderEntity order,Integer rate){
+    private SuBillEntity createOrderBill(Integer userId,SuOrderEntity order,Integer billType,Integer rate,Integer formUserId){
         SuBillEntity bill = new SuBillEntity();
         bill.setUserId(order.getUserId());
+        bill.setFromUserId(formUserId);
         bill.setMoney(PromotionUtils.calcByRate(order.getPromotionAmount(),rate));
-        bill.setType(order.getType());
+        bill.setType(billType);
         bill.setOrderId(order.getId());
         bill.setPromotionRate(rate);
         bill.setState(BillTypeConstant.ORDER);

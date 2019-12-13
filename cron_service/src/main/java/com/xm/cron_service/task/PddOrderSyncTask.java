@@ -62,7 +62,7 @@ public class PddOrderSyncTask {
             lastHistory = defaultEntity();
             lastHistory.setStartUpdateTime(lastEndTime);
             lastHistory.setEndUpdateTime(now);
-            if(lastEndTime.getTime() - now.getTime() >= 1000 * 60 * 60 * 24){
+            if(now.getTime() - lastEndTime.getTime() >= 1000 * 60 * 60 * 24){
                 //距离上次查询时间超过一天 重新开始
                 lastHistory = defaultEntity();
                 log.error("拼多多订单服务 - 同步失败：距离上次查询时间超过一天 无效区间：[{}] - [{}] 已修正为：[{}] - [{}]",

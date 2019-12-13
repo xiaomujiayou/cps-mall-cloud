@@ -1,10 +1,12 @@
 package com.xm.api_user.service;
 
+import com.xm.comment_serialize.module.user.dto.ProxyProfitDto;
 import com.xm.comment_serialize.module.user.entity.SuUserEntity;
 import com.xm.comment_serialize.module.user.ex.RolePermissionEx;
 import com.xm.comment_serialize.module.user.ex.UserRoleEx;
 import com.xm.comment_serialize.module.user.form.GetUserInfoForm;
 import com.xm.comment_serialize.module.user.form.UpdateUserInfoForm;
+import com.xm.comment_utils.mybatis.PageBean;
 import me.chanjar.weixin.common.error.WxErrorException;
 
 import java.util.List;
@@ -39,4 +41,14 @@ public interface UserService {
      * @return
      */
     SuUserEntity getSuperUser(Integer userId,int userType);
+
+    /**
+     * 获取用户代理收益信息
+     * @param userId
+     * @param state
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    PageBean<ProxyProfitDto> getProxyProfit(Integer userId, Integer state, Integer orderColumn, Integer orderBy, Integer pageNum, Integer pageSize);
 }

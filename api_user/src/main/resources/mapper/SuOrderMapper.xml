@@ -18,6 +18,9 @@
     <result column="promotion_rate" property="promotionRate" jdbcType="INTEGER" />
     <result column="promotion_amount" property="promotionAmount" jdbcType="INTEGER" />
     <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="form_type" property="formType" jdbcType="INTEGER" />
+    <result column="share_user_id" property="shareUserId" jdbcType="INTEGER" />
+    <result column="from_app" property="fromApp" jdbcType="INTEGER" />
     <result column="custom_parameters" property="customParameters" jdbcType="VARCHAR" />
     <result column="order_modify_at" property="orderModifyAt" jdbcType="TIMESTAMP" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />

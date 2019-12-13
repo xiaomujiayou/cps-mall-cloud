@@ -4,6 +4,7 @@
   <resultMap id="BaseResultMap" type="com.xm.comment_serialize.module.user.entity.SuBillEntity" >
     <result column="id" property="id" jdbcType="INTEGER" />
     <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="from_user_id" property="fromUserId" jdbcType="INTEGER" />
     <result column="money" property="money" jdbcType="INTEGER" />
     <result column="type" property="type" jdbcType="INTEGER" />
     <result column="order_id" property="orderId" jdbcType="INTEGER" />

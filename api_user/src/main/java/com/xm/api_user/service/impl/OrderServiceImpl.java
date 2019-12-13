@@ -45,7 +45,7 @@ public class OrderServiceImpl implements OrderService {
      * @param order
      */
     @LcnTransaction
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void receiveOrderMsg(SuOrderEntity order) {
         //判断是否为新收录订单（系统未曾收录的）
@@ -79,13 +79,22 @@ public class OrderServiceImpl implements OrderService {
      * @param order
      */
     @LcnTransaction
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void onOrderCreate(SuOrderEntity order) {
         //保存订单
         JSONObject params = JSON.parseObject(order.getCustomParameters());
         Integer userId = params.getInteger("userId");
+        Integer shareUserId = params.getInteger("shareUserId");
+        Integer fromApp = params.getInteger("fromApp");
         order.setUserId(userId);
+        order.setShareUserId(shareUserId);
+        if(order.getShareUserId() != null && !order.getShareUserId().equals("")){
+            order.setFormType(2);
+        }else {
+            order.setFormType(1);
+        }
+        order.setFromApp(fromApp);
         order.setCreateTime(new Date());
         suOrderMapper.insertUseGeneratedKeys(order);
         //创建订单收益账单
@@ -99,7 +108,7 @@ public class OrderServiceImpl implements OrderService {
      * @param oldOrder
      */
     @LcnTransaction
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void updateOrderState(SuOrderEntity newOrder,SuOrderEntity oldOrder) {
         if(checkState(newOrder,oldOrder, OrderStateConstant.CHECK_SUCESS, OrderStateConstant.ALREADY_SETTLED)){

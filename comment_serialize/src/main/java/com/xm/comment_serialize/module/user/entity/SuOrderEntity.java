@@ -88,7 +88,22 @@ public class SuOrderEntity implements Serializable{
 	private Integer type;
 
 	/**
-	 * 自定义参数(userId:购买用户,fromUser:分享的用户,appType:app来源)
+	 * 来源类型(1:自购,2:其他用户分享)
+	 */
+	private Integer formType;
+
+	/**
+	 * 分享订单分享的用户id
+	 */
+	private Integer shareUserId;
+
+	/**
+	 * 订单来源(1:微信小程序)
+	 */
+	private Integer fromApp;
+
+	/**
+	 * 自定义参数(userId:购买用户,shareUserId:分享的用户,fromApp:app来源)
 	 */
 	private String customParameters;
 
