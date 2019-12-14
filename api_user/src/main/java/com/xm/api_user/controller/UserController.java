@@ -1,5 +1,9 @@
 package com.xm.api_user.controller;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.NumberUtil;
+import com.sun.org.apache.xml.internal.utils.Hashtree2Node;
+import com.xm.api_user.mapper.SuUserMapper;
 import com.xm.api_user.service.UserService;
 import com.xm.comment.annotation.LoginUser;
 import com.xm.comment.response.Msg;
@@ -8,6 +12,8 @@ import com.xm.comment.response.R;
 import com.xm.comment_serialize.module.user.entity.SuUserEntity;
 import com.xm.comment_serialize.module.user.ex.RolePermissionEx;
 import com.xm.comment_serialize.module.user.form.UpdateUserInfoForm;
+import com.xm.comment_serialize.module.user.vo.UserInfoVo;
+import com.xm.comment_serialize.module.user.vo.UserProfitVo;
 import me.chanjar.weixin.common.error.WxErrorException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,25 +34,21 @@ public class UserController{
 
     @Autowired
     private UserService userService;
-
-    @GetMapping("/test")
-    public Object test(){
-
-        Map<String,Object> result = new HashMap<>();
-        result.put("test",1);
-        return R.sucess(result);
-    }
+    @Autowired
+    private SuUserMapper suUserMapper;
 
     /**
      * 获取用户信息
      * @return
      */
     @PostMapping("/info")
-    public Msg<SuUserEntity> info(@RequestBody GetUserInfoForm getUserInfoForm) throws WxErrorException {
-        if(StringUtils.isAllBlank(getUserInfoForm.getCode(),getUserInfoForm.getOpenId()) && getUserInfoForm.getUserId() == null)
+    public Msg<UserInfoVo> info(@RequestBody GetUserInfoForm getUserInfoForm) throws WxErrorException {
+        if(StringUtils.isAllBlank(getUserInfoForm.getCode(),getUserInfoForm.getOpenId()))
             return R.error(MsgEnum.PARAM_VALID_ERROR);
         SuUserEntity userEntity = userService.getUserInfo(getUserInfoForm);
-        return userEntity != null ? R.sucess(userEntity):R.error(MsgEnum.DATA_ALREADY_NOT_EXISTS);
+        UserInfoVo userInfoVo = new UserInfoVo();
+        BeanUtil.copyProperties(userEntity,userInfoVo);
+        return userEntity != null ? R.sucess(userInfoVo):R.error(MsgEnum.DATA_ALREADY_NOT_EXISTS);
     }
 
     /**
@@ -54,9 +56,12 @@ public class UserController{
      * @return
      */
     @PostMapping("/update")
-    public Msg<Object> info(@Valid @RequestBody UpdateUserInfoForm updateUserInfoForm, BindingResult bindingResult, @LoginUser Integer userId) {
+    public Msg<UserInfoVo> info(@Valid @RequestBody UpdateUserInfoForm updateUserInfoForm, BindingResult bindingResult, @LoginUser Integer userId) throws WxErrorException {
         userService.updateUserInfo(userId,updateUserInfoForm);
-        return R.sucess();
+        SuUserEntity userEntity = suUserMapper.selectByPrimaryKey(userId);
+        UserInfoVo userInfoVo = new UserInfoVo();
+        BeanUtil.copyProperties(userEntity,userInfoVo);
+        return R.sucess(userInfoVo);
     }
 
     /**
@@ -77,6 +82,24 @@ public class UserController{
     @GetMapping("/superUser")
     public Object superUser(Integer userId, int userType) {
         return R.sucess(userService.getSuperUser(userId,userType));
+    }
+
+    /**
+     * 用户收益概略信息
+     * @param userId
+     * @return
+     */
+    @GetMapping("/profit")
+    public Msg getUserProft(@LoginUser Integer userId) {
+        UserProfitVo userProfitVo = userService.getUserProft(userId);
+        Map<String,String> result = new HashMap<>();
+        result.put("totalCoupon",NumberUtil.roundStr(NumberUtil.div(Double.valueOf(userProfitVo.getTotalCoupon()).doubleValue() ,100d),2));
+        result.put("totalCommission",NumberUtil.roundStr(NumberUtil.div(Double.valueOf(userProfitVo.getTotalCommission()).doubleValue() ,100d),2));
+        result.put("todayProfit",NumberUtil.roundStr(NumberUtil.div(Double.valueOf(userProfitVo.getTodayProfit()).doubleValue() ,100d),2));
+        result.put("totalConsumption",NumberUtil.roundStr(NumberUtil.div(Double.valueOf(userProfitVo.getTotalConsumption()).doubleValue() ,100d),2));
+        result.put("totalShare",NumberUtil.roundStr(NumberUtil.div(Double.valueOf(userProfitVo.getTotalShare()).doubleValue() ,100d),2));
+        result.put("totalProxyUser",NumberUtil.roundStr(NumberUtil.div(Double.valueOf(userProfitVo.getTotalProxyUser()).doubleValue() ,100d),2));
+        return R.sucess(result);
     }
 
 }

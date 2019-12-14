@@ -17,4 +17,5 @@ public interface SuUserMapperEx extends MyMapper<SuUserEntity> {
      */
     List<ProxyProfitDto> getProxyProfit(Integer userId,Integer billState);
 
+    Integer getIndirectUserCount(Integer userId);
 }

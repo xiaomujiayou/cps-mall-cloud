@@ -6,6 +6,8 @@ import com.xm.comment_serialize.module.user.ex.RolePermissionEx;
 import com.xm.comment_serialize.module.user.ex.UserRoleEx;
 import com.xm.comment_serialize.module.user.form.GetUserInfoForm;
 import com.xm.comment_serialize.module.user.form.UpdateUserInfoForm;
+import com.xm.comment_serialize.module.user.vo.ProxyInfoVo;
+import com.xm.comment_serialize.module.user.vo.UserProfitVo;
 import com.xm.comment_utils.mybatis.PageBean;
 import me.chanjar.weixin.common.error.WxErrorException;
 
@@ -51,4 +53,18 @@ public interface UserService {
      * @return
      */
     PageBean<ProxyProfitDto> getProxyProfit(Integer userId, Integer state, Integer orderColumn, Integer orderBy, Integer pageNum, Integer pageSize);
+
+    /**
+     * 获取用户代理信息
+     * @param userId
+     * @return
+     */
+    ProxyInfoVo getProxyInfo(Integer userId);
+
+    /**
+     * 获取用户收益概略信息
+     * @param userId
+     * @return
+     */
+    UserProfitVo getUserProft(Integer userId);
 }

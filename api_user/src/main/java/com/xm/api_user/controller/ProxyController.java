@@ -8,6 +8,7 @@ import com.xm.comment.response.Msg;
 import com.xm.comment.response.R;
 import com.xm.comment_serialize.module.user.dto.ProxyProfitDto;
 import com.xm.comment_serialize.module.user.form.GetProxyProfitForm;
+import com.xm.comment_serialize.module.user.vo.ProxyInfoVo;
 import com.xm.comment_utils.mybatis.PageBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -33,7 +34,7 @@ public class ProxyController {
     public Msg<PageBean<ProxyProfitDto>> get(@LoginUser Integer userId, @Valid GetProxyProfitForm getProxyProfitForm, BindingResult bindingResult){
         PageBean<ProxyProfitDto> pageBean = userService.getProxyProfit(
                 userId,
-                getProxyProfitForm.getState(),
+                getProxyProfitForm.getState() == null? null:getProxyProfitForm.getState() == 0?null:getProxyProfitForm.getState(),
                 getProxyProfitForm.getOrderColumn(),
                 getProxyProfitForm.getOrderBy(),
                 getProxyProfitForm.getPageNum(),
@@ -42,9 +43,14 @@ public class ProxyController {
 //            o.setProxyName(StrUtil.hide(o.getProxyName(),3,4));
             o.setCreateTime(DateUtil.format(DateUtil.parse(o.getCreateTime()),"MM-dd HH:mm"));
         });
-
         return R.sucess(pageBean);
     }
 
-
+    /**
+     *  获取用户代理详情
+     */
+    @GetMapping("/info")
+    public Msg<ProxyInfoVo> getInfo(@LoginUser Integer userId){
+        return R.sucess(userService.getProxyInfo(userId));
+    }
 }

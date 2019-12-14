@@ -2,8 +2,10 @@ package com.xm.api_user.service.impl;
 
 import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
+import cn.hutool.core.date.DateUtil;
 import com.github.pagehelper.PageHelper;
 import com.xm.api_user.mapper.*;
+import com.xm.api_user.mapper.custom.SuOrderMapperEx;
 import com.xm.api_user.mapper.custom.SuRoleMapperEx;
 import com.xm.api_user.mapper.custom.SuUserMapperEx;
 import com.xm.api_user.service.UserService;
@@ -19,6 +21,8 @@ import com.xm.comment_serialize.module.user.ex.RolePermissionEx;
 import com.xm.comment_serialize.module.user.ex.UserRoleEx;
 import com.xm.comment_serialize.module.user.form.GetUserInfoForm;
 import com.xm.comment_serialize.module.user.form.UpdateUserInfoForm;
+import com.xm.comment_serialize.module.user.vo.ProxyInfoVo;
+import com.xm.comment_serialize.module.user.vo.UserProfitVo;
 import com.xm.comment_utils.encry.MD5;
 import com.xm.comment_utils.mybatis.PageBean;
 import me.chanjar.weixin.common.error.WxErrorException;
@@ -28,8 +32,10 @@ import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Example;
 import tk.mybatis.orderbyhelper.OrderByHelper;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service("userService")
@@ -51,6 +57,11 @@ public class UserServiceImpl implements UserService {
     private WxMaService wxMaService;
     @Autowired
     private MallFeignClient mallFeignClient;
+    @Autowired
+    private SuOrderMapper suOrderMapper;
+    @Autowired
+    private SuOrderMapperEx suOrderMapperEx;
+
 
     @Override
     public SuUserEntity getUserInfo(GetUserInfoForm getUserInfoForm) throws WxErrorException {
@@ -66,8 +77,6 @@ public class UserServiceImpl implements UserService {
             SuUserEntity record = new SuUserEntity();
             record.setOpenId(getUserInfoForm.getOpenId());
             return suUserMapper.selectOne(record);
-        }else if(getUserInfoForm.getUserId() != null){
-            return suUserMapper.selectByPrimaryKey(getUserInfoForm.getUserId());
         }else {
             throw new GlobleException(MsgEnum.PARAM_VALID_ERROR);
         }
@@ -184,8 +193,33 @@ public class UserServiceImpl implements UserService {
             }
 
         }
-         PageHelper.startPage(pageNum,pageSize);
+        PageHelper.startPage(pageNum,pageSize);
         List<ProxyProfitDto> proxyProfitDtos = suUserMapperEx.getProxyProfit(userId,state);
         return new PageBean<>(proxyProfitDtos);
+    }
+
+    @Override
+    public ProxyInfoVo getProxyInfo(Integer userId) {
+        ProxyInfoVo proxyInfoVo = new ProxyInfoVo();
+        proxyInfoVo.setTotalIndirectProxy(suUserMapperEx.getIndirectUserCount(userId));
+        SuUserEntity example = new SuUserEntity();
+        example.setParentId(userId);
+        proxyInfoVo.setTotalDirectProxy(suUserMapper.selectCount(example));
+        return proxyInfoVo;
+    }
+
+    @Override
+    public UserProfitVo getUserProft(Integer userId) {
+        UserProfitVo userProfitVo = new UserProfitVo();
+        Map<String, BigDecimal> orderInfo = suOrderMapperEx.getUserOrderAbout(userId);
+        userProfitVo.setTotalCoupon(orderInfo.get("totalCoupon").intValue());
+        userProfitVo.setTotalCommission(suOrderMapperEx.getUserTotalCommission(userId,3,null,null).intValue());
+        userProfitVo.setTodayProfit(suOrderMapperEx.getUserTotalCommission(userId,null, DateUtil.parse(DateUtil.today()),new Date()).intValue());
+        userProfitVo.setTotalConsumption(orderInfo.get("totalConsumption").intValue());
+        userProfitVo.setTotalShare(suOrderMapperEx.getUserShareOrderAbout(userId).intValue());
+
+        ProxyInfoVo proxyInfoVo = getProxyInfo(userId);
+        userProfitVo.setTotalProxyUser(proxyInfoVo.getTotalDirectProxy()+proxyInfoVo.getTotalIndirectProxy());
+        return userProfitVo;
     }
 }

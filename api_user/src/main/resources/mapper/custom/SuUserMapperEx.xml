@@ -12,7 +12,7 @@
   </resultMap>
 
     <select id="getProxyProfit" resultMap="ProxyFitMap">
-        SELECT s2.id,s2.nickname,s2.head_img,s2.create_time,COUNT(s3.id) proxy_num,SUM(b1.money) proxy_profit
+        SELECT s2.id,s2.nickname,s2.head_img,s2.create_time,COUNT(DISTINCT s3.id) proxy_num,SUM(b1.money) proxy_profit
             FROM
                 su_user s1
             LEFT JOIN su_user s2
@@ -34,6 +34,10 @@
             AND s1.id = #{userId}
         </where>
         GROUP BY s2.id
+    </select>
+
+    <select id="getIndirectUserCount" resultType="java.lang.Integer">
+        SELECT COUNT(u2.id) FROM su_user u1 LEFT JOIN su_user u2 ON u2.parent_id = u1.id WHERE u1.parent_id = #{userId}
     </select>
 
 </mapper>

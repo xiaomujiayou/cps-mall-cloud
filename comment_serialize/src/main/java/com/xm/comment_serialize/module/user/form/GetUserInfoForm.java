@@ -6,5 +6,5 @@ import lombok.Data;
 public class GetUserInfoForm {
     private String openId;
     private String code;
-    private Integer userId;
+//    private Integer userId;
 }

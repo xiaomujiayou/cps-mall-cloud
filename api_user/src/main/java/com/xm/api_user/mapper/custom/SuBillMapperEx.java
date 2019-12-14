@@ -11,7 +11,14 @@ import java.util.List;
 
 public interface SuBillMapperEx extends MyMapper<SuBillEntity> {
 
-
+    /**
+     * 获取
+     * @param userId
+     * @param type
+     * @param platformType
+     * @param state
+     * @return
+     */
     List<OrderBillDto> getOrderBill(Integer userId,Integer type,Integer platformType,Integer state);
 
 }
