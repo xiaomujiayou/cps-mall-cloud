@@ -34,7 +34,6 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void add(Integer userId, String keyword) {
         SuSearchEntity criteria = new SuSearchEntity();
         criteria.setUserId(userId);

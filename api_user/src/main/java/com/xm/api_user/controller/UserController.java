@@ -98,7 +98,7 @@ public class UserController{
         result.put("todayProfit",NumberUtil.roundStr(NumberUtil.div(Double.valueOf(userProfitVo.getTodayProfit()).doubleValue() ,100d),2));
         result.put("totalConsumption",NumberUtil.roundStr(NumberUtil.div(Double.valueOf(userProfitVo.getTotalConsumption()).doubleValue() ,100d),2));
         result.put("totalShare",NumberUtil.roundStr(NumberUtil.div(Double.valueOf(userProfitVo.getTotalShare()).doubleValue() ,100d),2));
-        result.put("totalProxyUser",NumberUtil.roundStr(NumberUtil.div(Double.valueOf(userProfitVo.getTotalProxyUser()).doubleValue() ,100d),2));
+        result.put("totalProxyUser",userProfitVo.getTotalProxyUser().toString());
         return R.sucess(result);
     }
 

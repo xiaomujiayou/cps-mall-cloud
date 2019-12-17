@@ -68,13 +68,15 @@ public class ProductController {
 
     @GetMapping("/sale")
     public Msg getProductSaleInfo(@LoginUser Integer userId,@Valid GetProductSaleInfoForm productSaleInfoForm) throws Exception {
+        if(userId.equals(productSaleInfoForm.getShareUserId()))
+            productSaleInfoForm.setShareUserId(null);
         return R.sucess(productContext
                 .platformType(productSaleInfoForm.getPlatformType())
                 .getService()
                 .saleInfo(
                         userId,
                         productSaleInfoForm.getAppType(),
-                        productSaleInfoForm.getFromUser(),
+                        productSaleInfoForm.getShareUserId(),
                         productSaleInfoForm.getGoodsId()));
     }
 
