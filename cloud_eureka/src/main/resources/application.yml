@@ -7,7 +7,7 @@ server:
   port: 8101
 eureka:
   instance:
-    hostname: eureka
+    hostname: eureka-server
   client:
     fetch-registry: false
     register-with-eureka: false
