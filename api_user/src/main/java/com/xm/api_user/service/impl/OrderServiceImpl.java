@@ -9,6 +9,7 @@ import com.xm.api_user.mapper.SuOrderMapper;
 import com.xm.api_user.mapper.custom.SuBillMapperEx;
 import com.xm.api_user.service.BillService;
 import com.xm.api_user.service.OrderService;
+import com.xm.api_user.service.ShareService;
 import com.xm.comment_serialize.module.user.constant.OrderStateConstant;
 import com.xm.comment_serialize.module.user.dto.OrderBillDto;
 import com.xm.comment_serialize.module.user.entity.SuOrderEntity;
@@ -37,6 +38,8 @@ public class OrderServiceImpl implements OrderService {
     private BillService billService;
     @Autowired
     private SuBillMapperEx suBillMapperEx;
+    @Autowired
+    private ShareService shareService;
 
     /**
      * 处理订单消息
@@ -91,6 +94,8 @@ public class OrderServiceImpl implements OrderService {
         order.setShareUserId(shareUserId);
         if(order.getShareUserId() != null && !order.getShareUserId().equals("")){
             order.setFormType(2);
+            //添加分享记录
+            shareService.buy(order);
         }else {
             order.setFormType(1);
         }

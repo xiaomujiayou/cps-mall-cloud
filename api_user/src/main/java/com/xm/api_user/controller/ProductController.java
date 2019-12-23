@@ -1,6 +1,7 @@
 package com.xm.api_user.controller;
 
 import com.xm.api_user.service.ProductService;
+import com.xm.api_user.service.ShareService;
 import com.xm.comment.annotation.LoginUser;
 import com.xm.comment.response.Msg;
 import com.xm.comment.response.R;
@@ -24,6 +25,8 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
+    @Autowired
+    private ShareService shareService;
 
     /**
      * 商品是否被收藏
@@ -96,6 +99,11 @@ public class ProductController {
     public Msg get(@LoginUser Integer userId,@RequestBody @Valid AddUserHistoryForm addUserHistoryForm,BindingResult bindingResult){
         if(userId != null) {
             productService.addHistory(userId,addUserHistoryForm.getPlatformType(),addUserHistoryForm.getGoodsId());
+        }
+        //添加分享记录
+//        if(addUserHistoryForm.getShareUserId() != null && !addUserHistoryForm.getShareUserId().equals("") && !addUserHistoryForm.getShareUserId().equals(userId)){
+        if(addUserHistoryForm.getShareUserId() != null && !addUserHistoryForm.getShareUserId().equals("")){
+            shareService.show(addUserHistoryForm.getShareUserId(),addUserHistoryForm.getGoodsId(),addUserHistoryForm.getPlatformType());
         }
         return R.sucess();
     }

@@ -92,7 +92,6 @@ public class UserServiceImpl implements UserService {
         user.setOpenId(openId);
         user.setNickname("Su_"+ MD5.md5(openId,"").substring(0,5));
         user.setSex(0);
-        user.setHeadImg("https://mall-share.oss-cn-shanghai.aliyuncs.com/comment/img/headImg.png?x-oss-process=image/resize,m_fixed,h_132,w_132");
         user.setCreateTime(new Date());
         user.setLastLogin(new Date());
         suUserMapper.insertUseGeneratedKeys(user);

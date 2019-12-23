@@ -1,6 +1,8 @@
 package com.xm.api_user.service;
 
 import com.xm.comment_serialize.module.user.entity.SuOrderEntity;
+import com.xm.comment_serialize.module.user.vo.BillVo;
+import com.xm.comment_utils.mybatis.PageBean;
 
 public interface BillService {
 
@@ -23,6 +25,6 @@ public interface BillService {
      */
     public void invalidOrderBill(SuOrderEntity order);
 
-
+    public PageBean<BillVo> getList(Integer userId, Integer state, Integer type, Integer pageNum, Integer pageSize);
 
 }

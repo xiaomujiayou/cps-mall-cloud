@@ -15,7 +15,7 @@
         SELECT s2.id,s2.nickname,s2.head_img,s2.create_time,COUNT(DISTINCT s3.id) proxy_num,SUM(b1.money) proxy_profit
             FROM
                 su_user s1
-            LEFT JOIN su_user s2
+            RIGHT JOIN su_user s2
                 ON s2.parent_id = s1.id
             LEFT JOIN su_user s3
                 ON s2.id = s3.parent_id

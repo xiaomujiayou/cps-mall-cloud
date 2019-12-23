@@ -10,6 +10,7 @@
     <result column="order_id" property="orderId" jdbcType="INTEGER" />
     <result column="promotion_rate" property="promotionRate" jdbcType="INTEGER" />
     <result column="state" property="state" jdbcType="INTEGER" />
+    <result column="income" property="income" jdbcType="INTEGER" />
     <result column="fail_reason" property="failReason" jdbcType="VARCHAR" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />

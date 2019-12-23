@@ -1,6 +1,7 @@
 package com.xm.api_user.controller;
 
 import com.xm.api_user.mapper.SuPidMapper;
+import com.xm.api_user.service.PidService;
 import com.xm.api_user.service.UserService;
 import com.xm.comment.annotation.LoginUser;
 import com.xm.comment.module.mall.feign.MallFeignClient;
@@ -32,26 +33,10 @@ import java.util.Map;
 public class PidController {
 
     @Autowired
-    private SuPidMapper suPidMapper;
-
-    @Autowired
-    private MallFeignClient mallFeignClient;
+    private PidService pidService;
 
     @GetMapping
     public Msg<SuPidEntity> getPid(Integer userId,Integer platformType){
-        SuPidEntity suPidEntity = new SuPidEntity();
-        suPidEntity.setUserId(userId);
-        suPidEntity.setPlatformType(platformType);
-        suPidEntity = suPidMapper.selectOne(suPidEntity);
-        if(suPidEntity != null && suPidEntity.getId() != null)
-            return R.sucess(suPidEntity);
-        String pid = mallFeignClient.generatePid(userId,platformType).getData();
-        suPidEntity = new SuPidEntity();
-        suPidEntity.setPlatformType(platformType);
-        suPidEntity.setUserId(userId);
-        suPidEntity.setPId(pid);
-        suPidEntity.setCreateTime(new Date(System.currentTimeMillis()));
-        suPidMapper.insertSelective(suPidEntity);
-        return R.sucess(suPidEntity);
+        return R.sucess(pidService.getPid(userId,platformType));
     }
 }
