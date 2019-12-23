@@ -3,6 +3,7 @@ package com.xm.comment.module.mall.feign;
 import com.xm.comment.annotation.LoginUser;
 import com.xm.comment.module.mall.feign.fallback.MallFeignClientFallBack;
 import com.xm.comment.response.Msg;
+import com.xm.comment_serialize.module.mall.bo.ProductIndexBo;
 import com.xm.comment_serialize.module.mall.entity.SmConfigEntity;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
 import com.xm.comment_serialize.module.mall.form.OrderIncrementListForm;
@@ -13,6 +14,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
@@ -39,4 +41,7 @@ public interface MallFeignClient {
 
     @GetMapping("/product/details")
     public Msg<List<SmProductEntity>> getProductDetails(@RequestParam Integer platformType,@RequestParam List<String> goodsIds);
+
+    @PostMapping(value = "/product/details" ,consumes = "application/json")
+    public Msg<List<SmProductEntity>> getProductDetails(@RequestBody List<ProductIndexBo> productIndexBos);
 }

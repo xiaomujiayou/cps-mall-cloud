@@ -48,6 +48,11 @@ public class SuBillEntity implements Serializable{
 	private Integer state;
 
 	/**
+	 * 收支类型(1:收入账单,2:支出)
+	 */
+	private Integer income;
+
+	/**
 	 * 账单失效原因
 	 */
 	private String failReason;

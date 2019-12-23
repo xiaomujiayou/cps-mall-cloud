@@ -1,5 +1,7 @@
 package com.xm.api_mall.service.impl;
 
+import cn.hutool.core.math.MathUtil;
+import cn.hutool.core.util.NumberUtil;
 import com.alibaba.fastjson.JSON;
 import com.pdd.pop.sdk.http.PopHttpClient;
 import com.pdd.pop.sdk.http.api.request.*;
@@ -202,7 +204,9 @@ public class PddProductApiServiceImpl implements ProductApiService {
         smProductEntity.setName(goodsListItem.getGoodsName());
         smProductEntity.setOriginalPrice(goodsListItem.getMinGroupPrice().intValue());
         smProductEntity.setCouponPrice(goodsListItem.getCouponDiscount().intValue());
-        smProductEntity.setCashPrice((int)(goodsListItem.getPromotionRate()*goodsListItem.getMinGroupPrice()/1000));
+
+//        smProductEntity.setCashPrice((int)(goodsListItem.getPromotionRate()*goodsListItem.getMinGroupPrice()/1000));
+        smProductEntity.setCashPrice(NumberUtil.div(NumberUtil.mul(NumberUtil.sub(goodsListItem.getMinGroupPrice() - goodsListItem.getCouponDiscount()),goodsListItem.getPromotionRate()) ,1000).intValue());
         smProductEntity.setMallName(goodsListItem.getMallName());
         smProductEntity.setSalesTip(goodsListItem.getSalesTip());
         smProductEntity.setMallCps(goodsListItem.getMallCps());

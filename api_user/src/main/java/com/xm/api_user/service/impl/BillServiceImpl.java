@@ -29,6 +29,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tk.mybatis.mapper.entity.Example;
 import tk.mybatis.orderbyhelper.OrderByHelper;
 
 import java.util.*;
@@ -208,12 +209,25 @@ public class BillServiceImpl implements BillService {
 
     @Override
     public PageBean<BillVo> getList(Integer userId, Integer state, Integer type, Integer pageNum, Integer pageSize) {
-        SuBillEntity example = new SuBillEntity();
-        example.setState(state);
-        example.setType(type);
         PageHelper.startPage(pageNum,pageSize);
         OrderByHelper.orderBy("create_time desc");
-        List<SuBillEntity> suBillEntities = suBillMapper.select(example);
+        List<SuBillEntity> suBillEntities = null;
+
+        //自购订单包含分享自购
+        if(type != null && type == 1){
+            Example example = new Example(SuBillEntity.class);
+            Example.Criteria criteria =  example.createCriteria().andIn("type",Arrays.asList(1,3));
+            if(state != null)
+                criteria.andEqualTo("state",state);
+            suBillEntities = suBillMapper.selectByExample(example);
+
+        }else {
+            SuBillEntity example = new SuBillEntity();
+            example.setState(state);
+            example.setType(type);
+            suBillEntities = suBillMapper.select(example);
+        }
+
         PageBean suBillPageBean = new PageBean(suBillEntities);
         Map<Integer,List<SuBillEntity>> groupMap = suBillEntities.stream().collect(Collectors.groupingBy(SuBillEntity::getType));
         Map<Integer,String> orderIdMap = new HashMap<>();

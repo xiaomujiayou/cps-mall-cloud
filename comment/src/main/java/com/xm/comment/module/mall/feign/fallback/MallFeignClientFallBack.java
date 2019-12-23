@@ -4,6 +4,7 @@ import com.xm.comment.module.mall.feign.MallFeignClient;
 import com.xm.comment.response.Msg;
 import com.xm.comment.response.MsgEnum;
 import com.xm.comment.response.R;
+import com.xm.comment_serialize.module.mall.bo.ProductIndexBo;
 import com.xm.comment_serialize.module.mall.entity.SmConfigEntity;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
 import com.xm.comment_serialize.module.mall.form.ProductDetailForm;
@@ -45,6 +46,11 @@ public class MallFeignClientFallBack implements MallFeignClient {
 
     @Override
     public Msg<List<SmProductEntity>> getProductDetails(Integer platformType, List<String> goodsIds) {
+        return R.error(MsgEnum.SERVICE_AVAILABLE);
+    }
+
+    @Override
+    public Msg<List<SmProductEntity>> getProductDetails(List<ProductIndexBo> productIndexBos) {
         return R.error(MsgEnum.SERVICE_AVAILABLE);
     }
 

@@ -10,4 +10,5 @@ public class AddUserHistoryForm {
     private Integer platformType;
     @NotNull(message = "goodsId不能为空")
     private String goodsId;
+    private Integer shareUserId;
 }
