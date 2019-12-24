@@ -1,6 +1,5 @@
-package com.xm.api_user.utils;
+package com.xm.comment.utils;
 
-import cn.hutool.core.math.MathUtil;
 import cn.hutool.core.util.NumberUtil;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
 

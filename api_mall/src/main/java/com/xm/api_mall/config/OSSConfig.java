@@ -1,13 +1,12 @@
-package com.xm.comment.config;
+package com.xm.api_mall.config;
 
 import com.aliyun.oss.OSS;
-import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.OSSClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-//@Configuration
+@Configuration
 public class OSSConfig {
 
     @Value("${oss.ali.endpoint}")

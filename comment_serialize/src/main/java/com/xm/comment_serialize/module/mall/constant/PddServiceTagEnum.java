@@ -1,13 +1,14 @@
 package com.xm.comment_serialize.module.mall.constant;
 
 public enum  PddServiceTagEnum {
+    RETURN_FREIGHT(3,"退货包运费",true),
     SEND_INSTALL(4,"送货入户并安装",true),
     SEND(5,"送货入户",true),
     BILL(6,"电子发票",true),
     BAD_FRUIT_COMPENSATION(9,"坏果包赔",true),
     QUICK_REFUND(11,"闪电退款",true),
-    SEND_TIME_24(12,"24小时发货",true),
-    SEND_TIME_48(13,"48小时发货",true),
+    SEND_TIME_24(12,"24小时发货",false),
+    SEND_TIME_48(13,"48小时发货",false),
     SHUN_FENG(17,"顺丰包邮",true),
     CHANGE_NO_REPAIR(18,"只换不修",true),
     GUARANTEE(19,"全国联保",true),

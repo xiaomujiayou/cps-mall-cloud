@@ -1,5 +1,6 @@
 package com.xm.api_mall.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.math.MathUtil;
 import cn.hutool.core.util.NumberUtil;
 import com.alibaba.fastjson.JSON;
@@ -10,6 +11,7 @@ import com.xm.api_mall.service.ConfigService;
 import com.xm.api_mall.service.ProductApiService;
 import com.xm.comment.exception.GlobleException;
 import com.xm.comment.response.MsgEnum;
+import com.xm.comment.utils.GoodsPriceUtil;
 import com.xm.comment_serialize.module.mall.bo.ProductCriteriaBo;
 import com.xm.comment_serialize.module.mall.bo.ShareLinkBo;
 import com.xm.comment_serialize.module.mall.constant.*;
@@ -204,16 +206,16 @@ public class PddProductApiServiceImpl implements ProductApiService {
         smProductEntity.setName(goodsListItem.getGoodsName());
         smProductEntity.setOriginalPrice(goodsListItem.getMinGroupPrice().intValue());
         smProductEntity.setCouponPrice(goodsListItem.getCouponDiscount().intValue());
-
-//        smProductEntity.setCashPrice((int)(goodsListItem.getPromotionRate()*goodsListItem.getMinGroupPrice()/1000));
-        smProductEntity.setCashPrice(NumberUtil.div(NumberUtil.mul(NumberUtil.sub(goodsListItem.getMinGroupPrice() - goodsListItem.getCouponDiscount()),goodsListItem.getPromotionRate()) ,1000).intValue());
         smProductEntity.setMallName(goodsListItem.getMallName());
         smProductEntity.setSalesTip(goodsListItem.getSalesTip());
         smProductEntity.setMallCps(goodsListItem.getMallCps());
         smProductEntity.setPromotionRate(goodsListItem.getPromotionRate().intValue());
         smProductEntity.setHasCoupon(goodsListItem.getHasCoupon()?1:0);
+        smProductEntity.setCashPrice(GoodsPriceUtil.type(PlatformTypeConstant.PDD).calcProfit(smProductEntity).intValue());
         if(goodsListItem.getServiceTags() != null)
-            smProductEntity.setServiceTags(String.join(",",getServiceTags(goodsListItem.getServiceTags().stream().map(o->{return o.intValue();}).collect(Collectors.toList()))));
+            smProductEntity.setServiceTags(String.join(",", getServiceTags(goodsListItem.getServiceTags().stream().map(o -> {
+                return o.intValue();
+            }).collect(Collectors.toList()))));
         if(goodsListItem.getActivityType() != null)
             smProductEntity.setActivityType(getActiviteType(goodsListItem.getActivityType()));
         smProductEntity.setCreateTime(new Date());
@@ -229,14 +231,14 @@ public class PddProductApiServiceImpl implements ProductApiService {
         smProductEntity.setDes(detailsItem.getGoodsDesc());
         smProductEntity.setOriginalPrice(detailsItem.getMinGroupPrice().intValue());
         smProductEntity.setCouponPrice(detailsItem.getCouponDiscount().intValue());
-        smProductEntity.setCashPrice((int)(detailsItem.getPromotionRate()*detailsItem.getMinGroupPrice()/1000));
         smProductEntity.setMallName(detailsItem.getMallName());
         smProductEntity.setSalesTip(detailsItem.getSalesTip());
         smProductEntity.setMallCps(2);
         smProductEntity.setPromotionRate(detailsItem.getPromotionRate().intValue());
         smProductEntity.setHasCoupon(detailsItem.getCouponTotalQuantity() > 0?1:0);
+        smProductEntity.setCashPrice(GoodsPriceUtil.type(PlatformTypeConstant.PDD).calcProfit(smProductEntity).intValue());
         if(detailsItem.getServiceTags() != null)
-            smProductEntity.setServiceTags(String.join(",",getServiceTags(detailsItem.getServiceTags())));
+            smProductEntity.setServiceTags(String.join(",", getServiceTags(detailsItem.getServiceTags())));
         smProductEntity.setCreateTime(new Date());
         return smProductEntity;
     }
@@ -244,7 +246,7 @@ public class PddProductApiServiceImpl implements ProductApiService {
     private List<String> getServiceTags(List<Integer> serviceTags){
         if(serviceTags == null || serviceTags.size() <= 0)
             return null;
-        return serviceTags.stream().map(o->{
+        List<String> tags = serviceTags.stream().map(o->{
             try {
                 PddServiceTagEnum pddServiceTagEnum = EnumUtils.getEnum(PddServiceTagEnum.class,"tagId",o);
                 if (pddServiceTagEnum != null && pddServiceTagEnum.getShow()){
@@ -261,6 +263,8 @@ public class PddProductApiServiceImpl implements ProductApiService {
             }
             return null;
         }).collect(Collectors.toList());
+        CollUtil.removeNull(tags);
+        return tags;
     }
     private String getActiviteType(Integer activiteType) {
         if(activiteType == null)
