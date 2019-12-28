@@ -1,6 +1,7 @@
 package com.xm.api_mall.service;
 
 import com.xm.comment_serialize.module.mall.bo.ShareLinkBo;
+import com.xm.comment_serialize.module.mall.entity.SmBannerEntity;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
 import com.xm.comment_serialize.module.mall.form.ProductDetailForm;
 import com.xm.comment_serialize.module.mall.form.ProductListForm;
@@ -51,6 +52,22 @@ public interface ProductService {
      * @return
      */
     public PageBean<SmProductEntity> likeList(Integer userId,ProductListForm productListForm) throws Exception;
+
+    /**
+     * 主题商品列表
+     * @param userId
+     * @param productListForm
+     * @return
+     * @throws Exception
+     */
+    public PageBean<SmProductEntity> themeList(Integer userId,ProductListForm productListForm) throws Exception;
+
+    /**
+     * 获取主题活动
+     * @return
+     * @throws Exception
+     */
+    public List<SmBannerEntity> themes() throws Exception;
 
     /**
      * 批量获取商品详情

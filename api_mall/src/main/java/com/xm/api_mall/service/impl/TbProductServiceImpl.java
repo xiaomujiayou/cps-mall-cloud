@@ -2,6 +2,7 @@ package com.xm.api_mall.service.impl;
 
 import com.xm.api_mall.service.ProductService;
 import com.xm.comment_serialize.module.mall.bo.ShareLinkBo;
+import com.xm.comment_serialize.module.mall.entity.SmBannerEntity;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
 import com.xm.comment_serialize.module.mall.form.ProductListForm;
 import com.xm.comment_utils.mybatis.PageBean;
@@ -45,6 +46,16 @@ public class TbProductServiceImpl implements ProductService {
 
     @Override
     public PageBean<SmProductEntity> likeList(Integer userId, ProductListForm productListForm) throws Exception {
+        return null;
+    }
+
+    @Override
+    public PageBean<SmProductEntity> themeList(Integer userId, ProductListForm productListForm) throws Exception {
+        return null;
+    }
+
+    @Override
+    public List<SmBannerEntity> themes() throws Exception {
         return null;
     }
 

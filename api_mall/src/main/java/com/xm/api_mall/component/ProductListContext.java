@@ -4,10 +4,14 @@ import com.xm.api_mall.service.ProductService;
 import com.xm.comment.exception.GlobleException;
 import com.xm.comment.response.MsgEnum;
 import com.xm.comment_serialize.module.mall.constant.ProductListTypeConstant;
+import com.xm.comment_serialize.module.mall.constant.ProductListTypeEnum;
 import com.xm.comment_serialize.module.mall.form.ProductListForm;
+import com.xm.comment_utils.enu.EnumUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ProductListContext<T> {
 
@@ -18,41 +22,8 @@ public class ProductListContext<T> {
         this.productService = productService;
     }
 
-    public ProductListContext listType(Integer listType) throws NoSuchMethodException {
-        String methodName = null;
-        switch (listType){
-            case ProductListTypeConstant.BEST_LIST:{
-                methodName = "bestList";
-                break;
-            }
-            case ProductListTypeConstant.OPTION_LIST:{
-                methodName = "optionList";
-                break;
-            }
-            case ProductListTypeConstant.CUSTOM_LIST:{
-                methodName = "customList";
-                break;
-            }
-            case ProductListTypeConstant.LIKE_LIST:{
-                methodName = "likeList";
-                break;
-            }
-            case ProductListTypeConstant.SIMILAR_LIST:{
-                methodName = "similarList";
-                break;
-            }
-            case ProductListTypeConstant.HOT_LIST:{
-                methodName = "hotList";
-                break;
-            }
-            case ProductListTypeConstant.KEYWORD_LIST:{
-                methodName = "keywordList";
-                break;
-            }
-            default:{
-                throw new GlobleException(MsgEnum.TYPE_NOTFOUND_ERROR,"无效类型listType："+listType);
-            }
-        }
+    public ProductListContext listType(Integer listType) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        String methodName = EnumUtils.getEnum(ProductListTypeEnum.class,"key",listType).getName();
         listMethod = ProductService.class.getMethod(methodName, Integer.class, ProductListForm.class);
         return this;
     }

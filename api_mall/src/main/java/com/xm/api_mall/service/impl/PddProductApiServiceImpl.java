@@ -3,7 +3,9 @@ package com.xm.api_mall.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.math.MathUtil;
 import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.PageUtil;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.pdd.pop.sdk.http.PopHttpClient;
 import com.pdd.pop.sdk.http.api.request.*;
 import com.pdd.pop.sdk.http.api.response.*;
@@ -12,6 +14,7 @@ import com.xm.api_mall.service.ProductApiService;
 import com.xm.comment.exception.GlobleException;
 import com.xm.comment.response.MsgEnum;
 import com.xm.comment.utils.GoodsPriceUtil;
+import com.xm.comment_serialize.module.mall.bo.PddThemeBo;
 import com.xm.comment_serialize.module.mall.bo.ProductCriteriaBo;
 import com.xm.comment_serialize.module.mall.bo.ShareLinkBo;
 import com.xm.comment_serialize.module.mall.constant.*;
@@ -20,6 +23,7 @@ import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
 import com.xm.comment_serialize.module.user.entity.SuOrderEntity;
 import com.xm.comment_utils.enu.EnumUtils;
 import com.xm.comment_utils.mybatis.PageBean;
+import com.xm.comment_utils.mybatis.PageUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -177,6 +181,58 @@ public class PddProductApiServiceImpl implements ProductApiService {
         return DateUtils.parseDate(response.getTimeGetResponse().getTime(),"yyyy-MM-dd HH:mm:ss");
     }
 
+    @Override
+    public PageBean<SmProductEntity> getTopGoodsList(Integer type, Integer pageNum, Integer pageSize) throws Exception {
+        PddDdkTopGoodsListQueryRequest request = new PddDdkTopGoodsListQueryRequest();
+        request.setOffset(PageUtil.getStart(pageNum,pageSize));
+        request.setLimit(pageSize);
+        request.setSortType(type);
+        PddDdkTopGoodsListQueryResponse response = popHttpClient.syncInvoke(request);
+        List<SmProductEntity> list = response.getTopGoodsListGetResponse().getList().stream().map( o ->{
+            return convertListDetail(o);
+        }).collect(Collectors.toList());
+        PageBean<SmProductEntity> pageBean = new PageBean<>(list);
+        pageBean.setPageNum(pageNum);
+        pageBean.setPageSize(pageSize);
+        pageBean.setTotal(response.getTopGoodsListGetResponse().getTotal());
+        return pageBean;
+    }
+
+    @Override
+    public List<PddThemeBo> getThemeList() throws Exception {
+        PddDdkThemeListGetRequest request = new PddDdkThemeListGetRequest();
+        PddDdkThemeListGetResponse response = popHttpClient.syncInvoke(request);
+        List<PddThemeBo> list = response.getThemeListGetResponse().getThemeList().stream().map(o -> {
+            PddThemeBo pddThemeBo = new PddThemeBo();
+            pddThemeBo.setId(o.getId().intValue());
+            pddThemeBo.setName(o.getName());
+            pddThemeBo.setImageUrl(o.getImageUrl());
+            pddThemeBo.setGoodsNum(o.getGoodsNum().intValue());
+            return pddThemeBo;
+        }).collect(Collectors.toList());
+        return list;
+    }
+
+    @Override
+    public PageBean<SmProductEntity> getThemeGoodsList(Integer themeId) throws Exception {
+        PddDdkThemeGoodsSearchRequest request = new PddDdkThemeGoodsSearchRequest();
+        request.setThemeId(themeId.longValue());
+        PddDdkThemeGoodsSearchResponse response = popHttpClient.syncInvoke(request);
+
+        List<SmProductEntity> list = response.getThemeListGetResponse().getGoodsList().stream().map(o ->{
+            return convertThemeGoods(o);
+        }).collect(Collectors.toList());
+
+        PageBean<SmProductEntity> pageBean = new PageBean<>(list);
+        pageBean.setTotal(response.getThemeListGetResponse().getTotal());
+        pageBean.setPageNum(1);
+        pageBean.setPageSize(response.getThemeListGetResponse().getTotal().intValue());
+        return pageBean;
+    }
+
+
+
+
     private SuOrderEntity convertOrder(PddDdkOrderListIncrementGetResponse.OrderListGetResponseOrderListItem item){
         SuOrderEntity orderEntity = new SuOrderEntity();
         orderEntity.setOrderSn(item.getOrderSn());
@@ -198,6 +254,41 @@ public class PddProductApiServiceImpl implements ProductApiService {
         return orderEntity;
     }
 
+    private SmProductEntity convertThemeGoods(PddDdkThemeGoodsSearchResponse.ThemeListGetResponseGoodsListItem goodsListItem) {
+        SmProductEntity smProductEntity = new SmProductEntity();
+        smProductEntity.setType(PlatformTypeConstant.PDD);
+        smProductEntity.setGoodsId(goodsListItem.getGoodsId().toString());
+        smProductEntity.setGoodsThumbnailUrl(goodsListItem.getGoodsThumbnailUrl());
+        smProductEntity.setName(goodsListItem.getGoodsName());
+        smProductEntity.setOriginalPrice(goodsListItem.getMinGroupPrice().intValue());
+        smProductEntity.setCouponPrice(goodsListItem.getCouponDiscount().intValue());
+        smProductEntity.setMallName(goodsListItem.getMallName());
+        smProductEntity.setSalesTip(goodsListItem.getSalesTip());
+//        smProductEntity.setMallCps(goodsListItem.getMallCps());
+        smProductEntity.setPromotionRate(goodsListItem.getPromotionRate().intValue());
+        smProductEntity.setHasCoupon(goodsListItem.getHasCoupon()?1:0);
+        smProductEntity.setCashPrice(GoodsPriceUtil.type(PlatformTypeConstant.PDD).calcProfit(smProductEntity).intValue());
+        smProductEntity.setCreateTime(new Date());
+        return smProductEntity;
+    }
+
+    private SmProductEntity convertListDetail(PddDdkTopGoodsListQueryResponse.TopGoodsListGetResponseListItem goodsListItem) {
+        SmProductEntity smProductEntity = new SmProductEntity();
+        smProductEntity.setType(PlatformTypeConstant.PDD);
+        smProductEntity.setGoodsId(goodsListItem.getGoodsId().toString());
+        smProductEntity.setGoodsThumbnailUrl(goodsListItem.getGoodsThumbnailUrl());
+        smProductEntity.setName(goodsListItem.getGoodsName());
+        smProductEntity.setOriginalPrice(goodsListItem.getMinGroupPrice().intValue());
+        smProductEntity.setCouponPrice(goodsListItem.getCouponDiscount().intValue());
+        smProductEntity.setMallName(goodsListItem.getMallName());
+        smProductEntity.setSalesTip(goodsListItem.getSalesTip());
+        smProductEntity.setMallCps(goodsListItem.getMallCps());
+        smProductEntity.setPromotionRate(goodsListItem.getPromotionRate().intValue());
+        smProductEntity.setHasCoupon(goodsListItem.getHasCoupon()?1:0);
+        smProductEntity.setCashPrice(GoodsPriceUtil.type(PlatformTypeConstant.PDD).calcProfit(smProductEntity).intValue());
+        smProductEntity.setCreateTime(new Date());
+        return smProductEntity;
+    }
     private SmProductEntity convertListDetail(PddDdkGoodsSearchResponse.GoodsSearchResponseGoodsListItem goodsListItem) {
         SmProductEntity smProductEntity = new SmProductEntity();
         smProductEntity.setType(PlatformTypeConstant.PDD);
@@ -212,12 +303,12 @@ public class PddProductApiServiceImpl implements ProductApiService {
         smProductEntity.setPromotionRate(goodsListItem.getPromotionRate().intValue());
         smProductEntity.setHasCoupon(goodsListItem.getHasCoupon()?1:0);
         smProductEntity.setCashPrice(GoodsPriceUtil.type(PlatformTypeConstant.PDD).calcProfit(smProductEntity).intValue());
-        if(goodsListItem.getServiceTags() != null)
-            smProductEntity.setServiceTags(String.join(",", getServiceTags(goodsListItem.getServiceTags().stream().map(o -> {
-                return o.intValue();
-            }).collect(Collectors.toList()))));
-        if(goodsListItem.getActivityType() != null)
-            smProductEntity.setActivityType(getActiviteType(goodsListItem.getActivityType()));
+//        if(goodsListItem.getServiceTags() != null)
+//            smProductEntity.setServiceTags(String.join(",", getServiceTags(goodsListItem.getServiceTags().stream().map(o -> {
+//                return o.intValue();
+//            }).collect(Collectors.toList()))));
+//        if(goodsListItem.getActivityType() != null)
+//            smProductEntity.setActivityType(getActiviteType(goodsListItem.getActivityType()));
         smProductEntity.setCreateTime(new Date());
         return smProductEntity;
     }

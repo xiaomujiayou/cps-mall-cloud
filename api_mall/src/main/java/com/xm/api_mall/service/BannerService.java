@@ -6,5 +6,5 @@ import com.xm.comment_serialize.module.mall.entity.SmBannerEntity;
 import java.util.List;
 
 public interface BannerService {
-    List<SmBannerEntity> getBannerByType(BannerTypeEnum bannerTypeEnum);
+    List<SmBannerEntity> getBannerByType(BannerTypeEnum bannerTypeEnum) throws Exception;
 }

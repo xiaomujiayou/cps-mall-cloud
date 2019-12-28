@@ -1,5 +1,6 @@
 package com.xm.api_mall.service;
 
+import com.xm.comment_serialize.module.mall.bo.PddThemeBo;
 import com.xm.comment_serialize.module.mall.bo.ProductCriteriaBo;
 import com.xm.comment_serialize.module.mall.bo.ShareLinkBo;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
@@ -63,4 +64,29 @@ public interface ProductApiService {
      * @return
      */
     public Date getTime() throws Exception;
+
+
+    /**
+     * 多多客获取爆款排行商品接口
+     * @param type      :商品类型(1:热销榜,2:收益榜)
+     * @param pageNum
+     * @param pageSize
+     * @return
+     * @throws Exception
+     */
+    public PageBean<SmProductEntity> getTopGoodsList(Integer type,Integer pageNum,Integer pageSize) throws Exception;
+
+    /**
+     * 获取主题推广类型
+     * @return
+     */
+    public List<PddThemeBo> getThemeList() throws Exception;
+
+    /**
+     * 获取主题商品列表
+     * @param themeId
+     * @return
+     */
+    public PageBean<SmProductEntity> getThemeGoodsList(Integer themeId) throws Exception;
+
 }

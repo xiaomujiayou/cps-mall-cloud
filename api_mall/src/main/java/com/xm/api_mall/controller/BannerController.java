@@ -1,7 +1,10 @@
 package com.xm.api_mall.controller;
 
+import com.xm.api_mall.component.PlatformContext;
 import com.xm.api_mall.service.BannerService;
+import com.xm.comment.exception.GlobleException;
 import com.xm.comment.response.Msg;
+import com.xm.comment.response.MsgEnum;
 import com.xm.comment.response.R;
 import com.xm.comment_serialize.module.mall.constant.BannerTypeEnum;
 import com.xm.comment_serialize.module.mall.entity.SmBannerEntity;
@@ -22,10 +25,34 @@ public class BannerController {
 
     @Autowired
     private BannerService bannerService;
+    @Autowired
+    private PlatformContext productContext;
 
+    /**
+     * 获取banner
+     * @param type
+     * @return
+     * @throws Exception
+     */
     @GetMapping("/{type}")
-    public Msg<List<SmBannerEntity>> banner(@PathVariable("type") Integer type) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    public Msg<List<SmBannerEntity>> banner(@PathVariable("type") Integer type) throws Exception {
         List<SmBannerEntity> smBannerEntities = bannerService.getBannerByType(EnumUtils.getEnum(BannerTypeEnum.class,"type",type));
         return R.sucess(smBannerEntities);
+    }
+
+    /**
+     * 获取主题活动列表
+     * @param platformType
+     * @return
+     * @throws Exception
+     */
+    @GetMapping("/theme")
+    public Msg<List<SmBannerEntity>> themeBanner(Integer platformType) throws Exception {
+        if(platformType == null)
+            throw new GlobleException(MsgEnum.PARAM_VALID_ERROR);
+        return R.sucess(productContext
+                .platformType(platformType)
+                .getService()
+                .themes());
     }
 }

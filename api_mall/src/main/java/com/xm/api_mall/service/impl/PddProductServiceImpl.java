@@ -9,7 +9,9 @@ import com.xm.comment.module.user.feign.UserFeignClient;
 import com.xm.comment.response.MsgEnum;
 import com.xm.comment_serialize.module.mall.bo.ProductCriteriaBo;
 import com.xm.comment_serialize.module.mall.bo.ShareLinkBo;
+import com.xm.comment_serialize.module.mall.constant.BannerTypeEnum;
 import com.xm.comment_serialize.module.mall.constant.PlatformTypeConstant;
+import com.xm.comment_serialize.module.mall.entity.SmBannerEntity;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
 import com.xm.comment_serialize.module.mall.form.ProductListForm;
 import com.xm.comment_serialize.module.user.entity.SuPidEntity;
@@ -92,7 +94,8 @@ public class PddProductServiceImpl implements ProductService {
 
     @Override
     public PageBean<SmProductEntity> hotList(Integer userId, ProductListForm productListForm) throws Exception {
-        return null;
+        //热销榜
+        return productApiService.getTopGoodsList(2,productListForm.getPageNum(),productListForm.getPageSize());
     }
 
     @Override
@@ -103,6 +106,27 @@ public class PddProductServiceImpl implements ProductService {
     @Override
     public PageBean<SmProductEntity> likeList(Integer userId, ProductListForm productListForm) throws Exception {
         return null;
+    }
+
+    @Override
+    public PageBean<SmProductEntity> themeList(Integer userId, ProductListForm productListForm) throws Exception {
+        return productApiService.getThemeGoodsList(productListForm.getThemeId());
+    }
+
+    @Override
+    public List<SmBannerEntity> themes() throws Exception {
+        //添加拼多多主题商品活动
+        List<SmBannerEntity> pddThemes = productApiService.getThemeList().stream().map(o->{
+            SmBannerEntity smBannerEntity = new SmBannerEntity();
+            smBannerEntity.setId(o.getId());
+            smBannerEntity.setType(BannerTypeEnum.HOME.getType());
+            smBannerEntity.setImg(o.getImageUrl());
+            smBannerEntity.setName(o.getName());
+            smBannerEntity.setUrl(String.format("/pages/theme/index?themeId=%s&platformType=%s&themeName=%s&themeImg=%s",o.getId(),PlatformTypeConstant.PDD,o.getName(),o.getImageUrl()));
+            smBannerEntity.setTarget(2);
+            return smBannerEntity;
+        }).collect(Collectors.toList());
+        return pddThemes;
     }
 
     @Override

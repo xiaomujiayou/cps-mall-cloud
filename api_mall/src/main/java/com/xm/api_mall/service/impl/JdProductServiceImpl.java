@@ -7,6 +7,7 @@ import com.xm.comment.exception.GlobleException;
 import com.xm.comment.response.MsgEnum;
 import com.xm.comment_serialize.module.mall.bo.ProductCriteriaBo;
 import com.xm.comment_serialize.module.mall.bo.ShareLinkBo;
+import com.xm.comment_serialize.module.mall.entity.SmBannerEntity;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
 import com.xm.comment_serialize.module.mall.form.ProductListForm;
 import com.xm.comment_utils.mybatis.PageBean;
@@ -52,6 +53,16 @@ public class JdProductServiceImpl implements ProductService {
 
     @Override
     public PageBean<SmProductEntity> likeList(Integer userId, ProductListForm productListForm) throws Exception {
+        return null;
+    }
+
+    @Override
+    public PageBean<SmProductEntity> themeList(Integer userId, ProductListForm productListForm) throws Exception {
+        return null;
+    }
+
+    @Override
+    public List<SmBannerEntity> themes() throws Exception {
         return null;
     }
 

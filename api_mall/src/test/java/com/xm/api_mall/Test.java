@@ -18,6 +18,20 @@ public class Test {
         String clientSecret = "702bee4684121e512392cb0405b9292fbc624234";
         PopClient client = new PopHttpClient(clientId, clientSecret);
 
+//        PddDdkThemePromUrlGenerateRequest request = new PddDdkThemePromUrlGenerateRequest();
+//        request.setPid("8944230_121096342");
+//        request.setThemeIdList(Arrays.asList(7593l));
+//        System.out.println(JSON.toJSONString(client.syncInvoke(request),SerializerFeature.PrettyFormat));
+
+
+        PddDdkThemeListGetRequest request = new PddDdkThemeListGetRequest();
+        System.out.println(JSON.toJSONString(client.syncInvoke(request),SerializerFeature.PrettyFormat));
+
+//        PddDdkThemeGoodsSearchRequest request = new PddDdkThemeGoodsSearchRequest();
+//        request.setThemeId(7593l);
+//        System.out.println(JSON.toJSONString(client.syncInvoke(request),SerializerFeature.PrettyFormat));
+
+
 //        PddDdkOrderDetailGetRequest request = new PddDdkOrderDetailGetRequest();
 //        request.setOrderSn("191124-380393554933775");
 //        System.out.println(JSON.toJSONString(client.syncInvoke(request),SerializerFeature.PrettyFormat));
@@ -40,9 +54,9 @@ public class Test {
 //        request.setGoodsIdList(Arrays.asList(18286407756l,397475984543l));
 //        System.out.println(JSON.toJSONString(client.syncInvoke(request), SerializerFeature.PrettyFormat));
 
-        PddDdkGoodsSearchRequest request = new PddDdkGoodsSearchRequest();
-        request.setGoodsIdList(Arrays.asList(68385598599l,45793598207l));
-        System.out.println(JSON.toJSONString(client.syncInvoke(request), SerializerFeature.PrettyFormat));
+//        PddDdkGoodsSearchRequest request = new PddDdkGoodsSearchRequest();
+//        request.setGoodsIdList(Arrays.asList(68385598599l,45793598207l));
+//        System.out.println(JSON.toJSONString(client.syncInvoke(request), SerializerFeature.PrettyFormat));
 
 //        PddDdkTopGoodsListQueryRequest request = new PddDdkTopGoodsListQueryRequest();
 //        request.setGoodsIdList(Arrays.asList(64820789754l,39747417643l,3974417643l));

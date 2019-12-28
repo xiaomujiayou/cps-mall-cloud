@@ -37,6 +37,8 @@ public class ProductListForm extends AbsPageForm {
     private Integer maxPrice;
     //商品Id
     private String goodsId;
+    //主题Id(pdd主题商品)
+    private Integer themeId;
 
 }
 
