@@ -11,6 +11,7 @@ public enum ProductListTypeEnum {
     KEYWORD_LIST(6,"keywordList"),
     HOT_LIST(7,"hotList"),
     THEME_LIST(8,"themeList"),
+    RECOMMENT_LIST(9,"recommendList"),
     ;
 
     private Integer key;

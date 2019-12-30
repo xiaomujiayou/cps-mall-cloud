@@ -5,6 +5,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Data
 public class ProductListForm extends AbsPageForm {
@@ -39,6 +40,9 @@ public class ProductListForm extends AbsPageForm {
     private String goodsId;
     //主题Id(pdd主题商品)
     private Integer themeId;
+    //营销活动烈性
+    private Integer channelType;
+    private List<Integer> activityTags;
 
 }
 

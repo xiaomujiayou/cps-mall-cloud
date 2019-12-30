@@ -63,6 +63,15 @@ public interface ProductService {
     public PageBean<SmProductEntity> themeList(Integer userId,ProductListForm productListForm) throws Exception;
 
     /**
+     * 获取营销活动列表
+     * @param userId
+     * @param productListForm
+     * @return
+     * @throws Exception
+     */
+    public PageBean<SmProductEntity> recommendList(Integer userId,ProductListForm productListForm) throws Exception;
+
+    /**
      * 获取主题活动
      * @return
      * @throws Exception

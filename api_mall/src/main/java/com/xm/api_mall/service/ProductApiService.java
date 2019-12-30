@@ -89,4 +89,15 @@ public interface ProductApiService {
      */
     public PageBean<SmProductEntity> getThemeGoodsList(Integer themeId) throws Exception;
 
+
+    /**
+     * 获取运营频道商品
+     * @param channelType
+     * @return
+     * @throws Exception
+     */
+    public PageBean<SmProductEntity> getRecommendGoodsList(Integer channelType,Integer pageNum,Integer pageSize) throws Exception;
+
+
+
 }

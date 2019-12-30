@@ -16,5 +16,6 @@ public class ProductCriteriaBo {
     private Integer minPrice;
     private Integer maxPrice;
     private List<Long> goodsIdList;
+    private List<Integer> activityTags;
 
 }

@@ -60,6 +60,8 @@ public class PddProductServiceImpl implements ProductService {
     @Override
     public PageBean<SmProductEntity> bestList(Integer userId, ProductListForm productListForm) throws Exception {
         ProductCriteriaBo productCriteriaBo = new ProductCriteriaBo();
+        if(productListForm.getActivityTags() != null && !productListForm.getActivityTags().isEmpty())
+            productCriteriaBo.setActivityTags(productListForm.getActivityTags());
         productCriteriaBo.setUserId(userId);
         productCriteriaBo.setPageNum(productListForm.getPageNum());
         productCriteriaBo.setPageSize(productListForm.getPageSize());
@@ -111,6 +113,11 @@ public class PddProductServiceImpl implements ProductService {
     @Override
     public PageBean<SmProductEntity> themeList(Integer userId, ProductListForm productListForm) throws Exception {
         return productApiService.getThemeGoodsList(productListForm.getThemeId());
+    }
+
+    @Override
+    public PageBean<SmProductEntity> recommendList(Integer userId, ProductListForm productListForm) throws Exception {
+        return productApiService.getRecommendGoodsList(productListForm.getChannelType(),productListForm.getPageNum(),productListForm.getPageSize());
     }
 
     @Override

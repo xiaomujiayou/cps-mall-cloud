@@ -18,4 +18,8 @@ public class ProductListTypeConstant {
     public static final int KEYWORD_LIST = 6;
     //热门商品列表
     public static final int HOT_LIST = 7;
+    //主题活动商品
+    public static final int THEME_LIST = 8;
+    //运营频道商品
+    public static final int RECOMMENT_LIST = 9;
 }

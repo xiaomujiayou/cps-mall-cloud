@@ -18,14 +18,30 @@ public class Test {
         String clientSecret = "702bee4684121e512392cb0405b9292fbc624234";
         PopClient client = new PopHttpClient(clientId, clientSecret);
 
+        PddGoodsOptGetRequest request = new PddGoodsOptGetRequest();
+        request.setParentOptId(1);
+        System.out.println(JSON.toJSONString(client.syncInvoke(request),SerializerFeature.PrettyFormat));
+
+//        PddDdkRpPromUrlGenerateRequest request = new PddDdkRpPromUrlGenerateRequest();
+//        request.setChannelType(4);
+//        request.setPIdList(Arrays.asList("8944230_121096342"));
+//        request.setGenerateWeApp(true);
+//        request.setGenerateWeappWebview(true);
+//        System.out.println(JSON.toJSONString(client.syncInvoke(request),SerializerFeature.PrettyFormat));
+
 //        PddDdkThemePromUrlGenerateRequest request = new PddDdkThemePromUrlGenerateRequest();
 //        request.setPid("8944230_121096342");
 //        request.setThemeIdList(Arrays.asList(7593l));
 //        System.out.println(JSON.toJSONString(client.syncInvoke(request),SerializerFeature.PrettyFormat));
 
 
-        PddDdkThemeListGetRequest request = new PddDdkThemeListGetRequest();
-        System.out.println(JSON.toJSONString(client.syncInvoke(request),SerializerFeature.PrettyFormat));
+//        PddDdkWeappQrcodeUrlGenRequest request = new PddDdkWeappQrcodeUrlGenRequest();
+//        request.setPId("8944230_121096342");
+//        request.setGoodsIdList(Arrays.asList(72368682l));
+//        System.out.println(JSON.toJSONString(client.syncInvoke(request),SerializerFeature.PrettyFormat));
+
+//        PddDdkThemeListGetRequest request = new PddDdkThemeListGetRequest();
+//        System.out.println(JSON.toJSONString(client.syncInvoke(request),SerializerFeature.PrettyFormat));
 
 //        PddDdkThemeGoodsSearchRequest request = new PddDdkThemeGoodsSearchRequest();
 //        request.setThemeId(7593l);

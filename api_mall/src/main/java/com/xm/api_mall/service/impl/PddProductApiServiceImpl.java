@@ -1,5 +1,6 @@
 package com.xm.api_mall.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.math.MathUtil;
 import cn.hutool.core.util.NumberUtil;
@@ -14,6 +15,7 @@ import com.xm.api_mall.service.ProductApiService;
 import com.xm.comment.exception.GlobleException;
 import com.xm.comment.response.MsgEnum;
 import com.xm.comment.utils.GoodsPriceUtil;
+import com.xm.comment_serialize.module.mall.bo.PddGoodsListItem;
 import com.xm.comment_serialize.module.mall.bo.PddThemeBo;
 import com.xm.comment_serialize.module.mall.bo.ProductCriteriaBo;
 import com.xm.comment_serialize.module.mall.bo.ShareLinkBo;
@@ -62,6 +64,7 @@ public class PddProductApiServiceImpl implements ProductApiService {
         request.setKeyword(criteria.getKeyword());
         request.setGoodsIdList(criteria.getGoodsIdList());
         request.setSortType(criteria.getOrderBy());
+        request.setActivityTags(criteria.getActivityTags());
         //筛选器
         List<Map<String,Object>> rangeList = new ArrayList<>();
         //价格区间
@@ -69,21 +72,22 @@ public class PddProductApiServiceImpl implements ProductApiService {
             Map<String,Object> range = new HashMap<>();
             range.put("range_id",0);
             range.put("range_from",criteria.getMinPrice());
-            range.put("range_to",criteria.getMaxPrice());
+            range.put("range_to",criteria.getMaxPrice().equals(0)?null:criteria.getMaxPrice());
             rangeList.add(range);
         }
+
         if(!rangeList.isEmpty()){
             request.setRangeList(JSON.toJSONString(rangeList));
         }
         PddDdkGoodsSearchResponse response = popHttpClient.syncInvoke(request);
         List<PddDdkGoodsSearchResponse.GoodsSearchResponseGoodsListItem> goodsList = response.getGoodsSearchResponse().getGoodsList();
-        List<SmProductEntity> smProductEntityList = goodsList.stream().map(o ->{return convertListDetail(o);}).collect(Collectors.toList());
-        PageBean<SmProductEntity> pageBean = new PageBean<>(smProductEntityList);
-        pageBean.setPageNum(criteria.getPageNum());
-        pageBean.setPageSize(criteria.getPageSize());
-        pageBean.setTotal(response.getGoodsSearchResponse().getTotalCount());
-        pageBean.setList(smProductEntityList);
-        return pageBean;
+        List<SmProductEntity> smProductEntityList = goodsList.stream().map(o ->{return convertGoodsList(o);}).collect(Collectors.toList());
+        return packageToPageBean(
+                smProductEntityList,
+                response.getGoodsSearchResponse().getTotalCount().intValue(),
+                criteria.getPageNum(),
+                criteria.getPageSize());
+
     }
 
     @Override
@@ -92,7 +96,7 @@ public class PddProductApiServiceImpl implements ProductApiService {
         request.setGoodsIdList(goodsIds);
         PddDdkGoodsSearchResponse response = popHttpClient.syncInvoke(request);
         List<PddDdkGoodsSearchResponse.GoodsSearchResponseGoodsListItem> goodsList = response.getGoodsSearchResponse().getGoodsList();
-        List<SmProductEntity> smProductEntityList = goodsList.stream().map(o ->{return convertListDetail(o);}).collect(Collectors.toList());
+        List<SmProductEntity> smProductEntityList = goodsList.stream().map(o ->{return convertGoodsList(o);}).collect(Collectors.toList());
         return smProductEntityList;
     }
 
@@ -164,16 +168,6 @@ public class PddProductApiServiceImpl implements ProductApiService {
         return pageBean;
     }
 
-//    private List<SuOrderEntity> moke(){
-//        List<SuOrderEntity> suOrderEntities = new ArrayList<>();
-//        for (int i = 0; i < 40; i++) {
-//            SuOrderEntity suOrderEntity = new SuOrderEntity();
-//            suOrderEntity.setNum(i+"");
-//            suOrderEntities.add(suOrderEntity);
-//        }
-//        return suOrderEntities;
-//    }
-
     @Override
     public Date getTime() throws Exception {
         PddTimeGetRequest request = new PddTimeGetRequest();
@@ -189,13 +183,13 @@ public class PddProductApiServiceImpl implements ProductApiService {
         request.setSortType(type);
         PddDdkTopGoodsListQueryResponse response = popHttpClient.syncInvoke(request);
         List<SmProductEntity> list = response.getTopGoodsListGetResponse().getList().stream().map( o ->{
-            return convertListDetail(o);
+            return convertGoodsList(o);
         }).collect(Collectors.toList());
-        PageBean<SmProductEntity> pageBean = new PageBean<>(list);
-        pageBean.setPageNum(pageNum);
-        pageBean.setPageSize(pageSize);
-        pageBean.setTotal(response.getTopGoodsListGetResponse().getTotal());
-        return pageBean;
+        return packageToPageBean(
+                list,
+                response.getTopGoodsListGetResponse().getTotal().intValue(),
+                pageNum,
+                pageSize);
     }
 
     @Override
@@ -220,17 +214,59 @@ public class PddProductApiServiceImpl implements ProductApiService {
         PddDdkThemeGoodsSearchResponse response = popHttpClient.syncInvoke(request);
 
         List<SmProductEntity> list = response.getThemeListGetResponse().getGoodsList().stream().map(o ->{
-            return convertThemeGoods(o);
+            return convertGoodsList(o);
         }).collect(Collectors.toList());
+        return packageToPageBean(
+                list,
+                response.getThemeListGetResponse().getTotal().intValue(),
+                1,
+                response.getThemeListGetResponse().getTotal().intValue());
+    }
 
+    @Override
+    public PageBean<SmProductEntity> getRecommendGoodsList(Integer channelType,Integer pageNum,Integer pageSize) throws Exception {
+        PddDdkGoodsRecommendGetRequest request = new PddDdkGoodsRecommendGetRequest();
+        request.setChannelType(channelType);
+        request.setOffset(PageUtil.getStart(pageNum,pageSize));
+        request.setLimit(pageSize);
+        PddDdkGoodsRecommendGetResponse response = popHttpClient.syncInvoke(request);
+        List<SmProductEntity> list = response.getGoodsBasicDetailResponse().getList().stream().map(o->{
+            return convertGoodsList(o);
+        }).collect(Collectors.toList());
+        return packageToPageBean(
+                list,
+                response.getGoodsBasicDetailResponse().getTotal().intValue(),
+                pageNum,
+                pageSize);
+    }
+
+    private PageBean<SmProductEntity> packageToPageBean(List<SmProductEntity> list,Integer total,Integer pageNum,Integer pageSize){
         PageBean<SmProductEntity> pageBean = new PageBean<>(list);
-        pageBean.setTotal(response.getThemeListGetResponse().getTotal());
-        pageBean.setPageNum(1);
-        pageBean.setPageSize(response.getThemeListGetResponse().getTotal().intValue());
+        pageBean.setTotal(total);
+        pageBean.setPageNum(pageNum);
+        pageBean.setPageSize(pageSize);
         return pageBean;
     }
 
-
+    private SmProductEntity convertGoodsList(Object listItem){
+        PddGoodsListItem pddGoodsListItem = new PddGoodsListItem();
+        BeanUtil.copyProperties(listItem,pddGoodsListItem);
+        SmProductEntity smProductEntity = new SmProductEntity();
+        smProductEntity.setType(PlatformTypeConstant.PDD);
+        smProductEntity.setGoodsId(pddGoodsListItem.getGoodsId().toString());
+        smProductEntity.setGoodsThumbnailUrl(pddGoodsListItem.getGoodsThumbnailUrl());
+        smProductEntity.setName(pddGoodsListItem.getGoodsName());
+        smProductEntity.setOriginalPrice(pddGoodsListItem.getMinGroupPrice().intValue());
+        smProductEntity.setCouponPrice(pddGoodsListItem.getCouponDiscount().intValue());
+        smProductEntity.setMallName(pddGoodsListItem.getMallName());
+        smProductEntity.setSalesTip(pddGoodsListItem.getSalesTip());
+        smProductEntity.setMallCps(pddGoodsListItem.getMallCps());
+        smProductEntity.setPromotionRate(pddGoodsListItem.getPromotionRate().intValue());
+        smProductEntity.setHasCoupon(pddGoodsListItem.getHasCoupon()?1:0);
+        smProductEntity.setCashPrice(GoodsPriceUtil.type(PlatformTypeConstant.PDD).calcProfit(smProductEntity).intValue());
+        smProductEntity.setCreateTime(new Date());
+        return smProductEntity;
+    }
 
 
     private SuOrderEntity convertOrder(PddDdkOrderListIncrementGetResponse.OrderListGetResponseOrderListItem item){
@@ -254,64 +290,64 @@ public class PddProductApiServiceImpl implements ProductApiService {
         return orderEntity;
     }
 
-    private SmProductEntity convertThemeGoods(PddDdkThemeGoodsSearchResponse.ThemeListGetResponseGoodsListItem goodsListItem) {
-        SmProductEntity smProductEntity = new SmProductEntity();
-        smProductEntity.setType(PlatformTypeConstant.PDD);
-        smProductEntity.setGoodsId(goodsListItem.getGoodsId().toString());
-        smProductEntity.setGoodsThumbnailUrl(goodsListItem.getGoodsThumbnailUrl());
-        smProductEntity.setName(goodsListItem.getGoodsName());
-        smProductEntity.setOriginalPrice(goodsListItem.getMinGroupPrice().intValue());
-        smProductEntity.setCouponPrice(goodsListItem.getCouponDiscount().intValue());
-        smProductEntity.setMallName(goodsListItem.getMallName());
-        smProductEntity.setSalesTip(goodsListItem.getSalesTip());
-//        smProductEntity.setMallCps(goodsListItem.getMallCps());
-        smProductEntity.setPromotionRate(goodsListItem.getPromotionRate().intValue());
-        smProductEntity.setHasCoupon(goodsListItem.getHasCoupon()?1:0);
-        smProductEntity.setCashPrice(GoodsPriceUtil.type(PlatformTypeConstant.PDD).calcProfit(smProductEntity).intValue());
-        smProductEntity.setCreateTime(new Date());
-        return smProductEntity;
-    }
+//    private SmProductEntity convertThemeGoods(PddDdkThemeGoodsSearchResponse.ThemeListGetResponseGoodsListItem goodsListItem) {
+//        SmProductEntity smProductEntity = new SmProductEntity();
+//        smProductEntity.setType(PlatformTypeConstant.PDD);
+//        smProductEntity.setGoodsId(goodsListItem.getGoodsId().toString());
+//        smProductEntity.setGoodsThumbnailUrl(goodsListItem.getGoodsThumbnailUrl());
+//        smProductEntity.setName(goodsListItem.getGoodsName());
+//        smProductEntity.setOriginalPrice(goodsListItem.getMinGroupPrice().intValue());
+//        smProductEntity.setCouponPrice(goodsListItem.getCouponDiscount().intValue());
+//        smProductEntity.setMallName(goodsListItem.getMallName());
+//        smProductEntity.setSalesTip(goodsListItem.getSalesTip());
+////        smProductEntity.setMallCps(goodsListItem.getMallCps());
+//        smProductEntity.setPromotionRate(goodsListItem.getPromotionRate().intValue());
+//        smProductEntity.setHasCoupon(goodsListItem.getHasCoupon()?1:0);
+//        smProductEntity.setCashPrice(GoodsPriceUtil.type(PlatformTypeConstant.PDD).calcProfit(smProductEntity).intValue());
+//        smProductEntity.setCreateTime(new Date());
+//        return smProductEntity;
+//    }
 
-    private SmProductEntity convertListDetail(PddDdkTopGoodsListQueryResponse.TopGoodsListGetResponseListItem goodsListItem) {
-        SmProductEntity smProductEntity = new SmProductEntity();
-        smProductEntity.setType(PlatformTypeConstant.PDD);
-        smProductEntity.setGoodsId(goodsListItem.getGoodsId().toString());
-        smProductEntity.setGoodsThumbnailUrl(goodsListItem.getGoodsThumbnailUrl());
-        smProductEntity.setName(goodsListItem.getGoodsName());
-        smProductEntity.setOriginalPrice(goodsListItem.getMinGroupPrice().intValue());
-        smProductEntity.setCouponPrice(goodsListItem.getCouponDiscount().intValue());
-        smProductEntity.setMallName(goodsListItem.getMallName());
-        smProductEntity.setSalesTip(goodsListItem.getSalesTip());
-        smProductEntity.setMallCps(goodsListItem.getMallCps());
-        smProductEntity.setPromotionRate(goodsListItem.getPromotionRate().intValue());
-        smProductEntity.setHasCoupon(goodsListItem.getHasCoupon()?1:0);
-        smProductEntity.setCashPrice(GoodsPriceUtil.type(PlatformTypeConstant.PDD).calcProfit(smProductEntity).intValue());
-        smProductEntity.setCreateTime(new Date());
-        return smProductEntity;
-    }
-    private SmProductEntity convertListDetail(PddDdkGoodsSearchResponse.GoodsSearchResponseGoodsListItem goodsListItem) {
-        SmProductEntity smProductEntity = new SmProductEntity();
-        smProductEntity.setType(PlatformTypeConstant.PDD);
-        smProductEntity.setGoodsId(goodsListItem.getGoodsId().toString());
-        smProductEntity.setGoodsThumbnailUrl(goodsListItem.getGoodsThumbnailUrl());
-        smProductEntity.setName(goodsListItem.getGoodsName());
-        smProductEntity.setOriginalPrice(goodsListItem.getMinGroupPrice().intValue());
-        smProductEntity.setCouponPrice(goodsListItem.getCouponDiscount().intValue());
-        smProductEntity.setMallName(goodsListItem.getMallName());
-        smProductEntity.setSalesTip(goodsListItem.getSalesTip());
-        smProductEntity.setMallCps(goodsListItem.getMallCps());
-        smProductEntity.setPromotionRate(goodsListItem.getPromotionRate().intValue());
-        smProductEntity.setHasCoupon(goodsListItem.getHasCoupon()?1:0);
-        smProductEntity.setCashPrice(GoodsPriceUtil.type(PlatformTypeConstant.PDD).calcProfit(smProductEntity).intValue());
-//        if(goodsListItem.getServiceTags() != null)
-//            smProductEntity.setServiceTags(String.join(",", getServiceTags(goodsListItem.getServiceTags().stream().map(o -> {
-//                return o.intValue();
-//            }).collect(Collectors.toList()))));
-//        if(goodsListItem.getActivityType() != null)
-//            smProductEntity.setActivityType(getActiviteType(goodsListItem.getActivityType()));
-        smProductEntity.setCreateTime(new Date());
-        return smProductEntity;
-    }
+//    private SmProductEntity convertListDetail(PddDdkTopGoodsListQueryResponse.TopGoodsListGetResponseListItem goodsListItem) {
+//        SmProductEntity smProductEntity = new SmProductEntity();
+//        smProductEntity.setType(PlatformTypeConstant.PDD);
+//        smProductEntity.setGoodsId(goodsListItem.getGoodsId().toString());
+//        smProductEntity.setGoodsThumbnailUrl(goodsListItem.getGoodsThumbnailUrl());
+//        smProductEntity.setName(goodsListItem.getGoodsName());
+//        smProductEntity.setOriginalPrice(goodsListItem.getMinGroupPrice().intValue());
+//        smProductEntity.setCouponPrice(goodsListItem.getCouponDiscount().intValue());
+//        smProductEntity.setMallName(goodsListItem.getMallName());
+//        smProductEntity.setSalesTip(goodsListItem.getSalesTip());
+//        smProductEntity.setMallCps(goodsListItem.getMallCps());
+//        smProductEntity.setPromotionRate(goodsListItem.getPromotionRate().intValue());
+//        smProductEntity.setHasCoupon(goodsListItem.getHasCoupon()?1:0);
+//        smProductEntity.setCashPrice(GoodsPriceUtil.type(PlatformTypeConstant.PDD).calcProfit(smProductEntity).intValue());
+//        smProductEntity.setCreateTime(new Date());
+//        return smProductEntity;
+//    }
+//    private SmProductEntity convertListDetail(PddDdkGoodsSearchResponse.GoodsSearchResponseGoodsListItem goodsListItem) {
+//        SmProductEntity smProductEntity = new SmProductEntity();
+//        smProductEntity.setType(PlatformTypeConstant.PDD);
+//        smProductEntity.setGoodsId(goodsListItem.getGoodsId().toString());
+//        smProductEntity.setGoodsThumbnailUrl(goodsListItem.getGoodsThumbnailUrl());
+//        smProductEntity.setName(goodsListItem.getGoodsName());
+//        smProductEntity.setOriginalPrice(goodsListItem.getMinGroupPrice().intValue());
+//        smProductEntity.setCouponPrice(goodsListItem.getCouponDiscount().intValue());
+//        smProductEntity.setMallName(goodsListItem.getMallName());
+//        smProductEntity.setSalesTip(goodsListItem.getSalesTip());
+//        smProductEntity.setMallCps(goodsListItem.getMallCps());
+//        smProductEntity.setPromotionRate(goodsListItem.getPromotionRate().intValue());
+//        smProductEntity.setHasCoupon(goodsListItem.getHasCoupon()?1:0);
+//        smProductEntity.setCashPrice(GoodsPriceUtil.type(PlatformTypeConstant.PDD).calcProfit(smProductEntity).intValue());
+////        if(goodsListItem.getServiceTags() != null)
+////            smProductEntity.setServiceTags(String.join(",", getServiceTags(goodsListItem.getServiceTags().stream().map(o -> {
+////                return o.intValue();
+////            }).collect(Collectors.toList()))));
+////        if(goodsListItem.getActivityType() != null)
+////            smProductEntity.setActivityType(getActiviteType(goodsListItem.getActivityType()));
+//        smProductEntity.setCreateTime(new Date());
+//        return smProductEntity;
+//    }
     private SmProductEntity convertDetail(PddDdkGoodsDetailResponse.GoodsDetailResponseGoodsDetailsItem detailsItem){
         SmProductEntity smProductEntity = new SmProductEntity();
         smProductEntity.setType(PlatformTypeConstant.PDD);

@@ -81,7 +81,7 @@ public class OptionServiceImpl implements OptionService {
             List<Integer> sort = Arrays.asList(sortStr.split(",")).stream().map(o->{return Integer.valueOf(o);}).collect(Collectors.toList());
             List<SmOptEntity> sorted = new ArrayList<>();
             for (Integer id: sort) {
-                SmOptEntity smOptEntity = smOptEntities.stream().filter(o->{return o.getId().equals(id);}).findFirst().get();
+                SmOptEntity smOptEntity = smOptEntities.stream().filter(o->{return o.getId().equals(id);}).findFirst().orElse(null);
                 if(smOptEntity != null){
                     sorted.add(smOptEntity);
                 }

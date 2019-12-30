@@ -62,6 +62,11 @@ public class JdProductServiceImpl implements ProductService {
     }
 
     @Override
+    public PageBean<SmProductEntity> recommendList(Integer userId, ProductListForm productListForm) throws Exception {
+        return null;
+    }
+
+    @Override
     public List<SmBannerEntity> themes() throws Exception {
         return null;
     }
