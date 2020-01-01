@@ -70,6 +70,11 @@ public class SuUserEntity implements Serializable{
 	private String language;
 
 	/**
+	 * 推广位id
+	 */
+	private Integer pid;
+
+	/**
 	 * 最后登录时间
 	 */
 	private java.util.Date lastLogin;

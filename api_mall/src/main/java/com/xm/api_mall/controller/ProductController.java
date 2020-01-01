@@ -1,15 +1,21 @@
 package com.xm.api_mall.controller;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.xm.api_mall.component.PlatformContext;
 import com.xm.comment.annotation.LoginUser;
+import com.xm.comment.annotation.Pid;
 import com.xm.comment.module.user.feign.UserFeignClient;
 import com.xm.comment.response.Msg;
 import com.xm.comment.response.R;
+import com.xm.comment.utils.GoodsPriceUtil;
 import com.xm.comment_serialize.module.mall.bo.ProductIndexBo;
+import com.xm.comment_serialize.module.mall.entity.SmPidEntity;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
+import com.xm.comment_serialize.module.mall.ex.SmProductEntityEx;
 import com.xm.comment_serialize.module.mall.form.GetProductSaleInfoForm;
 import com.xm.comment_serialize.module.mall.form.ProductDetailForm;
 import com.xm.comment_serialize.module.mall.form.ProductListForm;
+import com.xm.comment_serialize.module.mall.vo.SmProductVo;
 import com.xm.comment_utils.mybatis.PageBean;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,12 +64,17 @@ public class ProductController {
      * @return
      */
     @GetMapping("/detail")
-    public Msg<SmProductEntity> getProductDetail(@Valid ProductDetailForm productDetailForm, BindingResult bindingResult, @LoginUser(necessary = false) Integer userId) throws Exception {
-//        userFeignClient.addProductHistory(userId,productDetailForm.getPlatformType(),productDetailForm.getGoodsId());
-        return R.sucess(productContext
+    public Msg<SmProductVo> getProductDetail(@Valid ProductDetailForm productDetailForm, BindingResult bindingResult, @LoginUser(necessary = false) Integer userId) throws Exception {
+        SmProductEntityEx smProductEntityEx = productContext
                 .platformType(productDetailForm.getPlatformType())
                 .getService()
-                .detail(productDetailForm.getGoodsId()));
+                .detail(
+                        productDetailForm.getGoodsId(),
+                        userId,
+                        productDetailForm.getShareUserId());
+        SmProductVo smProductVo = new SmProductVo();
+        BeanUtil.copyProperties(smProductEntityEx,smProductVo);
+        return R.sucess(smProductVo);
     }
 
     /**
@@ -122,7 +133,7 @@ public class ProductController {
     }
 
     @GetMapping("/sale")
-    public Msg getProductSaleInfo(@LoginUser Integer userId,@Valid GetProductSaleInfoForm productSaleInfoForm) throws Exception {
+    public Msg getProductSaleInfo(@LoginUser Integer userId,@Pid String pid, @Valid GetProductSaleInfoForm productSaleInfoForm) throws Exception {
         if(userId.equals(productSaleInfoForm.getShareUserId()))
             productSaleInfoForm.setShareUserId(null);
         return R.sucess(productContext
@@ -130,6 +141,7 @@ public class ProductController {
                 .getService()
                 .saleInfo(
                         userId,
+                        pid,
                         productSaleInfoForm.getAppType(),
                         productSaleInfoForm.getShareUserId(),
                         productSaleInfoForm.getGoodsId()));

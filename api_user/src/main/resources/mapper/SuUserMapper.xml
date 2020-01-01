@@ -15,6 +15,7 @@
     <result column="province" property="province" jdbcType="VARCHAR" />
     <result column="country" property="country" jdbcType="VARCHAR" />
     <result column="language" property="language" jdbcType="VARCHAR" />
+    <result column="pid" property="pid" jdbcType="INTEGER" />
     <result column="last_login" property="lastLogin" jdbcType="TIMESTAMP" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
   </resultMap>

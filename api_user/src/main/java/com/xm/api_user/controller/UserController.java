@@ -24,6 +24,7 @@ import com.xm.comment_serialize.module.user.form.GetUserInfoForm;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import javax.ws.rs.GET;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,17 +39,29 @@ public class UserController{
     private SuUserMapper suUserMapper;
 
     /**
-     * 获取用户信息
+     * 获取用户信息摘要
      * @return
      */
     @PostMapping("/info")
-    public Msg<UserInfoVo> info(@RequestBody GetUserInfoForm getUserInfoForm) throws WxErrorException {
+    public Msg<SuUserEntity> info(@RequestBody GetUserInfoForm getUserInfoForm) throws WxErrorException {
         if(StringUtils.isAllBlank(getUserInfoForm.getCode(),getUserInfoForm.getOpenId()))
             return R.error(MsgEnum.PARAM_VALID_ERROR);
         SuUserEntity userEntity = userService.getUserInfo(getUserInfoForm);
         UserInfoVo userInfoVo = new UserInfoVo();
         BeanUtil.copyProperties(userEntity,userInfoVo);
-        return userEntity != null ? R.sucess(userInfoVo):R.error(MsgEnum.DATA_ALREADY_NOT_EXISTS);
+        SuUserEntity result = new SuUserEntity();
+        BeanUtil.copyProperties(userInfoVo,result);
+        return userEntity != null ? R.sucess(result):R.error(MsgEnum.DATA_ALREADY_NOT_EXISTS);
+    }
+
+    /**
+     * 获取用户完整信息
+     * @return
+     * @throws WxErrorException
+     */
+    @GetMapping("/info/detail")
+    public Msg<SuUserEntity> infoDetail(Integer userId) throws WxErrorException {
+        return userId != null ? R.sucess(suUserMapper.selectByPrimaryKey(userId)):R.error(MsgEnum.DATA_ALREADY_NOT_EXISTS);
     }
 
     /**

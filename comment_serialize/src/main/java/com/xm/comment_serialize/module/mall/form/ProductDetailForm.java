@@ -12,5 +12,7 @@ public class ProductDetailForm {
     //商品id
     @NotNull(message = "goodsId不能为空")
     private String goodsId;
+    //分享用户id
+    private Integer shareUserId;
 
 }

@@ -6,6 +6,7 @@ import com.xm.comment.response.MsgEnum;
 import com.xm.comment.response.R;
 import com.xm.comment_serialize.module.mall.bo.ProductIndexBo;
 import com.xm.comment_serialize.module.mall.entity.SmConfigEntity;
+import com.xm.comment_serialize.module.mall.entity.SmPidEntity;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
 import com.xm.comment_serialize.module.mall.form.ProductDetailForm;
 import com.xm.comment_serialize.module.user.entity.SuOrderEntity;
@@ -30,7 +31,12 @@ public class MallFeignClientFallBack implements MallFeignClient {
     }
 
     @Override
-    public Msg<String> generatePid(Integer userId, Integer platformType) {
+    public Msg<SmPidEntity> generatePid() {
+        return R.error(MsgEnum.SERVICE_AVAILABLE);
+    }
+
+    @Override
+    public Msg<SmPidEntity> getPid(Integer id) {
         return R.error(MsgEnum.SERVICE_AVAILABLE);
     }
 

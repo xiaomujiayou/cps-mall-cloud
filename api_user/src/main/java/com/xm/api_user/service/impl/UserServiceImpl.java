@@ -14,6 +14,7 @@ import com.xm.comment.module.mall.feign.MallFeignClient;
 import com.xm.comment.response.MsgEnum;
 import com.xm.comment_serialize.module.mall.constant.ConfigEnmu;
 import com.xm.comment_serialize.module.mall.constant.ConfigTypeConstant;
+import com.xm.comment_serialize.module.mall.entity.SmPidEntity;
 import com.xm.comment_serialize.module.user.constant.UserTypeConstant;
 import com.xm.comment_serialize.module.user.dto.ProxyProfitDto;
 import com.xm.comment_serialize.module.user.entity.*;
@@ -72,7 +73,7 @@ public class UserServiceImpl implements UserService {
             record = suUserMapper.selectOne(record);
             if(record != null)
                 return record;
-            return saveUser(wxMaJscode2SessionResult.getOpenid());
+            return addNewUser(wxMaJscode2SessionResult.getOpenid());
         }else if(StringUtils.isNotBlank(getUserInfoForm.getOpenId())){
             SuUserEntity record = new SuUserEntity();
             record.setOpenId(getUserInfoForm.getOpenId());
@@ -87,15 +88,19 @@ public class UserServiceImpl implements UserService {
      * @param openId
      * @return
      */
-    private SuUserEntity saveUser(String openId){
+    private SuUserEntity addNewUser(String openId){
+        SmPidEntity smPidEntity = mallFeignClient.generatePid().getData();
         SuUserEntity user = new SuUserEntity();
         user.setOpenId(openId);
         user.setNickname("Su_"+ MD5.md5(openId,"").substring(0,5));
         user.setSex(0);
         user.setCreateTime(new Date());
         user.setLastLogin(new Date());
-        suUserMapper.insertUseGeneratedKeys(user);
-        return suUserMapper.selectByPrimaryKey(user.getId());
+        user.setPid(smPidEntity.getId());
+        suUserMapper.insertSelective(user);
+        SuUserEntity record = new SuUserEntity();
+        record.setOpenId(openId);
+        return suUserMapper.selectOne(record);
     }
 
 

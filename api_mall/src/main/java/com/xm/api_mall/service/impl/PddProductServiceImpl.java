@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.xm.api_mall.mapper.SmOptMapper;
 import com.xm.api_mall.service.ProductApiService;
 import com.xm.api_mall.service.ProductService;
+import com.xm.api_mall.service.ProfitService;
 import com.xm.comment.exception.GlobleException;
 import com.xm.comment.module.user.feign.UserFeignClient;
 import com.xm.comment.response.MsgEnum;
@@ -13,8 +14,8 @@ import com.xm.comment_serialize.module.mall.constant.BannerTypeEnum;
 import com.xm.comment_serialize.module.mall.constant.PlatformTypeConstant;
 import com.xm.comment_serialize.module.mall.entity.SmBannerEntity;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
+import com.xm.comment_serialize.module.mall.ex.SmProductEntityEx;
 import com.xm.comment_serialize.module.mall.form.ProductListForm;
-import com.xm.comment_serialize.module.user.entity.SuPidEntity;
 import com.xm.comment_serialize.module.user.form.AddSearchForm;
 import com.xm.comment_utils.mybatis.PageBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,8 @@ public class PddProductServiceImpl implements ProductService {
 
     @Autowired
     private UserFeignClient userFeignClient;
+    @Autowired
+    private ProfitService profitService;
 
     @Override
     public PageBean<SmProductEntity> optionList(Integer userId, ProductListForm productListForm) throws Exception {
@@ -143,22 +146,18 @@ public class PddProductServiceImpl implements ProductService {
     }
 
     @Override
-    public SmProductEntity detail(String goodsId) throws Exception {
-        return productApiService.detail(Long.valueOf(goodsId));
+    public SmProductEntityEx detail(String goodsId, Integer userId, Integer shareUserId) throws Exception {
+        SmProductEntity smProductEntity = productApiService.detail(Long.valueOf(goodsId));
+        return profitService.calcProfit(smProductEntity,userId,shareUserId != null,shareUserId);
     }
 
     @Override
-    public ShareLinkBo saleInfo(Integer userId, Integer appType, Integer fromUser, String goodsId) throws Exception {
+    public ShareLinkBo saleInfo(Integer userId,String pid, Integer appType, Integer fromUser, String goodsId) throws Exception {
         Map<String,Object> customParams = new HashMap<>();
         customParams.put("userId",userId);
         customParams.put("appType",appType);
         customParams.put("fromUser",fromUser);
-        SuPidEntity suPidEntity = userFeignClient.getPid(userId, PlatformTypeConstant.PDD).getData();
-        return productApiService.getShareLink(JSON.toJSONString(customParams),suPidEntity.getPId(),Long.valueOf(goodsId));
+        return productApiService.getShareLink(JSON.toJSONString(customParams),pid,Long.valueOf(goodsId));
     }
 
-    @Override
-    public String generatePid(Integer userId) throws Exception {
-        return productApiService.generatePid(userId);
-    }
 }

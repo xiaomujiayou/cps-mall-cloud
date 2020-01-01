@@ -1,10 +1,15 @@
 package com.xm.cloud_gateway.filter;
 
+import cn.hutool.core.codec.Base64;
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSON;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
 import com.xm.comment.constants.TokenConstants;
 import com.xm.comment_serialize.module.user.entity.SuUserEntity;
+import com.xm.comment_serialize.module.user.vo.UserInfoVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
 import org.apache.shiro.SecurityUtils;
@@ -26,7 +31,7 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 
 /**
  * 用户信息过滤器
- * 如果用户已登录并且存在，则将用户id设置到request header中，以便其他服务通过@LoginUser注解获取
+ * 如果用户已登录并且存在，则将用户信息设置到request header中，以便其他服务通过@LoginUser注解获取
  */
 @Slf4j
 @Component
@@ -67,32 +72,40 @@ public class UserInfoFilter extends ZuulFilter {
         RequestContext requestContext = RequestContext.getCurrentContext();
         HttpServletRequest request = requestContext.getRequest();
         String token = request.getHeader("token");
-        if(token == null || "".equals(token.trim())){
-//            requestContext.setSendZuulResponse(false);
-//            requestContext.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
+
+        if(StrUtil.isBlank(token))
             return null;
-        }
+
         Session session = null;
         try {
-            session = SecurityUtils.getSecurityManager().getSession(new SessionKey() {
-                @Override
-                public Serializable getSessionId() {
-                    return token;
+            session = SecurityUtils.getSecurityManager().getSession(new MySessionKey(token));
+            if((Boolean) session.getAttribute(DefaultSubjectContext.AUTHENTICATED_SESSION_KEY)){
+                Object user = session.getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY);
+                SimplePrincipalCollection principal = (SimplePrincipalCollection)user;
+                SuUserEntity suUserEntity = principal.oneByType(SuUserEntity.class);
+                System.out.println(principal);
+                if(user != null){
+                    requestContext.addZuulRequestHeader("user-info", Base64.encode(JSON.toJSONString(suUserEntity)));
+                    requestContext.addZuulRequestHeader("user-id", suUserEntity.getId().toString());
                 }
-            });
+            }
+
         }catch (UnknownSessionException e){
             log.debug("无效 token：{}",token);
-            return null;
-        }
-        if((Boolean) session.getAttribute(DefaultSubjectContext.AUTHENTICATED_SESSION_KEY)){
-            Object user = session.getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY);
-            SimplePrincipalCollection principal = (SimplePrincipalCollection)user;
-            SuUserEntity suUserEntity = principal.oneByType(SuUserEntity.class);
-            System.out.println(principal);
-            if(user != null){
-                requestContext.addZuulRequestHeader("userId",suUserEntity.getId().toString());
-            }
         }
         return null;
+    }
+    public class MySessionKey implements SessionKey {
+
+        private String token;
+
+        public MySessionKey(String token) {
+            this.token = token;
+        }
+
+        @Override
+        public Serializable getSessionId() {
+            return token;
+        }
     }
 }

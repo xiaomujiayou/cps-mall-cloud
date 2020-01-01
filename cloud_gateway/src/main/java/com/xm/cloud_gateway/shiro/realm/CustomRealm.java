@@ -7,6 +7,7 @@ import com.xm.comment_serialize.module.user.entity.SuPermissionEntity;
 import com.xm.comment_serialize.module.user.entity.SuUserEntity;
 import com.xm.comment_serialize.module.user.ex.RolePermissionEx;
 import com.xm.comment_serialize.module.user.form.GetUserInfoForm;
+import com.xm.comment_serialize.module.user.vo.UserInfoVo;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -59,8 +60,6 @@ public class CustomRealm extends AuthorizingRealm {
         System.out.println("身份验证");
         //获取用户的输入的账号.
         String openId = (String)token.getPrincipal();
-        System.out.println(openId);
-
         GetUserInfoForm form = new GetUserInfoForm();
         form.setOpenId(openId);
         Msg<SuUserEntity> userInfoMsg = userFeignClient.getUserInfo(form);

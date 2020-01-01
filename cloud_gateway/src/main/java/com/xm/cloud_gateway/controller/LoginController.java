@@ -15,6 +15,7 @@ import com.xm.comment_serialize.module.user.entity.SuPermissionEntity;
 import com.xm.comment_serialize.module.user.entity.SuUserEntity;
 import com.xm.comment_serialize.module.user.form.GetUserInfoForm;
 import com.xm.comment_serialize.module.user.form.WechatLoginForm;
+import com.xm.comment_serialize.module.user.vo.UserInfoVo;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationToken;

@@ -3,6 +3,7 @@ package com.xm.api_mall.service;
 import com.xm.comment_serialize.module.mall.bo.ShareLinkBo;
 import com.xm.comment_serialize.module.mall.entity.SmBannerEntity;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
+import com.xm.comment_serialize.module.mall.ex.SmProductEntityEx;
 import com.xm.comment_serialize.module.mall.form.ProductDetailForm;
 import com.xm.comment_serialize.module.mall.form.ProductListForm;
 import com.xm.comment_utils.mybatis.PageBean;
@@ -92,7 +93,7 @@ public interface ProductService {
      * @return
      * @throws Exception
      */
-    public SmProductEntity detail(String goodsId) throws Exception;
+    public SmProductEntityEx detail(String goodsId,Integer userId, Integer shareUserId) throws Exception;
 
     /**
      * 获取购买信息
@@ -102,10 +103,7 @@ public interface ProductService {
      * @param goodsId
      * @return
      */
-    public ShareLinkBo saleInfo(Integer userId,Integer appType,Integer fromUser,String goodsId) throws Exception;
+    public ShareLinkBo saleInfo(Integer userId,String pid,Integer appType,Integer fromUser,String goodsId) throws Exception;
 
-    /**
-     * 生成推广位id
-     */
-    public String generatePid(Integer userId) throws Exception;
+
 }

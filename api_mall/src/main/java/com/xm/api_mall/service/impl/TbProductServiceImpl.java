@@ -4,6 +4,7 @@ import com.xm.api_mall.service.ProductService;
 import com.xm.comment_serialize.module.mall.bo.ShareLinkBo;
 import com.xm.comment_serialize.module.mall.entity.SmBannerEntity;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
+import com.xm.comment_serialize.module.mall.ex.SmProductEntityEx;
 import com.xm.comment_serialize.module.mall.form.ProductListForm;
 import com.xm.comment_utils.mybatis.PageBean;
 import org.springframework.stereotype.Service;
@@ -70,17 +71,13 @@ public class TbProductServiceImpl implements ProductService {
     }
 
     @Override
-    public SmProductEntity detail(String goodsId) {
+    public SmProductEntityEx detail(String goodsId, Integer userId, Integer shareUserId) throws Exception {
         return null;
     }
 
     @Override
-    public ShareLinkBo saleInfo(Integer userId, Integer appType, Integer fromUser, String goodsId) throws Exception {
+    public ShareLinkBo saleInfo(Integer userId, String pid, Integer appType, Integer fromUser, String goodsId) throws Exception {
         return null;
     }
 
-    @Override
-    public String generatePid(Integer userId) throws Exception {
-        return null;
-    }
 }

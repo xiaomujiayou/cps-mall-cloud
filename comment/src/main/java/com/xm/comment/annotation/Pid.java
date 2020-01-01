@@ -8,17 +8,11 @@ import java.lang.annotation.*;
 @Target({ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface LoginUser {
+public @interface Pid {
 
     /**
-     * 是否必须存在
+     * 默认从request header中取出userId
      * @return
      */
     boolean necessary() default true;
-
-    /**
-     * 是否获取最新用户信息
-     * @return
-     */
-    boolean latest() default false;
 }
