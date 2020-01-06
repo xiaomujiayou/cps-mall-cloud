@@ -1,5 +1,6 @@
 package com.xm.api_user.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.github.pagehelper.PageHelper;
 import com.xm.api_user.mapper.SuProductMapper;
 import com.xm.api_user.service.ProductService;
@@ -7,6 +8,7 @@ import com.xm.comment.exception.GlobleException;
 import com.xm.comment.module.mall.feign.MallFeignClient;
 import com.xm.comment.response.MsgEnum;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
+import com.xm.comment_serialize.module.mall.ex.SmProductEntityEx;
 import com.xm.comment_serialize.module.mall.form.ProductDetailForm;
 import com.xm.comment_serialize.module.user.entity.SuProductEntity;
 import com.xm.comment_utils.mybatis.PageBean;
@@ -38,6 +40,7 @@ public class ProductServiceImpl implements ProductService {
         List<SuProductEntity> suProductEntities = suProductMapper.select(suProductEntity);
         Map<String, java.util.Date> timeMap = suProductEntities.stream().collect(Collectors.toMap(SuProductEntity::getGoodsId,SuProductEntity::getCreateTime));
         Map<String, Integer> idMap = suProductEntities.stream().collect(Collectors.toMap(SuProductEntity::getGoodsId,SuProductEntity::getId));
+        Map<String, Integer> shareUserIdMap = suProductEntities.stream().filter(o->o.getShareUserId() != null).collect(Collectors.toMap(SuProductEntity::getGoodsId,SuProductEntity::getShareUserId));
         Map<Integer,List<SuProductEntity>> groups = suProductEntities.stream().collect(Collectors.groupingBy(SuProductEntity::getPlatformType));
         List<SmProductEntity> smProductEntities = groups.entrySet().stream().map(o->{
             List<String> goodsIds = o.getValue().stream().map(SuProductEntity::getGoodsId).collect(Collectors.toList());
@@ -48,19 +51,28 @@ public class ProductServiceImpl implements ProductService {
         })).collect(Collectors.toList());
         smProductEntities = smProductEntities.stream().sorted(Comparator.comparing(o->timeMap.get(o.getGoodsId()))).collect(Collectors.toList());
         Collections.reverse(smProductEntities);
+
+        List<SmProductEntityEx> smProductEntityExes = smProductEntities.stream().map(o->{
+            SmProductEntityEx smProductEntityEx = new SmProductEntityEx();
+            BeanUtil.copyProperties(o,smProductEntityEx);
+            smProductEntityEx.setShareUserId(shareUserIdMap.get(o.getGoodsId()));
+            return smProductEntityEx;
+        }).collect(Collectors.toList());
+
         PageBean pageBean = new PageBean(suProductEntities);
-        pageBean.setList(smProductEntities);
+        pageBean.setList(smProductEntityExes);
         return pageBean;
     }
 
     @Override
-    public void addHistory(Integer userId, Integer platformType, String goodsId) {
+    public void addHistory(Integer userId, Integer platformType, String goodsId,Integer shareUserId) {
         SuProductEntity suProductEntity = new SuProductEntity();
         suProductEntity.setUserId(userId);
         suProductEntity.setGoodsId(goodsId);
         suProductEntity.setPlatformType(platformType);
         suProductEntity.setType(2);
         suProductMapper.delete(suProductEntity);
+        suProductEntity.setShareUserId(shareUserId);
         suProductEntity.setDel(1);
         suProductEntity.setCreateTime(new Date(System.currentTimeMillis()));
         suProductMapper.insert(suProductEntity);
@@ -101,7 +113,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void collect(Integer userId, Integer platformType, String goodsId, Boolean isCollect) {
+    public void collect(Integer userId, Integer platformType, String goodsId,Integer shareUserId, Boolean isCollect) {
         SuProductEntity suProductEntity = new SuProductEntity();
         suProductEntity.setUserId(userId);
         suProductEntity.setType(1);
@@ -109,6 +121,7 @@ public class ProductServiceImpl implements ProductService {
         suProductEntity.setGoodsId(goodsId);
         if(isCollect){
             suProductMapper.delete(suProductEntity);
+            suProductEntity.setShareUserId(shareUserId);
             suProductEntity.setDel(1);
             suProductEntity.setCreateTime(new Date(System.currentTimeMillis()));
             suProductMapper.insertSelective(suProductEntity);

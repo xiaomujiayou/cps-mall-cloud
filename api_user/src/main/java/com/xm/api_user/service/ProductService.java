@@ -1,6 +1,7 @@
 package com.xm.api_user.service;
 
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
+import com.xm.comment_serialize.module.mall.ex.SmProductEntityEx;
 import com.xm.comment_utils.mybatis.PageBean;
 
 import java.util.List;
@@ -15,7 +16,7 @@ public interface ProductService {
      * @param suProductType
      * @return
      */
-    public PageBean<SmProductEntity> getUserProduct(Integer userId,Integer pageNum,Integer pageSize,Integer suProductType);
+    public PageBean<SmProductEntity> getUserProduct(Integer userId, Integer pageNum, Integer pageSize, Integer suProductType);
 
     /**
      * 添加浏览历史记录
@@ -23,7 +24,7 @@ public interface ProductService {
      * @param platformType
      * @param goodsId
      */
-    public void addHistory(Integer userId,Integer platformType,String goodsId);
+    public void addHistory(Integer userId,Integer platformType,String goodsId,Integer shareUserId);
 
     /**
      * @param userId
@@ -47,5 +48,5 @@ public interface ProductService {
      * @param platformType
      * @param goodsId
      */
-    public void collect(Integer userId,Integer platformType,String goodsId,Boolean isCollect);
+    public void collect(Integer userId,Integer platformType,String goodsId,Integer shareUserId,Boolean isCollect);
 }

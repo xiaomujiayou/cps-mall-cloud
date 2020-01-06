@@ -6,6 +6,7 @@ import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
 import com.xm.comment_serialize.module.mall.ex.SmProductEntityEx;
 import com.xm.comment_serialize.module.mall.form.ProductDetailForm;
 import com.xm.comment_serialize.module.mall.form.ProductListForm;
+import com.xm.comment_serialize.module.mall.vo.SmProductSimpleVo;
 import com.xm.comment_utils.mybatis.PageBean;
 
 import java.util.List;
@@ -16,43 +17,43 @@ public interface ProductService {
      * 通过option获取商品
      * @return
      */
-    public PageBean<SmProductEntity> optionList(Integer userId, ProductListForm productListForm) throws Exception;
+    public PageBean<SmProductEntityEx> optionList(Integer userId,String pid ,ProductListForm productListForm) throws Exception;
 
     /**
      * 获取类似商品
      * @return
      */
-    public PageBean<SmProductEntity> similarList(Integer userId,ProductListForm productListForm);
+    public PageBean<SmProductEntityEx> similarList(Integer userId,String pid,ProductListForm productListForm) throws Exception;
 
     /**
      * 获取推荐商品
      * @return
      */
-    public PageBean<SmProductEntity> bestList (Integer userId,ProductListForm productListForm) throws Exception;
+    public PageBean<SmProductEntityEx> bestList (Integer userId,String pid,ProductListForm productListForm) throws Exception;
 
     /**
      * 根据关键字获取商品
      * @return
      */
-    public PageBean<SmProductEntity> keywordList(Integer userId,ProductListForm productListForm) throws Exception;
+    public PageBean<SmProductEntityEx> keywordList(Integer userId,String pid,ProductListForm productListForm) throws Exception;
 
     /**
      * 获取热销商品
      * @return
      */
-    public PageBean<SmProductEntity> hotList(Integer userId,ProductListForm productListForm) throws Exception;
+    public PageBean<SmProductEntityEx> hotList(Integer userId,String pid,ProductListForm productListForm) throws Exception;
 
     /**
      * 获取自定义商品
      * @return
      */
-    public PageBean<SmProductEntity> customList(Integer userId,ProductListForm productListForm) throws Exception;
+    public PageBean<SmProductEntityEx> customList(Integer userId,String pid,ProductListForm productListForm) throws Exception;
 
     /**
      * 获取猜你喜欢商品
      * @return
      */
-    public PageBean<SmProductEntity> likeList(Integer userId,ProductListForm productListForm) throws Exception;
+    public PageBean<SmProductEntityEx> likeList(Integer userId,String pid,ProductListForm productListForm) throws Exception;
 
     /**
      * 主题商品列表
@@ -61,7 +62,7 @@ public interface ProductService {
      * @return
      * @throws Exception
      */
-    public PageBean<SmProductEntity> themeList(Integer userId,ProductListForm productListForm) throws Exception;
+    public PageBean<SmProductEntityEx> themeList(Integer userId,String pid,ProductListForm productListForm) throws Exception;
 
     /**
      * 获取营销活动列表
@@ -70,7 +71,7 @@ public interface ProductService {
      * @return
      * @throws Exception
      */
-    public PageBean<SmProductEntity> recommendList(Integer userId,ProductListForm productListForm) throws Exception;
+    public PageBean<SmProductEntityEx> recommendList(Integer userId,String pid,ProductListForm productListForm) throws Exception;
 
     /**
      * 获取主题活动
@@ -93,7 +94,15 @@ public interface ProductService {
      * @return
      * @throws Exception
      */
-    public SmProductEntityEx detail(String goodsId,Integer userId, Integer shareUserId) throws Exception;
+    public SmProductEntityEx detail(String goodsId,String pid,Integer userId, Integer shareUserId) throws Exception;
+
+    /**
+     * 获取商品简略信息
+     * @param goodsId
+     * @return
+     * @throws Exception
+     */
+    public SmProductSimpleVo basicDetail(Long goodsId) throws Exception;
 
     /**
      * 获取购买信息

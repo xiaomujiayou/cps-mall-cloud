@@ -32,10 +32,10 @@ public class OrderController {
      * @return
      * @throws Exception
      */
-    @GetMapping("/pdd/increment")
-    public Msg<PageBean<SuOrderEntity>> getIncrement(@Valid OrderIncrementListForm form, BindingResult bindingResult) throws Exception {
-        return R.sucess(pddProductApiService.getOrderByIncrement(form.getStartUpdateTime(),form.getEndUpdateTime(),form.getPageNum(),form.getPageSize()));
-    }
+//    @GetMapping("/pdd/increment")
+//    public Msg<PageBean<SuOrderEntity>> getIncrement(@Valid OrderIncrementListForm form, BindingResult bindingResult) throws Exception {
+//        return R.sucess(pddProductApiService.getOrderByIncrement(form.getStartUpdateTime(),form.getEndUpdateTime(),form.getPageNum(),form.getPageSize()));
+//    }
 
     @GetMapping("/time")
     public Msg<Date> getTime() throws Exception {

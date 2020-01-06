@@ -24,7 +24,7 @@ public class ProductListContext<T> {
 
     public ProductListContext listType(Integer listType) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         String methodName = EnumUtils.getEnum(ProductListTypeEnum.class,"key",listType).getName();
-        listMethod = ProductService.class.getMethod(methodName, Integer.class, ProductListForm.class);
+        listMethod = ProductService.class.getMethod(methodName, Integer.class,String.class, ProductListForm.class);
         return this;
     }
 

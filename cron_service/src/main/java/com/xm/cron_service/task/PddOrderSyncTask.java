@@ -1,5 +1,8 @@
 package com.xm.cron_service.task;
 
+import cn.hutool.core.date.DateField;
+import cn.hutool.core.date.DateUnit;
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.xm.comment.exception.GlobleException;
@@ -12,19 +15,16 @@ import com.xm.comment_serialize.module.user.entity.SuOrderEntity;
 import com.xm.comment_utils.mybatis.PageBean;
 import com.xm.comment_utils.mybatis.PageUtils;
 import com.xm.cron_service.mapper.ScPddOrderSyncHistoryMapper;
+import com.xm.cron_service.service.TaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
 import tk.mybatis.orderbyhelper.OrderByHelper;
 
-import java.lang.ref.PhantomReference;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 
@@ -34,23 +34,29 @@ import java.util.List;
 @Slf4j
 @Component
 @EnableScheduling
-public class PddOrderSyncTask {
+public class PddOrderSyncTask{
 
-    @Autowired
-    private MallFeignClient mallFeignClient;
+//    @Autowired
+//    private MallFeignClient mallFeignClient;
     @Autowired
     private ScPddOrderSyncHistoryMapper scPddOrderSyncHistoryMapper;
     @Autowired
     private RabbitTemplate rabbitTemplate;
+    @Resource(name = "pddTaskService")
+    private TaskService pddTaskService;
 
+    //最大间隔时间
+    private final int MAX_INTERVAL_TIME = 24 * 60 * 60;
+    //查询时间往前推10分钟(避免因平台服务处理时间额漏单)
+    private final int MOVE_FORWARD = -10 * 60;
 
     /**
      * 每分钟同步一次
      */
 //    @Async("threadPool")
     @Scheduled(cron = "0/30 * * * * ?")
-    public void dowork() throws InterruptedException {
-       log.debug("拼多多订单服务 start");
+    public void dowork() {
+
         ScPddOrderSyncHistoryEntity lastHistory = getLastHistory();
         if(lastHistory.getTotalPage() != null && lastHistory.getPage() < lastHistory.getTotalPage()){
             //查询下页数据
@@ -60,38 +66,37 @@ public class PddOrderSyncTask {
             Date now = getTime();
             Date lastEndTime = lastHistory.getEndUpdateTime();
             lastHistory = defaultEntity();
-            lastHistory.setStartUpdateTime(lastEndTime);
+            lastHistory.setStartUpdateTime(DateUtil.offset(lastEndTime,DateField.SECOND,MOVE_FORWARD));
             lastHistory.setEndUpdateTime(now);
-            if(now.getTime() - lastEndTime.getTime() >= 1000 * 60 * 60 * 24){
-                //距离上次查询时间超过一天 重新开始
-                lastHistory = defaultEntity();
-                log.error("拼多多订单服务 - 同步失败：距离上次查询时间超过一天 无效区间：[{}] - [{}] 已修正为：[{}] - [{}]",
+            if(DateUtil.between(now,lastEndTime, DateUnit.SECOND) >= MAX_INTERVAL_TIME){
+                //查询时间段超时则重新计算结束时间
+                lastHistory.setEndUpdateTime(DateUtil.offset(lastEndTime, DateField.SECOND,MAX_INTERVAL_TIME));
+                log.error("拼多多订单服务 - 同步失败：距离上次查询时间超时 无效区间：[{}] - [{}] 已修正为：[{}] - [{}]",
                         lastEndTime,
                         now,
                         lastHistory.getStartUpdateTime(),
                         lastHistory.getEndUpdateTime());
             }
         }
-        Msg<PageBean<SuOrderEntity>> msg = mallFeignClient.getIncrement(
-                lastHistory.getStartUpdateTime(),
-                lastHistory.getEndUpdateTime(),
-                lastHistory.getPage(),
-                lastHistory.getPageSize());
-        //接口出错
-        if(!msg.getCode().equals(200)) {
-            log.error("拼多多订单服务 - 同步出错：[{}]", msg.getMsg());
-            return;
+        PageBean<SuOrderEntity> pageBean = null;
+        try {
+            pageBean = pddTaskService.getOrderByIncrement(
+                    lastHistory.getStartUpdateTime(),
+                    lastHistory.getEndUpdateTime(),
+                    lastHistory.getPage(),
+                    lastHistory.getPageSize());
+        } catch (Exception e) {
+            log.error("拼多多订单服务 - 同步出错：[{}]", e);
         }
-        PageBean<SuOrderEntity> pageBean = msg.getData();
 
         if(pageBean.getList() != null){
-            msg.getData().getList().stream().forEach(o->{
+            pageBean.getList().stream().forEach(o->{
                 log.debug("拼多多订单服务 - 收到订单：[{}]", JSON.toJSONString(o));
                 rabbitTemplate.convertAndSend(OrderMqConfig.EXCHANGE,OrderMqConfig.KEY,o);
             });
         }
-        lastHistory.setReturnCount((int)msg.getData().getTotal());
-        lastHistory.setTotalPage(PageUtils.calcTotalPage((int)msg.getData().getTotal(),msg.getData().getPageSize()));
+        lastHistory.setReturnCount((int)pageBean.getTotal());
+        lastHistory.setTotalPage(PageUtils.calcTotalPage((int)pageBean.getTotal(),pageBean.getPageSize()));
         lastHistory.setCreateTime(new Date());
         lastHistory.setId(null);
         scPddOrderSyncHistoryMapper.insertSelective(lastHistory);
@@ -130,10 +135,13 @@ public class PddOrderSyncTask {
      */
 
     private Date getTime(){
-        Msg<Date> msg = mallFeignClient.getTime();
-        if(msg.getCode() != 200)
-            throw new GlobleException(MsgEnum.SERVICE_AVAILABLE,"获取时间失败：" + msg.getMsg());
-        return msg.getData();
+        Date date = null;
+        try {
+            date = pddTaskService.getTime();
+        } catch (Exception e) {
+            log.error("{}",e);
+        }
+        return date;
     }
 
 

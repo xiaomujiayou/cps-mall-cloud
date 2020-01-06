@@ -14,5 +14,6 @@ public class SmProductEntityEx extends SmProductEntity {
     private Integer buyRate;
     //购买收益
     private Integer buyPrice;
-
+    //分享用户id
+    private Integer shareUserId;
 }

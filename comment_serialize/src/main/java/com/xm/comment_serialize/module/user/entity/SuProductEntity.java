@@ -33,6 +33,11 @@ public class SuProductEntity implements Serializable{
 	private Integer type;
 
 	/**
+	 * 分享用户id
+	 */
+	private Integer shareUserId;
+
+	/**
 	 * 是否删除(0:已删除,1:未删除)
 	 */
 	private Integer del;

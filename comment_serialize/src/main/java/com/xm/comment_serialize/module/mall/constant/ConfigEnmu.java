@@ -11,8 +11,11 @@ public enum ConfigEnmu {
     PRODUCT_BUY_RATE("product_buy_rate","商品购买默认佣金比例(千分比)"),
     PRODUCT_PROXY_RATE("product_proxy_rate","商品购买代理人佣金比例(千分比)"),
     PRODUCT_SEARCH_RECOMMEND("product_search_recommend","搜索页推荐搜索"),
-    PROXY_LEVEL("proxy_level","代理层级")
-
+    PROXY_LEVEL("proxy_level","代理层级"),
+    PLATFORM_NAME("platform_name","平台名称"),
+    PLATFORM_ID("platform_id","平台id"),
+    PLATFORM_ALL_NAME("platform_all_name","所有平台名称"),
+    PLATFORM_ALL_ID("platform_all_id","所有平台id"),
     ;
     ConfigEnmu(String name, String desc) {
         this.name = name;

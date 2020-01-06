@@ -10,6 +10,7 @@ public class ProductCriteriaBo {
     private Integer pageNum;
     private Integer pageSize;
 
+    private String pid;
     private Integer optionId;
     private String keyword;
     private Integer orderBy;

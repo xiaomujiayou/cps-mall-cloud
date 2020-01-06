@@ -18,6 +18,13 @@
     </properties>
 
     <dependencies>
+
+        <!-- 分词工具 -->
+        <dependency>
+            <groupId>com.hankcs</groupId>
+            <artifactId>hanlp</artifactId>
+        </dependency>
+
         <!-- 拼多多sdk -->
         <dependency>
             <groupId>com.xm.pdd</groupId>

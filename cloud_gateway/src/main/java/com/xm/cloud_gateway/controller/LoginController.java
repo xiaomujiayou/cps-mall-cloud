@@ -42,6 +42,7 @@ public class LoginController {
     public Object login(@Valid @RequestBody WechatLoginForm wechatLoginForm, BindingResult bindingResult){
         GetUserInfoForm form = new GetUserInfoForm();
         form.setCode(wechatLoginForm.getCode());
+        form.setShareUserId(wechatLoginForm.getShareUserId());
         Msg<SuUserEntity> msg = userFeignClient.getUserInfo(form);
         WeChatToken token = new WeChatToken(msg.getData().getOpenId());
         if(!SecurityUtils.getSubject().isAuthenticated()){

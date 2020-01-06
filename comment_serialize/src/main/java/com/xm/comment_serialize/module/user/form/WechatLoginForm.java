@@ -8,4 +8,5 @@ import javax.validation.constraints.NotEmpty;
 public class WechatLoginForm {
     @NotEmpty(message = "code不能为空")
     private String code;
+    private Integer shareUserId;
 }

@@ -8,6 +8,8 @@ import com.xm.comment_serialize.module.mall.bo.ProductIndexBo;
 import com.xm.comment_serialize.module.mall.entity.SmConfigEntity;
 import com.xm.comment_serialize.module.mall.entity.SmPidEntity;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
+import com.xm.comment_serialize.module.mall.ex.SmProductEntityEx;
+import com.xm.comment_serialize.module.mall.form.CalcProfitForm;
 import com.xm.comment_serialize.module.mall.form.ProductDetailForm;
 import com.xm.comment_serialize.module.user.entity.SuOrderEntity;
 import com.xm.comment_utils.mybatis.PageBean;
@@ -55,8 +57,14 @@ public class MallFeignClientFallBack implements MallFeignClient {
         return R.error(MsgEnum.SERVICE_AVAILABLE);
     }
 
+
     @Override
     public Msg<List<SmProductEntity>> getProductDetails(List<ProductIndexBo> productIndexBos) {
+        return R.error(MsgEnum.SERVICE_AVAILABLE);
+    }
+
+    @Override
+    public Msg<List<SmProductEntityEx>> calc(CalcProfitForm calcProfitForm) {
         return R.error(MsgEnum.SERVICE_AVAILABLE);
     }
 

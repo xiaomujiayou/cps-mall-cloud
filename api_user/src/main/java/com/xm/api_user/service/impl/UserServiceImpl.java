@@ -3,6 +3,7 @@ package com.xm.api_user.service.impl;
 import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import com.github.pagehelper.PageHelper;
 import com.xm.api_user.mapper.*;
 import com.xm.api_user.mapper.custom.SuOrderMapperEx;
@@ -73,7 +74,7 @@ public class UserServiceImpl implements UserService {
             record = suUserMapper.selectOne(record);
             if(record != null)
                 return record;
-            return addNewUser(wxMaJscode2SessionResult.getOpenid());
+            return addNewUser(wxMaJscode2SessionResult.getOpenid(),getUserInfoForm.getShareUserId());
         }else if(StringUtils.isNotBlank(getUserInfoForm.getOpenId())){
             SuUserEntity record = new SuUserEntity();
             record.setOpenId(getUserInfoForm.getOpenId());
@@ -88,9 +89,11 @@ public class UserServiceImpl implements UserService {
      * @param openId
      * @return
      */
-    private SuUserEntity addNewUser(String openId){
+    private SuUserEntity addNewUser(String openId,Integer shareUserId){
         SmPidEntity smPidEntity = mallFeignClient.generatePid().getData();
         SuUserEntity user = new SuUserEntity();
+        if(shareUserId != null)
+            user.setParentId(shareUserId);
         user.setOpenId(openId);
         user.setNickname("Su_"+ MD5.md5(openId,"").substring(0,5));
         user.setSex(0);
@@ -139,7 +142,7 @@ public class UserServiceImpl implements UserService {
     public SuUserEntity getSuperUser(Integer userId, int userType) {
         SuUserEntity self = suUserMapper.selectByPrimaryKey(userId);
         if(self == null){
-            throw new GlobleException(MsgEnum.USER_NOFOUND_ERROR);
+            throw new GlobleException(MsgEnum.USER_NOFOUND_ERROR,"id:"+userId);
         }
         switch (userType){
             case UserTypeConstant.SELF:{

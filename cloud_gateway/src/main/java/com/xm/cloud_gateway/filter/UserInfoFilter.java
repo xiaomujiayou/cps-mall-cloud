@@ -83,7 +83,7 @@ public class UserInfoFilter extends ZuulFilter {
                 Object user = session.getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY);
                 SimplePrincipalCollection principal = (SimplePrincipalCollection)user;
                 SuUserEntity suUserEntity = principal.oneByType(SuUserEntity.class);
-                System.out.println(principal);
+                System.out.println(request.getRequestURI()+":"+principal);
                 if(user != null){
                     requestContext.addZuulRequestHeader("user-info", Base64.encode(JSON.toJSONString(suUserEntity)));
                     requestContext.addZuulRequestHeader("user-id", suUserEntity.getId().toString());

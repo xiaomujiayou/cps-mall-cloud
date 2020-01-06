@@ -8,8 +8,9 @@ zuul:
   sensitive-headers:
     - Cookie,Set-Cookie,Authorization
   host:
-    connect-timeout-millis: 15000
-    socket-timeout-millis: 60000
+#    connect-timeout-millis: 15000
+#    socket-timeout-millis: 60000
+    connection-request-timeout-millis: 5000
 
 ribbon:
   ReadTimeout: 10000

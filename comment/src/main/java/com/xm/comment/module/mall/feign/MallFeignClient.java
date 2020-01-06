@@ -7,6 +7,8 @@ import com.xm.comment_serialize.module.mall.bo.ProductIndexBo;
 import com.xm.comment_serialize.module.mall.entity.SmConfigEntity;
 import com.xm.comment_serialize.module.mall.entity.SmPidEntity;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
+import com.xm.comment_serialize.module.mall.ex.SmProductEntityEx;
+import com.xm.comment_serialize.module.mall.form.CalcProfitForm;
 import com.xm.comment_serialize.module.mall.form.OrderIncrementListForm;
 import com.xm.comment_serialize.module.mall.form.ProductDetailForm;
 import com.xm.comment_serialize.module.user.entity.SuOrderEntity;
@@ -48,4 +50,7 @@ public interface MallFeignClient {
 
     @PostMapping(value = "/product/details" ,consumes = "application/json")
     public Msg<List<SmProductEntity>> getProductDetails(@RequestBody List<ProductIndexBo> productIndexBos);
+
+    @PostMapping(value = "/profit/calc" ,consumes = "application/json")
+    public Msg<List<SmProductEntityEx>> calc(@RequestBody CalcProfitForm calcProfitForm);
 }

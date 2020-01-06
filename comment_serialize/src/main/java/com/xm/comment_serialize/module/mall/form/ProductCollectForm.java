@@ -12,6 +12,8 @@ public class ProductCollectForm {
     //商品Id
     @NotNull(message = "goodsId不能为空")
     private String goodsId;
+    //分享用户
+    private Integer shareUserId;
     //取消/收藏
     @NotNull(message = "isCollect不能为空")
     private Boolean isCollect;

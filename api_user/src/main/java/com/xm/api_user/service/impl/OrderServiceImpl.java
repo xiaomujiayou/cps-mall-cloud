@@ -56,10 +56,26 @@ public class OrderServiceImpl implements OrderService {
         if(oldOrder == null){
             //收录订单并计算相关账单
             orderService.onOrderCreate(order);
-        }
+        }else if(repeated(oldOrder,order))          //是否重复收录
+            return;
         //更新订单状态，并根据情况发放佣金
         orderService.updateOrderState(order,oldOrder);
     }
+
+    /**
+     * 订单是否重复
+     * @param oldOrder
+     * @param order
+     * @return
+     */
+    private boolean repeated(SuOrderEntity oldOrder, SuOrderEntity order) {
+        if(oldOrder == null)
+            return false;
+        if(oldOrder.getPlatformType().equals(order.getPlatformType()) && oldOrder.getState().equals(order.getState()))
+            return true;
+        return false;
+    }
+
     /**
      * 获取旧订单
      * @param order

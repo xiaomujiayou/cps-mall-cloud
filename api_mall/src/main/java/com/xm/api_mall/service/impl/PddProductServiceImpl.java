@@ -1,5 +1,6 @@
 package com.xm.api_mall.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.xm.api_mall.mapper.SmOptMapper;
 import com.xm.api_mall.service.ProductApiService;
@@ -16,6 +17,7 @@ import com.xm.comment_serialize.module.mall.entity.SmBannerEntity;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
 import com.xm.comment_serialize.module.mall.ex.SmProductEntityEx;
 import com.xm.comment_serialize.module.mall.form.ProductListForm;
+import com.xm.comment_serialize.module.mall.vo.SmProductSimpleVo;
 import com.xm.comment_serialize.module.user.form.AddSearchForm;
 import com.xm.comment_utils.mybatis.PageBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,45 +36,52 @@ public class PddProductServiceImpl implements ProductService {
 
     @Resource(name = "pddProductApiService")
     private ProductApiService productApiService;
-
     @Autowired
     private SmOptMapper smOptMapper;
-
     @Autowired
     private UserFeignClient userFeignClient;
     @Autowired
     private ProfitService profitService;
 
     @Override
-    public PageBean<SmProductEntity> optionList(Integer userId, ProductListForm productListForm) throws Exception {
+    public PageBean<SmProductEntityEx> optionList(Integer userId,String pid, ProductListForm productListForm) throws Exception {
         if(productListForm.getOptionId() == null || productListForm.getOptionId() == 0)
             throw new GlobleException(MsgEnum.PARAM_VALID_ERROR,"optionId 不能为空");
         ProductCriteriaBo productCriteriaBo = new ProductCriteriaBo();
+        productCriteriaBo.setPid(pid);
         productCriteriaBo.setUserId(userId);
         productCriteriaBo.setPageNum(productListForm.getPageNum());
         productCriteriaBo.setPageSize(productListForm.getPageSize());
         productCriteriaBo.setOptionId(Integer.valueOf(smOptMapper.selectByPrimaryKey(productListForm.getOptionId()).getPddOptId()));
-        return productApiService.getProductByCriteria(productCriteriaBo);
+        return convertSmProductEntityEx(userId,productApiService.getProductByCriteria(productCriteriaBo));
     }
 
     @Override
-    public PageBean<SmProductEntity> similarList(Integer userId, ProductListForm productListForm) {
-        return null;
+    public PageBean<SmProductEntityEx> similarList(Integer userId,String pid, ProductListForm productListForm) throws Exception {
+        if(StrUtil.isBlank(productListForm.getGoodsId()))
+            throw new GlobleException(MsgEnum.PARAM_VALID_ERROR,"optionId 不能为空");
+        SmProductEntity smProductEntity = productApiService.detail(Long.valueOf(productListForm.getGoodsId()),pid);
+        productListForm.setKeywords(smProductEntity.getName());
+        productListForm.setSort(3);
+        PageBean<SmProductEntityEx> productEntityExPageBean = keyworkSearch(userId,pid,productListForm);
+        productEntityExPageBean.setList(productEntityExPageBean.getList().stream().filter(o-> !smProductEntity.getGoodsId().equals(o.getGoodsId())).collect(Collectors.toList()));
+        return productEntityExPageBean;
     }
 
     @Override
-    public PageBean<SmProductEntity> bestList(Integer userId, ProductListForm productListForm) throws Exception {
+    public PageBean<SmProductEntityEx> bestList(Integer userId,String pid, ProductListForm productListForm) throws Exception {
         ProductCriteriaBo productCriteriaBo = new ProductCriteriaBo();
         if(productListForm.getActivityTags() != null && !productListForm.getActivityTags().isEmpty())
             productCriteriaBo.setActivityTags(productListForm.getActivityTags());
+        productCriteriaBo.setPid(pid);
         productCriteriaBo.setUserId(userId);
         productCriteriaBo.setPageNum(productListForm.getPageNum());
         productCriteriaBo.setPageSize(productListForm.getPageSize());
-        return productApiService.getProductByCriteria(productCriteriaBo);
+        return convertSmProductEntityEx(userId,productApiService.getProductByCriteria(productCriteriaBo));
     }
 
     @Override
-    public PageBean<SmProductEntity> keywordList(Integer userId, ProductListForm productListForm) throws Exception {
+    public PageBean<SmProductEntityEx> keywordList(Integer userId,String pid, ProductListForm productListForm) throws Exception {
         if(productListForm.getKeywords() == null || productListForm.getKeywords().trim().equals(""))
             throw new GlobleException(MsgEnum.PARAM_VALID_ERROR,"keywords 不能为空");
         //添加搜索历史
@@ -82,8 +91,11 @@ public class PddProductServiceImpl implements ProductService {
             addSearchForm.setKeyWords(productListForm.getKeywords());
             userFeignClient.addSearch(userId,addSearchForm);
         }
-
+        return keyworkSearch(userId,pid,productListForm);
+    }
+    private PageBean<SmProductEntityEx> keyworkSearch(Integer userId,String pid, ProductListForm productListForm) throws Exception {
         ProductCriteriaBo productCriteriaBo = new ProductCriteriaBo();
+        productCriteriaBo.setPid(pid);
         productCriteriaBo.setUserId(userId);
         productCriteriaBo.setPageNum(productListForm.getPageNum());
         productCriteriaBo.setPageSize(productListForm.getPageSize());
@@ -93,35 +105,51 @@ public class PddProductServiceImpl implements ProductService {
             productCriteriaBo.setMaxPrice(productListForm.getMaxPrice());
         }
         productCriteriaBo.setKeyword(productListForm.getKeywords());
-
-        return productApiService.getProductByCriteria(productCriteriaBo);
+        return convertSmProductEntityEx(userId,productApiService.getProductByCriteria(productCriteriaBo));
     }
 
     @Override
-    public PageBean<SmProductEntity> hotList(Integer userId, ProductListForm productListForm) throws Exception {
+    public PageBean<SmProductEntityEx> hotList(Integer userId,String pid, ProductListForm productListForm) throws Exception {
         //热销榜
-        return productApiService.getTopGoodsList(2,productListForm.getPageNum(),productListForm.getPageSize());
+        return convertSmProductEntityEx(
+                userId,
+                productApiService.getTopGoodsList(
+                        2,
+                        pid,
+                        productListForm.getPageNum(),
+                        productListForm.getPageSize()));
     }
 
     @Override
-    public PageBean<SmProductEntity> customList(Integer userId, ProductListForm productListForm) throws Exception {
+    public PageBean<SmProductEntityEx> customList(Integer userId,String pid, ProductListForm productListForm) throws Exception {
         return null;
     }
 
     @Override
-    public PageBean<SmProductEntity> likeList(Integer userId, ProductListForm productListForm) throws Exception {
+    public PageBean<SmProductEntityEx> likeList(Integer userId,String pid, ProductListForm productListForm) throws Exception {
         return null;
     }
 
     @Override
-    public PageBean<SmProductEntity> themeList(Integer userId, ProductListForm productListForm) throws Exception {
-        return productApiService.getThemeGoodsList(productListForm.getThemeId());
+    public PageBean<SmProductEntityEx> themeList(Integer userId,String pid, ProductListForm productListForm) throws Exception {
+        return convertSmProductEntityEx(userId,productApiService.getThemeGoodsList(productListForm.getThemeId(),pid));
     }
 
     @Override
-    public PageBean<SmProductEntity> recommendList(Integer userId, ProductListForm productListForm) throws Exception {
-        return productApiService.getRecommendGoodsList(productListForm.getChannelType(),productListForm.getPageNum(),productListForm.getPageSize());
+    public PageBean<SmProductEntityEx> recommendList(Integer userId,String pid, ProductListForm productListForm) throws Exception {
+        return convertSmProductEntityEx(userId,productApiService.getRecommendGoodsList(pid,productListForm.getChannelType(),productListForm.getPageNum(),productListForm.getPageSize()));
     }
+
+    private PageBean<SmProductEntityEx> convertSmProductEntityEx(Integer userId,PageBean<SmProductEntity> pageBean){
+        List<SmProductEntityEx> list = profitService.calcProfit(pageBean.getList(),userId);
+        PageBean<SmProductEntityEx> productEntityExPageBean = new PageBean<>();
+        productEntityExPageBean.setList(list);
+        productEntityExPageBean.setPageNum(pageBean.getPageNum());
+        productEntityExPageBean.setPageSize(pageBean.getPageSize());
+        productEntityExPageBean.setTotal(pageBean.getTotal());
+        return productEntityExPageBean;
+    }
+
 
     @Override
     public List<SmBannerEntity> themes() throws Exception {
@@ -146,9 +174,14 @@ public class PddProductServiceImpl implements ProductService {
     }
 
     @Override
-    public SmProductEntityEx detail(String goodsId, Integer userId, Integer shareUserId) throws Exception {
-        SmProductEntity smProductEntity = productApiService.detail(Long.valueOf(goodsId));
+    public SmProductEntityEx detail(String goodsId,String pid, Integer userId, Integer shareUserId) throws Exception {
+        SmProductEntity smProductEntity = productApiService.detail(Long.valueOf(goodsId),pid);
         return profitService.calcProfit(smProductEntity,userId,shareUserId != null,shareUserId);
+    }
+
+    @Override
+    public SmProductSimpleVo basicDetail(Long goodsId) throws Exception {
+        return productApiService.basicDetail(goodsId);
     }
 
     @Override

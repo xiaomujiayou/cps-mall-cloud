@@ -4,6 +4,7 @@ import com.xm.comment_serialize.module.mall.bo.PddThemeBo;
 import com.xm.comment_serialize.module.mall.bo.ProductCriteriaBo;
 import com.xm.comment_serialize.module.mall.bo.ShareLinkBo;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
+import com.xm.comment_serialize.module.mall.vo.SmProductSimpleVo;
 import com.xm.comment_serialize.module.user.entity.SuOrderEntity;
 import com.xm.comment_serialize.module.user.entity.SuUserEntity;
 import com.xm.comment_utils.mybatis.PageBean;
@@ -34,7 +35,16 @@ public interface ProductApiService {
      * @return
      * @throws Exception
      */
-    public SmProductEntity detail(Long goodsId) throws Exception;
+    public SmProductEntity detail(Long goodsId,String pid) throws Exception;
+
+
+    /**
+     * 获取商品简略信息
+     * @param goodsId
+     * @return
+     * @throws Exception
+     */
+    public SmProductSimpleVo basicDetail(Long goodsId) throws Exception;
 
     /**
      * 获取商品购买信息
@@ -52,14 +62,6 @@ public interface ProductApiService {
     public String generatePid(Integer userId) throws Exception;
 
     /**
-     * 按最后更新时间查询订单
-     * @param startUpdateTime
-     * @param endUpdateTime
-     * @return
-     */
-    public PageBean<SuOrderEntity> getOrderByIncrement(Date startUpdateTime,Date endUpdateTime,Integer pageNum,Integer pageSize) throws Exception;
-
-    /**
      * 获取系统时间
      * @return
      */
@@ -74,7 +76,7 @@ public interface ProductApiService {
      * @return
      * @throws Exception
      */
-    public PageBean<SmProductEntity> getTopGoodsList(Integer type,Integer pageNum,Integer pageSize) throws Exception;
+    public PageBean<SmProductEntity> getTopGoodsList(Integer type,String pid,Integer pageNum,Integer pageSize) throws Exception;
 
     /**
      * 获取主题推广类型
@@ -87,7 +89,7 @@ public interface ProductApiService {
      * @param themeId
      * @return
      */
-    public PageBean<SmProductEntity> getThemeGoodsList(Integer themeId) throws Exception;
+    public PageBean<SmProductEntity> getThemeGoodsList(Integer themeId,String pid) throws Exception;
 
 
     /**
@@ -96,7 +98,7 @@ public interface ProductApiService {
      * @return
      * @throws Exception
      */
-    public PageBean<SmProductEntity> getRecommendGoodsList(Integer channelType,Integer pageNum,Integer pageSize) throws Exception;
+    public PageBean<SmProductEntity> getRecommendGoodsList(String pid,Integer channelType,Integer pageNum,Integer pageSize) throws Exception;
 
 
 

@@ -12,6 +12,7 @@ import com.pdd.pop.sdk.http.api.request.*;
 import com.pdd.pop.sdk.http.api.response.*;
 import com.xm.api_mall.service.ConfigService;
 import com.xm.api_mall.service.ProductApiService;
+import com.xm.comment.enmu.ProductTypeEnum;
 import com.xm.comment.exception.GlobleException;
 import com.xm.comment.response.MsgEnum;
 import com.xm.comment.utils.GoodsPriceUtil;
@@ -22,6 +23,7 @@ import com.xm.comment_serialize.module.mall.bo.ShareLinkBo;
 import com.xm.comment_serialize.module.mall.constant.*;
 import com.xm.comment_serialize.module.mall.entity.SmConfigEntity;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
+import com.xm.comment_serialize.module.mall.vo.SmProductSimpleVo;
 import com.xm.comment_serialize.module.user.entity.SuOrderEntity;
 import com.xm.comment_utils.enu.EnumUtils;
 import com.xm.comment_utils.mybatis.PageBean;
@@ -56,6 +58,7 @@ public class PddProductApiServiceImpl implements ProductApiService {
         //获取店铺类型规则
         SmConfigEntity shopTypeConfig = configService.getConfig(criteria.getUserId(), ConfigEnmu.PDD_PRODUCT_BEST_LIST_SHOP_TYPE,ConfigTypeConstant.PROXY_CONFIG);
         PddDdkGoodsSearchRequest request = new PddDdkGoodsSearchRequest();
+        request.setPid(criteria.getPid());
         request.setSortType(sortConfig.getVal() == null?null:Integer.valueOf(sortConfig.getVal()));
         request.setMerchantType(shopTypeConfig.getVal()==null?null:Integer.valueOf(shopTypeConfig.getVal()));
         request.setPage(criteria.getPageNum());
@@ -101,13 +104,28 @@ public class PddProductApiServiceImpl implements ProductApiService {
     }
 
     @Override
-    public SmProductEntity detail(Long goodsId) throws Exception {
+    public SmProductEntity detail(Long goodsId,String pid) throws Exception {
         PddDdkGoodsDetailRequest request = new PddDdkGoodsDetailRequest();
         request.setGoodsIdList(Arrays.asList(goodsId));
+        request.setPid(pid);
         PddDdkGoodsDetailResponse response = popHttpClient.syncInvoke(request);
         if (response.getGoodsDetailResponse().getGoodsDetails() == null || response.getGoodsDetailResponse().getGoodsDetails().size() <= 0)
             throw new GlobleException(MsgEnum.DATA_ALREADY_NOT_EXISTS,"找不到拼多多商品："+goodsId);
-        return convertDetail(response.getGoodsDetailResponse().getGoodsDetails().get(00));
+        return convertDetail(response.getGoodsDetailResponse().getGoodsDetails().get(0));
+    }
+
+    @Override
+    public SmProductSimpleVo basicDetail(Long goodsId) throws Exception {
+        PddDdkGoodsBasicInfoGetRequest request = new PddDdkGoodsBasicInfoGetRequest();
+        request.setGoodsIdList(Arrays.asList(goodsId));
+        PddDdkGoodsBasicInfoGetResponse response = popHttpClient.syncInvoke(request);
+        SmProductSimpleVo smProductSimpleVo = new SmProductSimpleVo();
+        smProductSimpleVo.setGoodsId(response.getGoodsBasicDetailResponse().getGoodsList().get(0).getGoodsId().toString());
+        smProductSimpleVo.setGoodsThumbnailUrl(response.getGoodsBasicDetailResponse().getGoodsList().get(0).getGoodsPic());
+        smProductSimpleVo.setName(response.getGoodsBasicDetailResponse().getGoodsList().get(0).getGoodsName());
+        smProductSimpleVo.setOriginalPrice(response.getGoodsBasicDetailResponse().getGoodsList().get(0).getMinGroupPrice().intValue());
+        smProductSimpleVo.setType(PlatformTypeConstant.PDD);
+        return smProductSimpleVo;
     }
 
     @Override
@@ -144,29 +162,7 @@ public class PddProductApiServiceImpl implements ProductApiService {
         return response.getPIdGenerateResponse().getPIdList().get(0).getPId();
     }
 
-    @Override
-    public PageBean<SuOrderEntity> getOrderByIncrement(Date startUpdateTime, Date endUpdateTime, Integer pageNum, Integer pageSize) throws Exception {
-        PddDdkOrderListIncrementGetRequest request = new PddDdkOrderListIncrementGetRequest();
-        request.setStartUpdateTime(startUpdateTime.getTime()/1000);
-        request.setEndUpdateTime(endUpdateTime.getTime()/1000);
-        request.setPage(pageNum);
-        request.setPageSize(pageSize);
-        request.setReturnCount(true);
-        PddDdkOrderListIncrementGetResponse response = popHttpClient.syncInvoke(request);
-        List<PddDdkOrderListIncrementGetResponse.OrderListGetResponseOrderListItem> listItem = response.getOrderListGetResponse().getOrderList();
-        List<SuOrderEntity> orderEntities = null;
-        if(listItem != null) {
-            orderEntities = listItem.stream().map(o -> {
-                return convertOrder(o);
-            }).collect(Collectors.toList());
-        }
-        PageBean<SuOrderEntity> pageBean = new PageBean<>(orderEntities);
-        pageBean.setList(orderEntities);
-        pageBean.setPageNum(pageNum);
-        pageBean.setPageSize(pageSize);
-        pageBean.setTotal(response.getOrderListGetResponse().getTotalCount());
-        return pageBean;
-    }
+
 
     @Override
     public Date getTime() throws Exception {
@@ -176,11 +172,12 @@ public class PddProductApiServiceImpl implements ProductApiService {
     }
 
     @Override
-    public PageBean<SmProductEntity> getTopGoodsList(Integer type, Integer pageNum, Integer pageSize) throws Exception {
+    public PageBean<SmProductEntity> getTopGoodsList(Integer type,String pid, Integer pageNum, Integer pageSize) throws Exception {
         PddDdkTopGoodsListQueryRequest request = new PddDdkTopGoodsListQueryRequest();
         request.setOffset(PageUtil.getStart(pageNum,pageSize));
         request.setLimit(pageSize);
         request.setSortType(type);
+        request.setPId(pid);
         PddDdkTopGoodsListQueryResponse response = popHttpClient.syncInvoke(request);
         List<SmProductEntity> list = response.getTopGoodsListGetResponse().getList().stream().map( o ->{
             return convertGoodsList(o);
@@ -208,11 +205,10 @@ public class PddProductApiServiceImpl implements ProductApiService {
     }
 
     @Override
-    public PageBean<SmProductEntity> getThemeGoodsList(Integer themeId) throws Exception {
+    public PageBean<SmProductEntity> getThemeGoodsList(Integer themeId,String pid) throws Exception {
         PddDdkThemeGoodsSearchRequest request = new PddDdkThemeGoodsSearchRequest();
         request.setThemeId(themeId.longValue());
         PddDdkThemeGoodsSearchResponse response = popHttpClient.syncInvoke(request);
-
         List<SmProductEntity> list = response.getThemeListGetResponse().getGoodsList().stream().map(o ->{
             return convertGoodsList(o);
         }).collect(Collectors.toList());
@@ -224,11 +220,12 @@ public class PddProductApiServiceImpl implements ProductApiService {
     }
 
     @Override
-    public PageBean<SmProductEntity> getRecommendGoodsList(Integer channelType,Integer pageNum,Integer pageSize) throws Exception {
+    public PageBean<SmProductEntity> getRecommendGoodsList(String pid,Integer channelType,Integer pageNum,Integer pageSize) throws Exception {
         PddDdkGoodsRecommendGetRequest request = new PddDdkGoodsRecommendGetRequest();
         request.setChannelType(channelType);
         request.setOffset(PageUtil.getStart(pageNum,pageSize));
         request.setLimit(pageSize);
+        request.setPid(pid);
         PddDdkGoodsRecommendGetResponse response = popHttpClient.syncInvoke(request);
         List<SmProductEntity> list = response.getGoodsBasicDetailResponse().getList().stream().map(o->{
             return convertGoodsList(o);
@@ -268,86 +265,6 @@ public class PddProductApiServiceImpl implements ProductApiService {
         return smProductEntity;
     }
 
-
-    private SuOrderEntity convertOrder(PddDdkOrderListIncrementGetResponse.OrderListGetResponseOrderListItem item){
-        SuOrderEntity orderEntity = new SuOrderEntity();
-        orderEntity.setOrderSn(item.getOrderSn());
-        orderEntity.setProductId(item.getGoodsId().toString());
-        orderEntity.setProductName(item.getGoodsName());
-        orderEntity.setImgUrl(item.getGoodsThumbnailUrl());
-        orderEntity.setPlatformType(PlatformTypeConstant.PDD);
-        orderEntity.setState(item.getOrderStatus());
-        orderEntity.setFailReason(item.getFailReason());
-        orderEntity.setPId(item.getPId());
-        orderEntity.setOriginalPrice(item.getGoodsPrice().intValue());
-        orderEntity.setQuantity(item.getGoodsQuantity().intValue());
-        orderEntity.setAmount(item.getOrderAmount().intValue());
-        orderEntity.setPromotionRate(item.getPromotionRate().intValue());
-        orderEntity.setPromotionAmount(item.getPromotionAmount().intValue());
-        orderEntity.setType(item.getType());
-        orderEntity.setCustomParameters(item.getCustomParameters());
-        orderEntity.setOrderModifyAt(new Date(item.getOrderModifyAt() * 1000));
-        return orderEntity;
-    }
-
-//    private SmProductEntity convertThemeGoods(PddDdkThemeGoodsSearchResponse.ThemeListGetResponseGoodsListItem goodsListItem) {
-//        SmProductEntity smProductEntity = new SmProductEntity();
-//        smProductEntity.setType(PlatformTypeConstant.PDD);
-//        smProductEntity.setGoodsId(goodsListItem.getGoodsId().toString());
-//        smProductEntity.setGoodsThumbnailUrl(goodsListItem.getGoodsThumbnailUrl());
-//        smProductEntity.setName(goodsListItem.getGoodsName());
-//        smProductEntity.setOriginalPrice(goodsListItem.getMinGroupPrice().intValue());
-//        smProductEntity.setCouponPrice(goodsListItem.getCouponDiscount().intValue());
-//        smProductEntity.setMallName(goodsListItem.getMallName());
-//        smProductEntity.setSalesTip(goodsListItem.getSalesTip());
-////        smProductEntity.setMallCps(goodsListItem.getMallCps());
-//        smProductEntity.setPromotionRate(goodsListItem.getPromotionRate().intValue());
-//        smProductEntity.setHasCoupon(goodsListItem.getHasCoupon()?1:0);
-//        smProductEntity.setCashPrice(GoodsPriceUtil.type(PlatformTypeConstant.PDD).calcProfit(smProductEntity).intValue());
-//        smProductEntity.setCreateTime(new Date());
-//        return smProductEntity;
-//    }
-
-//    private SmProductEntity convertListDetail(PddDdkTopGoodsListQueryResponse.TopGoodsListGetResponseListItem goodsListItem) {
-//        SmProductEntity smProductEntity = new SmProductEntity();
-//        smProductEntity.setType(PlatformTypeConstant.PDD);
-//        smProductEntity.setGoodsId(goodsListItem.getGoodsId().toString());
-//        smProductEntity.setGoodsThumbnailUrl(goodsListItem.getGoodsThumbnailUrl());
-//        smProductEntity.setName(goodsListItem.getGoodsName());
-//        smProductEntity.setOriginalPrice(goodsListItem.getMinGroupPrice().intValue());
-//        smProductEntity.setCouponPrice(goodsListItem.getCouponDiscount().intValue());
-//        smProductEntity.setMallName(goodsListItem.getMallName());
-//        smProductEntity.setSalesTip(goodsListItem.getSalesTip());
-//        smProductEntity.setMallCps(goodsListItem.getMallCps());
-//        smProductEntity.setPromotionRate(goodsListItem.getPromotionRate().intValue());
-//        smProductEntity.setHasCoupon(goodsListItem.getHasCoupon()?1:0);
-//        smProductEntity.setCashPrice(GoodsPriceUtil.type(PlatformTypeConstant.PDD).calcProfit(smProductEntity).intValue());
-//        smProductEntity.setCreateTime(new Date());
-//        return smProductEntity;
-//    }
-//    private SmProductEntity convertListDetail(PddDdkGoodsSearchResponse.GoodsSearchResponseGoodsListItem goodsListItem) {
-//        SmProductEntity smProductEntity = new SmProductEntity();
-//        smProductEntity.setType(PlatformTypeConstant.PDD);
-//        smProductEntity.setGoodsId(goodsListItem.getGoodsId().toString());
-//        smProductEntity.setGoodsThumbnailUrl(goodsListItem.getGoodsThumbnailUrl());
-//        smProductEntity.setName(goodsListItem.getGoodsName());
-//        smProductEntity.setOriginalPrice(goodsListItem.getMinGroupPrice().intValue());
-//        smProductEntity.setCouponPrice(goodsListItem.getCouponDiscount().intValue());
-//        smProductEntity.setMallName(goodsListItem.getMallName());
-//        smProductEntity.setSalesTip(goodsListItem.getSalesTip());
-//        smProductEntity.setMallCps(goodsListItem.getMallCps());
-//        smProductEntity.setPromotionRate(goodsListItem.getPromotionRate().intValue());
-//        smProductEntity.setHasCoupon(goodsListItem.getHasCoupon()?1:0);
-//        smProductEntity.setCashPrice(GoodsPriceUtil.type(PlatformTypeConstant.PDD).calcProfit(smProductEntity).intValue());
-////        if(goodsListItem.getServiceTags() != null)
-////            smProductEntity.setServiceTags(String.join(",", getServiceTags(goodsListItem.getServiceTags().stream().map(o -> {
-////                return o.intValue();
-////            }).collect(Collectors.toList()))));
-////        if(goodsListItem.getActivityType() != null)
-////            smProductEntity.setActivityType(getActiviteType(goodsListItem.getActivityType()));
-//        smProductEntity.setCreateTime(new Date());
-//        return smProductEntity;
-//    }
     private SmProductEntity convertDetail(PddDdkGoodsDetailResponse.GoodsDetailResponseGoodsDetailsItem detailsItem){
         SmProductEntity smProductEntity = new SmProductEntity();
         smProductEntity.setType(PlatformTypeConstant.PDD);
@@ -379,14 +296,8 @@ public class PddProductApiServiceImpl implements ProductApiService {
                 if (pddServiceTagEnum != null && pddServiceTagEnum.getShow()){
                     return pddServiceTagEnum.getTagName();
                 }
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (EnumConstantNotPresentException e){
-                e.printStackTrace();
+            } catch (Exception e) {
+                log.error("{}",e);
             }
             return null;
         }).collect(Collectors.toList());
@@ -398,14 +309,8 @@ public class PddProductApiServiceImpl implements ProductApiService {
             return null;
         try {
             return EnumUtils.getEnum(PddActivityTypeEnum.class,"activityId",activiteType).getActivityName();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (EnumConstantNotPresentException e){
-            log.error(e.getMessage());
+        } catch (Exception e) {
+            log.error("{}",e);
         }
         return null;
     }

@@ -128,9 +128,9 @@ public class ShareServiceImpl implements ShareService {
                 }
             }
             if(order == 1) {
-                sb.append("desc");
-            }else {
                 sb.append("asc");
+            }else {
+                sb.append("desc");
             }
         }else {
             sb.append("update_time desc");

@@ -20,6 +20,13 @@
 
     <dependencies>
 
+        <!-- 拼多多sdk -->
+        <dependency>
+            <groupId>com.xm.pdd</groupId>
+            <artifactId>pop-sdk</artifactId>
+            <classifier>all</classifier>
+        </dependency>
+
         <!-- 公共资源项目 -->
         <dependency>
             <groupId>com.xm</groupId>

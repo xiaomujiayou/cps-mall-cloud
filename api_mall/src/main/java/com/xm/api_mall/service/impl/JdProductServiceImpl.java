@@ -11,6 +11,7 @@ import com.xm.comment_serialize.module.mall.entity.SmBannerEntity;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
 import com.xm.comment_serialize.module.mall.ex.SmProductEntityEx;
 import com.xm.comment_serialize.module.mall.form.ProductListForm;
+import com.xm.comment_serialize.module.mall.vo.SmProductSimpleVo;
 import com.xm.comment_utils.mybatis.PageBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -23,47 +24,47 @@ public class JdProductServiceImpl implements ProductService {
 
 
     @Override
-    public PageBean<SmProductEntity> optionList(Integer userId, ProductListForm productListForm) throws Exception {
+    public PageBean<SmProductEntityEx> optionList(Integer userId, String pid, ProductListForm productListForm) throws Exception {
         return null;
     }
 
     @Override
-    public PageBean<SmProductEntity> similarList(Integer userId, ProductListForm productListForm) {
+    public PageBean<SmProductEntityEx> similarList(Integer userId, String pid, ProductListForm productListForm) {
         return null;
     }
 
     @Override
-    public PageBean<SmProductEntity> bestList(Integer userId, ProductListForm productListForm) throws Exception {
+    public PageBean<SmProductEntityEx> bestList(Integer userId, String pid, ProductListForm productListForm) throws Exception {
         return null;
     }
 
     @Override
-    public PageBean<SmProductEntity> keywordList(Integer userId, ProductListForm productListForm) throws Exception {
+    public PageBean<SmProductEntityEx> keywordList(Integer userId, String pid, ProductListForm productListForm) throws Exception {
         return null;
     }
 
     @Override
-    public PageBean<SmProductEntity> hotList(Integer userId, ProductListForm productListForm) throws Exception {
+    public PageBean<SmProductEntityEx> hotList(Integer userId, String pid, ProductListForm productListForm) throws Exception {
         return null;
     }
 
     @Override
-    public PageBean<SmProductEntity> customList(Integer userId, ProductListForm productListForm) throws Exception {
+    public PageBean<SmProductEntityEx> customList(Integer userId, String pid, ProductListForm productListForm) throws Exception {
         return null;
     }
 
     @Override
-    public PageBean<SmProductEntity> likeList(Integer userId, ProductListForm productListForm) throws Exception {
+    public PageBean<SmProductEntityEx> likeList(Integer userId, String pid, ProductListForm productListForm) throws Exception {
         return null;
     }
 
     @Override
-    public PageBean<SmProductEntity> themeList(Integer userId, ProductListForm productListForm) throws Exception {
+    public PageBean<SmProductEntityEx> themeList(Integer userId, String pid, ProductListForm productListForm) throws Exception {
         return null;
     }
 
     @Override
-    public PageBean<SmProductEntity> recommendList(Integer userId, ProductListForm productListForm) throws Exception {
+    public PageBean<SmProductEntityEx> recommendList(Integer userId, String pid, ProductListForm productListForm) throws Exception {
         return null;
     }
 
@@ -78,14 +79,17 @@ public class JdProductServiceImpl implements ProductService {
     }
 
     @Override
-    public SmProductEntityEx detail(String goodsId, Integer userId, Integer shareUserId) throws Exception {
+    public SmProductEntityEx detail(String goodsId, String pid, Integer userId, Integer shareUserId) throws Exception {
         return null;
     }
 
+    @Override
+    public SmProductSimpleVo basicDetail(Long goodsId) throws Exception {
+        return null;
+    }
 
     @Override
     public ShareLinkBo saleInfo(Integer userId, String pid, Integer appType, Integer fromUser, String goodsId) throws Exception {
         return null;
     }
-
 }
