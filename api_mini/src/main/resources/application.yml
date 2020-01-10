@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: api-mini
+  profiles:
+    active: assembly-dev,plugin,dev
+
+
+wx:
+  miniapp:
+    configs:
+      - appid: wx77c95d4a2f1bfab0
+        secret: 149a2853db7a9aa718aca580b0883fbb
+        token: 8c8fa3529ee34d4e69a0baafb7069da3
+        aesKey: OCO8pFpEdFK4zkBNm7lb2MY6P8zeNTX5y6hxYfgYqqq
+        msgDataFormat: JSON

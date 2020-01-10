@@ -98,7 +98,7 @@ public class BillServiceImpl implements BillService {
 
         List<SuUserEntity> proxyUsers = getParentUser(order.getUserId(),proxyLevel);
         for (int i = 0; i < proxyLevel; i++) {
-            if(proxyUsers == null || proxyUsers.size() <= 0 || proxyUsers.get(i) == null)
+            if(proxyUsers == null || proxyUsers.size() <= 0 || i > proxyUsers.size() - 1  || proxyUsers.get(i) == null)
                 break;
             SuBillEntity proxyBill = createOrderBill(proxyUsers.get(i).getId(),order,2,proxyRate.get(i),i==0?order.getUserId():proxyUsers.get(i-1).getId());
             suBillMapper.insertSelective(proxyBill);
@@ -139,7 +139,7 @@ public class BillServiceImpl implements BillService {
         List<SuUserEntity> result = new ArrayList<>();
         Integer parentId = suUserMapper.selectByPrimaryKey(userId).getParentId();
         for (int i = 0; i < level; i++) {
-            if(parentId == null || parentId.equals(""))
+            if(parentId == null)
                 return result;
             SuUserEntity parentUser = suUserMapper.selectByPrimaryKey(parentId);
             result.add(parentUser);
@@ -240,7 +240,7 @@ public class BillServiceImpl implements BillService {
                 });
             }else if(Arrays.asList(2).contains(o.getKey())){
                 o.getValue().forEach(j ->{
-                    userIdMap.put(j.getId(),j.getOrderId().toString());
+                    userIdMap.put(j.getId(),j.getFromUserId().toString());
                 });
             }
         });
@@ -249,8 +249,8 @@ public class BillServiceImpl implements BillService {
         List<BillVo> billVos = suBillEntities.stream().map(o->{
             SuOrderEntity suOrderEntity = null;
             SuUserEntity suUserEntity = null;
-            suOrderEntity = suOrderEntities.stream().filter(j->{return j.getId().equals(Integer.valueOf(orderIdMap.get(o.getId())));}).findFirst().orElse(null);
-            suUserEntity = suUserEntities.stream().filter(j->{return j.getId().equals(Integer.valueOf(userIdMap.get(o.getId())));}).findFirst().orElse(null);
+            suOrderEntity = orderIdMap.get(o.getId()) == null?null: suOrderEntities.stream().filter(j->{return j.getId().equals(Integer.valueOf(orderIdMap.get(o.getId())));}).findFirst().orElse(null);
+            suUserEntity = userIdMap.get(o.getId()) == null?null:suUserEntities.stream().filter(j->{return j.getId().equals(Integer.valueOf(userIdMap.get(o.getId())));}).findFirst().orElse(null);
             if(ObjectUtil.isAllEmpty(suOrderEntity,suUserEntity))
                 return null;
             return covertBillVo(o,suOrderEntity,suUserEntity);

@@ -16,5 +16,6 @@ public class ShareVo {
     private Integer show;
     private Integer sellOut;
     private Integer willMakeMoney;
+    private String salesTip;
     private String createTime;
 }

@@ -6,6 +6,6 @@ spring:
 
 wx:
   appId: wx77c95d4a2f1bfab0
-  secret: acecbd89a9dd3009a80052a0905f5b52
+  secret: 149a2853db7a9aa718aca580b0883fbb
 #  token: GiOleLZJjps03G4dLq3Ogj0ooT2d3DKI
 #  encodingAESKey: y45Ljp45d5DQIt42TzL0iJPZePDoeIjd5jHoTQEQLe2

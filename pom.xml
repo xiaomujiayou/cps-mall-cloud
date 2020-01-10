@@ -25,6 +25,7 @@
         <module>cloud_eureka</module>
         <module>cloud_gateway</module>
         <module>api_mall</module>
+        <module>api_mini</module>
         <module>api_user</module>
         <module>api_proxy</module>
         <module>cron_service</module>
@@ -127,7 +128,7 @@
             <dependency>
                 <groupId>com.github.binarywang</groupId>
                 <artifactId>weixin-java-miniapp</artifactId>
-                <version>3.5.0</version>
+                <version>3.6.0</version>
             </dependency>
 
             <!--shiro-->

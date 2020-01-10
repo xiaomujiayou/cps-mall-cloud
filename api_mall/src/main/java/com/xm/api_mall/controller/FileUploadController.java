@@ -5,6 +5,7 @@ import com.aliyun.oss.OSS;
 import com.aliyun.oss.common.utils.BinaryUtil;
 import com.aliyun.oss.model.MatchMode;
 import com.aliyun.oss.model.PolicyConditions;
+import com.aliyun.oss.model.UploadFileRequest;
 import com.xm.comment.annotation.LoginUser;
 import com.xm.comment.response.R;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,4 +77,5 @@ public class FileUploadController {
         respMap.put("expire", String.valueOf(expireEndTime / 1000));
         return respMap;
     }
+
 }

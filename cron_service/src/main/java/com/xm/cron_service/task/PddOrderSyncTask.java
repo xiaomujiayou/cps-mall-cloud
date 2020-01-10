@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.github.pagehelper.PageHelper;
 import com.xm.comment.exception.GlobleException;
 import com.xm.comment.module.mall.feign.MallFeignClient;
@@ -25,8 +26,10 @@ import org.springframework.stereotype.Component;
 import tk.mybatis.orderbyhelper.OrderByHelper;
 
 import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * 同步拼多多订单
@@ -64,16 +67,16 @@ public class PddOrderSyncTask{
         }else if(lastHistory.getTotalPage() != null && lastHistory.getPage() >= lastHistory.getTotalPage()) {
             //开始下一轮查询
             Date now = getTime();
-            Date lastEndTime = lastHistory.getEndUpdateTime();
+            Date lastEndTime = DateUtil.offset(lastHistory.getEndUpdateTime(),DateField.SECOND,MOVE_FORWARD);
             lastHistory = defaultEntity();
-            lastHistory.setStartUpdateTime(DateUtil.offset(lastEndTime,DateField.SECOND,MOVE_FORWARD));
+            lastHistory.setStartUpdateTime(lastEndTime);
             lastHistory.setEndUpdateTime(now);
             if(DateUtil.between(now,lastEndTime, DateUnit.SECOND) >= MAX_INTERVAL_TIME){
                 //查询时间段超时则重新计算结束时间
                 lastHistory.setEndUpdateTime(DateUtil.offset(lastEndTime, DateField.SECOND,MAX_INTERVAL_TIME));
-                log.error("拼多多订单服务 - 同步失败：距离上次查询时间超时 无效区间：[{}] - [{}] 已修正为：[{}] - [{}]",
+                log.info("拼多多订单服务 - 时间超限：距离上次查询时间超时 超时区间：[{}] - [{}] 已修正为：[{}] - [{}]",
                         lastEndTime,
-                        now,
+                        DateUtil.format(now,"yyyy-MM-dd HH:mm:ss"),
                         lastHistory.getStartUpdateTime(),
                         lastHistory.getEndUpdateTime());
             }
@@ -143,7 +146,4 @@ public class PddOrderSyncTask{
         }
         return date;
     }
-
-
-    
 }

@@ -176,6 +176,7 @@ public class ShareServiceImpl implements ShareService {
         shareVo.setShow(suShareEntity.getWatch());
         shareVo.setSellOut(suShareEntity.getSell());
         shareVo.setWillMakeMoney(suShareEntity.getWillMakeMoney());
+        shareVo.setSalesTip(smProductEntity.getSalesTip());
         shareVo.setCreateTime(DateUtil.format(suShareEntity.getCreateTime(),"MM-dd HH:mm"));
         return shareVo;
     }

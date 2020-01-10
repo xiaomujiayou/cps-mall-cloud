@@ -8,6 +8,9 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 import tk.mybatis.spring.annotation.MapperScan;
 
+import javax.annotation.PostConstruct;
+import java.util.TimeZone;
+
 //开启分布式事务
 @EnableDistributedTransaction
 @ComponentScan("com.xm")
@@ -16,6 +19,10 @@ import tk.mybatis.spring.annotation.MapperScan;
 @EnableDiscoveryClient
 @SpringBootApplication
 public class CronServiceApplication {
+    @PostConstruct
+    void started() {
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
+    }
     public static void main(String[] args) {
         SpringApplication.run(CronServiceApplication.class, args);
     }

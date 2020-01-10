@@ -40,18 +40,22 @@ public class UserController{
 
     /**
      * 获取用户信息摘要
-     * @return
+     * @return/*-+
      */
     @PostMapping("/info")
     public Msg<SuUserEntity> info(@RequestBody GetUserInfoForm getUserInfoForm) throws WxErrorException {
         if(StringUtils.isAllBlank(getUserInfoForm.getCode(),getUserInfoForm.getOpenId()))
             return R.error(MsgEnum.PARAM_VALID_ERROR);
-        SuUserEntity userEntity = userService.getUserInfo(getUserInfoForm);
-        UserInfoVo userInfoVo = new UserInfoVo();
-        BeanUtil.copyProperties(userEntity,userInfoVo);
-        SuUserEntity result = new SuUserEntity();
-        BeanUtil.copyProperties(userInfoVo,result);
-        return userEntity != null ? R.sucess(result):R.error(MsgEnum.DATA_ALREADY_NOT_EXISTS);
+        try {
+            SuUserEntity userEntity = userService.getUserInfo(getUserInfoForm);
+            UserInfoVo userInfoVo = new UserInfoVo();
+            BeanUtil.copyProperties(userEntity,userInfoVo);
+            SuUserEntity result = new SuUserEntity();
+            BeanUtil.copyProperties(userInfoVo,result);
+            return userEntity != null ? R.sucess(result):R.error(MsgEnum.DATA_ALREADY_NOT_EXISTS);
+        }catch (WxErrorException e){
+            return R.error(MsgEnum.SYSTEM_INVALID_USER_ERROR);
+        }
     }
 
     /**

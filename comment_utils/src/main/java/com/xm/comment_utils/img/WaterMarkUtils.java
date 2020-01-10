@@ -64,7 +64,7 @@ public class WaterMarkUtils {
     }
 
     //处理文字水印的中英文字符的宽度转换
-    private static int getTextLength(String text){
+    public static int getTextLength(String text){
         int length = text.length();
         for(int i=0;i<text.length();i++){
             String s = String.valueOf(text.charAt(i));
