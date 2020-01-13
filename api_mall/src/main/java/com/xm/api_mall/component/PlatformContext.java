@@ -1,16 +1,12 @@
 package com.xm.api_mall.component;
 
 import com.xm.api_mall.service.ProductService;
-import com.xm.comment.exception.GlobleException;
-import com.xm.comment.response.MsgEnum;
+import com.xm.comment_utils.exception.GlobleException;
+import com.xm.comment_utils.response.MsgEnum;
 import com.xm.comment_serialize.module.mall.constant.PlatformTypeConstant;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 商品服务相关

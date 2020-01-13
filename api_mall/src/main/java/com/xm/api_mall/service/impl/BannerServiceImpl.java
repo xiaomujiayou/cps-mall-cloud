@@ -3,7 +3,6 @@ package com.xm.api_mall.service.impl;
 import com.xm.api_mall.mapper.SmBannerMapper;
 import com.xm.api_mall.service.BannerService;
 import com.xm.api_mall.service.ProductApiService;
-import com.xm.comment.response.R;
 import com.xm.comment_serialize.module.mall.constant.BannerTypeEnum;
 import com.xm.comment_serialize.module.mall.constant.PlatformTypeConstant;
 import com.xm.comment_serialize.module.mall.entity.SmBannerEntity;

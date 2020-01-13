@@ -1,0 +1,17 @@
+oss:
+  ali:
+    endpoint: oss-cn-shanghai.aliyuncs.com
+    access-key-id: LTAI4Fsu8LS6dfkSgk9qe6h1
+    access-key-secret: epYBonCerRq2V1QWR6CJ5yaFfjg1A5
+    bucket-name: mall-share
+
+pdd:
+  client-id: 022c61074e3d46dd946a45f3024a75d8
+  client-secret: 702bee4684121e512392cb0405b9292fbc624234
+
+mgj:
+  app-key: 102139
+  app-secret: FF7E20C91590054EACEFC1D645C8C5AE
+  url: https://openapi.mogujie.com/invoke
+  redirect-uri: http://xiaomujiayou.w3.luyouxia.net/api-mall/api/mgj/token
+  uid: 1et2402

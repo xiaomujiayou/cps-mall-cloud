@@ -1,8 +1,8 @@
 package com.xm.cloud_gateway.shiro.filter;
 
 import com.alibaba.fastjson.JSON;
-import com.xm.comment.response.MsgEnum;
-import com.xm.comment.response.R;
+import com.xm.comment_utils.response.MsgEnum;
+import com.xm.comment_utils.response.R;
 import org.apache.shiro.web.filter.authc.UserFilter;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMethod;

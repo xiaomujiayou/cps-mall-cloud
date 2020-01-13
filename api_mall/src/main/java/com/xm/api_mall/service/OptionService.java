@@ -19,4 +19,7 @@ public interface OptionService {
      * @return
      */
     List<SmOptEntity> getChildOption(Integer userId,Integer parentOptId);
+
+    List<SmOptEntity> getAllParentOption(Integer userId,Integer childOptId);
+
 }

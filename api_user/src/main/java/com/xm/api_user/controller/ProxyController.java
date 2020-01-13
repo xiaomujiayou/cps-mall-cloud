@@ -1,11 +1,10 @@
 package com.xm.api_user.controller;
 
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.StrUtil;
 import com.xm.api_user.service.UserService;
 import com.xm.comment.annotation.LoginUser;
-import com.xm.comment.response.Msg;
-import com.xm.comment.response.R;
+import com.xm.comment_utils.response.Msg;
+import com.xm.comment_utils.response.R;
 import com.xm.comment_serialize.module.user.dto.ProxyProfitDto;
 import com.xm.comment_serialize.module.user.form.GetProxyProfitForm;
 import com.xm.comment_serialize.module.user.vo.ProxyInfoVo;

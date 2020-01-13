@@ -24,13 +24,11 @@
             <artifactId>hanlp</artifactId>
         </dependency>
 
-        <!-- 拼多多sdk -->
         <dependency>
-            <groupId>com.xm.pdd</groupId>
-            <artifactId>pop-sdk</artifactId>
-            <classifier>all</classifier>
+            <groupId>com.xm</groupId>
+            <artifactId>comment_api</artifactId>
+            <version>${project.current.version}</version>
         </dependency>
-
         <!-- 公共项目资源 -->
         <dependency>
             <groupId>com.xm</groupId>

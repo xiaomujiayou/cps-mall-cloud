@@ -52,7 +52,8 @@ public class RedisCacheConfig extends CachingConfigurerSupport {
 
     private Map<String, RedisCacheConfiguration> getRedisCacheConfigurationMap() {
         Map<String, RedisCacheConfiguration> redisCacheConfigurationMap = new HashMap<>();
-        redisCacheConfigurationMap.put("pdd:pdStopWordService:stopWords", this.getRedisCacheConfigurationWithTtl(120));
+        //蘑菇街商品详情缓存30分钟
+        redisCacheConfigurationMap.put("share.goods.detail.mgj", this.getRedisCacheConfigurationWithTtl(30 * 60));
         return redisCacheConfigurationMap;
     }
 

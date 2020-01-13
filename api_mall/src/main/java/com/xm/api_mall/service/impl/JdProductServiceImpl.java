@@ -1,20 +1,14 @@
 package com.xm.api_mall.service.impl;
 
-import com.xm.api_mall.mapper.SmOptMapper;
-import com.xm.api_mall.service.ProductApiService;
 import com.xm.api_mall.service.ProductService;
-import com.xm.comment.exception.GlobleException;
-import com.xm.comment.response.MsgEnum;
-import com.xm.comment_serialize.module.mall.bo.ProductCriteriaBo;
 import com.xm.comment_serialize.module.mall.bo.ShareLinkBo;
 import com.xm.comment_serialize.module.mall.entity.SmBannerEntity;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
 import com.xm.comment_serialize.module.mall.ex.SmProductEntityEx;
+import com.xm.comment_serialize.module.mall.form.GetProductSaleInfoForm;
 import com.xm.comment_serialize.module.mall.form.ProductListForm;
 import com.xm.comment_serialize.module.mall.vo.SmProductSimpleVo;
 import com.xm.comment_utils.mybatis.PageBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -89,7 +83,9 @@ public class JdProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ShareLinkBo saleInfo(Integer userId, String pid, Integer appType, Integer fromUser, String goodsId) throws Exception {
+    public ShareLinkBo saleInfo(Integer userId, String pid, GetProductSaleInfoForm productSaleInfoForm) throws Exception {
         return null;
     }
+
+
 }

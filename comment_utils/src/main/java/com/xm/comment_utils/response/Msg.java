@@ -1,4 +1,4 @@
-package com.xm.comment.response;
+package com.xm.comment_utils.response;
 
 import lombok.Data;
 

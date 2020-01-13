@@ -2,8 +2,8 @@ package com.xm.api_user.controller;
 
 import com.xm.api_user.mapper.SuFeedbackMapper;
 import com.xm.comment.annotation.LoginUser;
-import com.xm.comment.response.Msg;
-import com.xm.comment.response.R;
+import com.xm.comment_utils.response.Msg;
+import com.xm.comment_utils.response.R;
 import com.xm.comment_serialize.module.user.entity.SuFeedbackEntity;
 import com.xm.comment_serialize.module.user.form.AddFeedBackForm;
 import org.springframework.beans.factory.annotation.Autowired;

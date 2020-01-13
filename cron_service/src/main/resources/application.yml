@@ -2,7 +2,7 @@ spring:
   application:
     name: cron-service
   profiles:
-    active: assembly-dev,plugin,dev
+    active: dev,plugin,cloud-dev,assembly-dev,api-dev
 
 pdd:
   client-id: 022c61074e3d46dd946a45f3024a75d8

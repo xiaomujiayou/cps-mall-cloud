@@ -15,18 +15,6 @@ spring:
     username: root
     password: xm123456
 
-#阿里云OSS文件管理
-oss:
-  ali:
-    endpoint: oss-cn-shanghai.aliyuncs.com
-    accessKeyId: LTAI4Fsu8LS6dfkSgk9qe6h1
-    accessKeySecret: epYBonCerRq2V1QWR6CJ5yaFfjg1A5
-    bucketName: mall-share
-
-pdd:
-  client-id: 022c61074e3d46dd946a45f3024a75d8
-  client-secret: 702bee4684121e512392cb0405b9292fbc624234
-
 logging:
   logPath: D:\java\data\log\share\api-mall
   logLevel: debug

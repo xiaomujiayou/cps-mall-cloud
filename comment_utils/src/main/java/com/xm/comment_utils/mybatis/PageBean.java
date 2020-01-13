@@ -11,11 +11,12 @@ import java.util.List;
 @Data
 public class PageBean<T> implements Serializable {
     private static final long serialVersionUID = 8656597559014685635L;
-    private long total;        //总记录数
-    private int pageNum;    // 第几页
-    private int pageSize;    // 每页记录数
-    private int pages;        // 总页数
-    private List<T> list;    //结果集
+    private long total;             //总记录数
+    private int pageNum;            // 第几页
+    private int pageSize;           // 每页记录数
+    private int pages;              // 总页数
+    private List<T> list;           //结果集
+    private Integer additional;     //附加参数
 
     public PageBean() {}
 

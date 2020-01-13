@@ -2,7 +2,7 @@ package com.xm.comment.module.user.feign;
 
 import com.xm.comment.config.FeignConfiguration;
 import com.xm.comment.module.user.feign.fallback.UserFeignClientFallBack;
-import com.xm.comment.response.Msg;
+import com.xm.comment_utils.response.Msg;
 import com.xm.comment_serialize.module.user.entity.SuConfigEntity;
 import com.xm.comment_serialize.module.user.entity.SuUserEntity;
 import com.xm.comment_serialize.module.user.ex.RolePermissionEx;

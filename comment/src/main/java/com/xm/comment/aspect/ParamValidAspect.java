@@ -1,7 +1,7 @@
 package com.xm.comment.aspect;
 
-import com.xm.comment.response.MsgEnum;
-import com.xm.comment.response.R;
+import com.xm.comment_utils.response.MsgEnum;
+import com.xm.comment_utils.response.R;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;

@@ -1,16 +1,13 @@
 package com.xm.comment.module.mall.feign;
 
-import com.xm.comment.annotation.LoginUser;
 import com.xm.comment.module.mall.feign.fallback.MallFeignClientFallBack;
-import com.xm.comment.response.Msg;
+import com.xm.comment_utils.response.Msg;
 import com.xm.comment_serialize.module.mall.bo.ProductIndexBo;
 import com.xm.comment_serialize.module.mall.entity.SmConfigEntity;
 import com.xm.comment_serialize.module.mall.entity.SmPidEntity;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
 import com.xm.comment_serialize.module.mall.ex.SmProductEntityEx;
 import com.xm.comment_serialize.module.mall.form.CalcProfitForm;
-import com.xm.comment_serialize.module.mall.form.OrderIncrementListForm;
-import com.xm.comment_serialize.module.mall.form.ProductDetailForm;
 import com.xm.comment_serialize.module.user.entity.SuOrderEntity;
 import com.xm.comment_utils.mybatis.PageBean;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -20,7 +17,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.validation.Valid;
 import java.util.Date;
 import java.util.List;
 

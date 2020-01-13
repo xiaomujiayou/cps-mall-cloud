@@ -1,4 +1,4 @@
-package com.xm.comment.response;
+package com.xm.comment_utils.response;
 
 public class R {
     public static <T> Msg<T> sucess(T data){

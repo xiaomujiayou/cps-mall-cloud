@@ -2,19 +2,15 @@ package com.xm.api_mall.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.math.MathUtil;
-import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.PageUtil;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.pdd.pop.sdk.http.PopHttpClient;
 import com.pdd.pop.sdk.http.api.request.*;
 import com.pdd.pop.sdk.http.api.response.*;
 import com.xm.api_mall.service.ConfigService;
 import com.xm.api_mall.service.ProductApiService;
-import com.xm.comment.enmu.ProductTypeEnum;
-import com.xm.comment.exception.GlobleException;
-import com.xm.comment.response.MsgEnum;
+import com.xm.comment_utils.exception.GlobleException;
+import com.xm.comment_utils.response.MsgEnum;
 import com.xm.comment.utils.GoodsPriceUtil;
 import com.xm.comment_serialize.module.mall.bo.PddGoodsListItem;
 import com.xm.comment_serialize.module.mall.bo.PddThemeBo;
@@ -24,18 +20,13 @@ import com.xm.comment_serialize.module.mall.constant.*;
 import com.xm.comment_serialize.module.mall.entity.SmConfigEntity;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
 import com.xm.comment_serialize.module.mall.vo.SmProductSimpleVo;
-import com.xm.comment_serialize.module.user.entity.SuOrderEntity;
 import com.xm.comment_utils.enu.EnumUtils;
 import com.xm.comment_utils.mybatis.PageBean;
-import com.xm.comment_utils.mybatis.PageUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.InvocationTargetException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -66,8 +57,9 @@ public class PddProductApiServiceImpl implements ProductApiService {
         request.setOptId(criteria.getOptionId() != null?criteria.getOptionId().longValue():null);
         request.setKeyword(criteria.getKeyword());
         request.setGoodsIdList(criteria.getGoodsIdList());
-        request.setSortType(criteria.getOrderBy());
+        request.setSortType(criteria.getOrderBy(PlatformTypeConstant.PDD));
         request.setActivityTags(criteria.getActivityTags());
+        request.setWithCoupon(criteria.getHasCoupon());
         //筛选器
         List<Map<String,Object>> rangeList = new ArrayList<>();
         //价格区间
@@ -94,9 +86,9 @@ public class PddProductApiServiceImpl implements ProductApiService {
     }
 
     @Override
-    public List<SmProductEntity> details(List<Long> goodsIds) throws Exception {
+    public List<SmProductEntity> details(List<String> goodsIds) throws Exception {
         PddDdkGoodsSearchRequest request = new PddDdkGoodsSearchRequest();
-        request.setGoodsIdList(goodsIds);
+        request.setGoodsIdList(goodsIds.stream().map(o->Long.valueOf(o)).collect(Collectors.toList()));
         PddDdkGoodsSearchResponse response = popHttpClient.syncInvoke(request);
         List<PddDdkGoodsSearchResponse.GoodsSearchResponseGoodsListItem> goodsList = response.getGoodsSearchResponse().getGoodsList();
         List<SmProductEntity> smProductEntityList = goodsList.stream().map(o ->{return convertGoodsList(o);}).collect(Collectors.toList());
@@ -104,9 +96,9 @@ public class PddProductApiServiceImpl implements ProductApiService {
     }
 
     @Override
-    public SmProductEntity detail(Long goodsId,String pid) throws Exception {
+    public SmProductEntity detail(String goodsId,String pid) throws Exception {
         PddDdkGoodsDetailRequest request = new PddDdkGoodsDetailRequest();
-        request.setGoodsIdList(Arrays.asList(goodsId));
+        request.setGoodsIdList(Arrays.asList(Long.valueOf(goodsId)));
         request.setPid(pid);
         PddDdkGoodsDetailResponse response = popHttpClient.syncInvoke(request);
         if (response.getGoodsDetailResponse().getGoodsDetails() == null || response.getGoodsDetailResponse().getGoodsDetails().size() <= 0)

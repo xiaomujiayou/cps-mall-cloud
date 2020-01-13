@@ -7,6 +7,7 @@ import com.xm.comment_serialize.module.mall.ex.SmProductEntityEx;
 import com.xm.comment_serialize.module.mall.form.ProductDetailForm;
 import com.xm.comment_serialize.module.mall.form.ProductListForm;
 import com.xm.comment_serialize.module.mall.vo.SmProductSimpleVo;
+import com.xm.comment_serialize.module.mall.form.GetProductSaleInfoForm;
 import com.xm.comment_utils.mybatis.PageBean;
 
 import java.util.List;
@@ -107,12 +108,9 @@ public interface ProductService {
     /**
      * 获取购买信息
      * @param userId
-     * @param appType   :所属平台类型(AppTypeConstant)
-     * @param fromUser  :分享的用户
-     * @param goodsId
      * @return
      */
-    public ShareLinkBo saleInfo(Integer userId,String pid,Integer appType,Integer fromUser,String goodsId) throws Exception;
+    public ShareLinkBo saleInfo(Integer userId,String pid,GetProductSaleInfoForm productSaleInfoForm) throws Exception;
 
 
 }

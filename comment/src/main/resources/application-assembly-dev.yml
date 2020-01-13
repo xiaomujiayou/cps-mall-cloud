@@ -44,11 +44,4 @@ tx-lcn:
   client:
     manager-address: 47.92.6.56:8070
 
-#阿里云OSS文件管理
-oss:
-  ali:
-    endpoint: http://oss-cn-hangzhou.aliyuncs.com
-    accessKeyId: LTAI4Fsu8LS6dfkSgk9qe6h1
-    accessKeySecret: epYBonCerRq2V1QWR6CJ5yaFfjg1A5
-    bucketName: mall-share
 

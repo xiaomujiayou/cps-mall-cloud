@@ -1,8 +1,9 @@
 package com.xm.comment.exception;
 
-import com.xm.comment.response.Msg;
-import com.xm.comment.response.MsgEnum;
-import com.xm.comment.response.R;
+import com.xm.comment_utils.exception.GlobleException;
+import com.xm.comment_utils.response.Msg;
+import com.xm.comment_utils.response.MsgEnum;
+import com.xm.comment_utils.response.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;

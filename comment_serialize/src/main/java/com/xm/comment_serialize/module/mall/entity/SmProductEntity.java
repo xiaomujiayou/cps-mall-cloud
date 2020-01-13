@@ -83,6 +83,11 @@ public class SmProductEntity implements Serializable{
 	private Integer hasCoupon;
 
 	/**
+	 * 优惠券id(蘑菇街专用)
+	 */
+	private String couponId;
+
+	/**
 	 * 佣金比例(千分比)
 	 */
 	private Integer promotionRate;

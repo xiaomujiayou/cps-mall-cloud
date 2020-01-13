@@ -17,6 +17,7 @@
     <result column="sales_tip" property="salesTip" jdbcType="VARCHAR" />
     <result column="mall_cps" property="mallCps" jdbcType="INTEGER" />
     <result column="has_coupon" property="hasCoupon" jdbcType="INTEGER" />
+    <result column="coupon_id" property="couponId" jdbcType="VARCHAR" />
     <result column="promotion_rate" property="promotionRate" jdbcType="INTEGER" />
     <result column="service_tags" property="serviceTags" jdbcType="VARCHAR" />
     <result column="activity_type" property="activityType" jdbcType="VARCHAR" />

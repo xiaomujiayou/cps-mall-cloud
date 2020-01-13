@@ -43,6 +43,10 @@ public class ProductListForm extends AbsPageForm {
     //营销活动烈性
     private Integer channelType;
     private List<Integer> activityTags;
+    //附加参数
+    private Integer additional;
+    //包含优惠券
+    private Boolean hasCoupon;
 
 }
 

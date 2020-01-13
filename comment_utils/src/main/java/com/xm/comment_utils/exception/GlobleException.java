@@ -1,6 +1,6 @@
-package com.xm.comment.exception;
+package com.xm.comment_utils.exception;
 
-import com.xm.comment.response.MsgEnum;
+import com.xm.comment_utils.response.MsgEnum;
 import lombok.Getter;
 import lombok.Setter;
 

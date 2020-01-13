@@ -15,5 +15,6 @@ public class GetProductSaleInfoForm {
     @NotNull(message = "appType不能为空")
     private Integer appType;
     private Integer shareUserId;
+    private String couponId;
 
 }

@@ -6,9 +6,11 @@ import com.xm.api_mall.mapper.SmOptMapper;
 import com.xm.api_mall.service.ProductApiService;
 import com.xm.api_mall.service.ProductService;
 import com.xm.api_mall.service.ProfitService;
-import com.xm.comment.exception.GlobleException;
+import com.xm.comment_serialize.module.mall.constant.GoodsSortContant;
+import com.xm.comment_serialize.module.mall.form.GetProductSaleInfoForm;
+import com.xm.comment_utils.exception.GlobleException;
 import com.xm.comment.module.user.feign.UserFeignClient;
-import com.xm.comment.response.MsgEnum;
+import com.xm.comment_utils.response.MsgEnum;
 import com.xm.comment_serialize.module.mall.bo.ProductCriteriaBo;
 import com.xm.comment_serialize.module.mall.bo.ShareLinkBo;
 import com.xm.comment_serialize.module.mall.constant.BannerTypeEnum;
@@ -21,11 +23,9 @@ import com.xm.comment_serialize.module.mall.vo.SmProductSimpleVo;
 import com.xm.comment_serialize.module.user.form.AddSearchForm;
 import com.xm.comment_utils.mybatis.PageBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,8 +59,8 @@ public class PddProductServiceImpl implements ProductService {
     @Override
     public PageBean<SmProductEntityEx> similarList(Integer userId,String pid, ProductListForm productListForm) throws Exception {
         if(StrUtil.isBlank(productListForm.getGoodsId()))
-            throw new GlobleException(MsgEnum.PARAM_VALID_ERROR,"optionId 不能为空");
-        SmProductEntity smProductEntity = productApiService.detail(Long.valueOf(productListForm.getGoodsId()),pid);
+            throw new GlobleException(MsgEnum.PARAM_VALID_ERROR,"goodsId 不能为空");
+        SmProductEntity smProductEntity = productApiService.detail(productListForm.getGoodsId(),pid);
         productListForm.setKeywords(smProductEntity.getName());
         productListForm.setSort(3);
         PageBean<SmProductEntityEx> productEntityExPageBean = keyworkSearch(userId,pid,productListForm);
@@ -100,6 +100,7 @@ public class PddProductServiceImpl implements ProductService {
         productCriteriaBo.setPageNum(productListForm.getPageNum());
         productCriteriaBo.setPageSize(productListForm.getPageSize());
         productCriteriaBo.setOrderBy(productListForm.getSort());
+        productCriteriaBo.setHasCoupon(productListForm.getHasCoupon());
         if(productListForm.getMinPrice() != null && productListForm.getMaxPrice() != null){
             productCriteriaBo.setMinPrice(productListForm.getMinPrice());
             productCriteriaBo.setMaxPrice(productListForm.getMaxPrice());
@@ -137,7 +138,20 @@ public class PddProductServiceImpl implements ProductService {
 
     @Override
     public PageBean<SmProductEntityEx> recommendList(Integer userId,String pid, ProductListForm productListForm) throws Exception {
-        return convertSmProductEntityEx(userId,productApiService.getRecommendGoodsList(pid,productListForm.getChannelType(),productListForm.getPageNum(),productListForm.getPageSize()));
+//        return convertSmProductEntityEx(userId,productApiService.getRecommendGoodsList(pid,productListForm.getChannelType(),productListForm.getPageNum(),productListForm.getPageSize()));
+        ProductCriteriaBo productCriteriaBo = new ProductCriteriaBo();
+        if(productListForm.getActivityTags() != null && !productListForm.getActivityTags().isEmpty())
+            productCriteriaBo.setActivityTags(productListForm.getActivityTags());
+        productCriteriaBo.setPid(pid);
+        productCriteriaBo.setUserId(userId);
+        productCriteriaBo.setPageNum(productListForm.getPageNum());
+        productCriteriaBo.setPageSize(productListForm.getPageSize());
+        productCriteriaBo.setHasCoupon(true);
+        productCriteriaBo.setOrderBy(GoodsSortContant.PROMOTION_PRICE_DESC);
+        productCriteriaBo.setMinPrice(200);
+        productCriteriaBo.setMaxPrice(10000);
+        productCriteriaBo.setOptionId(1);
+        return convertSmProductEntityEx(userId,productApiService.getProductByCriteria(productCriteriaBo));
     }
 
     private PageBean<SmProductEntityEx> convertSmProductEntityEx(Integer userId,PageBean<SmProductEntity> pageBean){
@@ -169,13 +183,12 @@ public class PddProductServiceImpl implements ProductService {
 
     @Override
     public List<SmProductEntity> details(List<String> goodsIds) throws Exception {
-        List<Long> goodsIdList = goodsIds.stream().map(o->{return Long.valueOf(o);}).collect(Collectors.toList());
-        return productApiService.details(goodsIdList);
+        return productApiService.details(goodsIds);
     }
 
     @Override
     public SmProductEntityEx detail(String goodsId,String pid, Integer userId, Integer shareUserId) throws Exception {
-        SmProductEntity smProductEntity = productApiService.detail(Long.valueOf(goodsId),pid);
+        SmProductEntity smProductEntity = productApiService.detail(goodsId,pid);
         return profitService.calcProfit(smProductEntity,userId,shareUserId != null,shareUserId);
     }
 
@@ -185,12 +198,12 @@ public class PddProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ShareLinkBo saleInfo(Integer userId,String pid, Integer appType, Integer fromUser, String goodsId) throws Exception {
+    public ShareLinkBo saleInfo(Integer userId,String pid, GetProductSaleInfoForm productSaleInfoForm) throws Exception {
         Map<String,Object> customParams = new HashMap<>();
         customParams.put("userId",userId);
-        customParams.put("appType",appType);
-        customParams.put("fromUser",fromUser);
-        return productApiService.getShareLink(JSON.toJSONString(customParams),pid,Long.valueOf(goodsId));
+        customParams.put("appType",productSaleInfoForm.getAppType());
+        customParams.put("fromUser",productSaleInfoForm.getShareUserId());
+        return productApiService.getShareLink(JSON.toJSONString(customParams),pid,Long.valueOf(productSaleInfoForm.getGoodsId()));
     }
 
 }

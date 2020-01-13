@@ -1,5 +1,6 @@
 package com.xm.api_mall.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.xm.api_mall.mapper.SmOptMapper;
 import com.xm.api_mall.service.ConfigService;
 import com.xm.api_mall.service.OptionService;
@@ -91,6 +92,19 @@ public class OptionServiceImpl implements OptionService {
             OrderByHelper.orderBy("sort asc");
             example.createCriteria().andEqualTo("parentId",parentId);
             smOptEntities = smOptMapper.selectByExample(example);
+        }
+        return smOptEntities;
+    }
+
+    @Override
+    public List<SmOptEntity> getAllParentOption(Integer userId, Integer childOptId) {
+        List<SmOptEntity> smOptEntities = new ArrayList<>();
+        SmOptEntity smOptEntity = smOptMapper.selectByPrimaryKey(childOptId);
+        while (ObjectUtil.isNotEmpty(smOptEntity) && smOptEntity.getLevel() >= 1){
+            smOptEntities.add(smOptEntity);
+            if(smOptEntity.getParentId() == null || smOptEntity.getParentId() == 0)
+                break;
+            smOptEntity = smOptMapper.selectByPrimaryKey(smOptEntity.getParentId());
         }
         return smOptEntities;
     }

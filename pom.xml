@@ -34,6 +34,7 @@
         <module>comment_mq</module>
         <module>comment_serialize</module>
         <module>comment_utils</module>
+        <module>comment_api</module>
     </modules>
 
     <dependencyManagement>
@@ -64,6 +65,15 @@
                 <groupId>com.hankcs</groupId>
                 <artifactId>hanlp</artifactId>
                 <version>portable-1.7.3</version>
+            </dependency>
+
+
+            <!--蘑菇街sdk-->
+            <!-- ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓-->
+            <dependency>
+                <groupId>com.xm.mgj</groupId>
+                <artifactId>openapi-sdk</artifactId>
+                <version>1.0.0</version>
             </dependency>
 
             <!--拼多多sdk-->
@@ -161,6 +171,7 @@
     </dependencyManagement>
 
     <dependencies>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>

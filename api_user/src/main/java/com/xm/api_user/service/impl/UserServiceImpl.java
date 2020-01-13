@@ -3,16 +3,15 @@ package com.xm.api_user.service.impl;
 import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.StrUtil;
 import com.github.pagehelper.PageHelper;
 import com.xm.api_user.mapper.*;
 import com.xm.api_user.mapper.custom.SuOrderMapperEx;
 import com.xm.api_user.mapper.custom.SuRoleMapperEx;
 import com.xm.api_user.mapper.custom.SuUserMapperEx;
 import com.xm.api_user.service.UserService;
-import com.xm.comment.exception.GlobleException;
+import com.xm.comment_utils.exception.GlobleException;
 import com.xm.comment.module.mall.feign.MallFeignClient;
-import com.xm.comment.response.MsgEnum;
+import com.xm.comment_utils.response.MsgEnum;
 import com.xm.comment_serialize.module.mall.constant.ConfigEnmu;
 import com.xm.comment_serialize.module.mall.constant.ConfigTypeConstant;
 import com.xm.comment_serialize.module.mall.entity.SmPidEntity;
@@ -20,7 +19,6 @@ import com.xm.comment_serialize.module.user.constant.UserTypeConstant;
 import com.xm.comment_serialize.module.user.dto.ProxyProfitDto;
 import com.xm.comment_serialize.module.user.entity.*;
 import com.xm.comment_serialize.module.user.ex.RolePermissionEx;
-import com.xm.comment_serialize.module.user.ex.UserRoleEx;
 import com.xm.comment_serialize.module.user.form.GetUserInfoForm;
 import com.xm.comment_serialize.module.user.form.UpdateUserInfoForm;
 import com.xm.comment_serialize.module.user.vo.ProxyInfoVo;
@@ -31,14 +29,12 @@ import me.chanjar.weixin.common.error.WxErrorException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import tk.mybatis.mapper.entity.Example;
 import tk.mybatis.orderbyhelper.OrderByHelper;
 
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service("userService")
 public class UserServiceImpl implements UserService {

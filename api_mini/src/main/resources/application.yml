@@ -2,7 +2,7 @@ spring:
   application:
     name: api-mini
   profiles:
-    active: assembly-dev,plugin,dev
+    active: dev,plugin,cloud-dev,assembly-dev,api-dev
 
 
 wx:

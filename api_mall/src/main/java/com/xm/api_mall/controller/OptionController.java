@@ -2,12 +2,10 @@ package com.xm.api_mall.controller;
 
 import com.xm.api_mall.service.OptionService;
 import com.xm.comment.annotation.LoginUser;
-import com.xm.comment.response.Msg;
-import com.xm.comment.response.R;
+import com.xm.comment_utils.response.Msg;
+import com.xm.comment_utils.response.R;
 import com.xm.comment_serialize.module.mall.entity.SmOptEntity;
-import com.xm.comment_serialize.module.mall.ex.OptEx;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

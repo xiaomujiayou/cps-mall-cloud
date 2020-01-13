@@ -26,7 +26,7 @@ public interface ProductApiService {
      * @param goodsIds
      * @return
      */
-    public List<SmProductEntity> details(List<Long> goodsIds) throws Exception;
+    public List<SmProductEntity> details(List<String> goodsIds) throws Exception;
 
     /**
      * 获取单个商品详情
@@ -35,7 +35,7 @@ public interface ProductApiService {
      * @return
      * @throws Exception
      */
-    public SmProductEntity detail(Long goodsId,String pid) throws Exception;
+    public SmProductEntity detail(String goodsId,String pid) throws Exception;
 
 
     /**

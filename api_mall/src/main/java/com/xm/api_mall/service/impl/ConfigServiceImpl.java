@@ -2,26 +2,21 @@ package com.xm.api_mall.service.impl;
 
 import com.xm.api_mall.mapper.SmConfigMapper;
 import com.xm.api_mall.service.ConfigService;
-import com.xm.comment.exception.GlobleException;
+import com.xm.comment_utils.exception.GlobleException;
 import com.xm.comment.module.user.feign.UserFeignClient;
-import com.xm.comment.response.Msg;
-import com.xm.comment.response.MsgEnum;
+import com.xm.comment_utils.response.Msg;
+import com.xm.comment_utils.response.MsgEnum;
 import com.xm.comment_serialize.module.mall.constant.ConfigEnmu;
 import com.xm.comment_serialize.module.mall.constant.ConfigTypeConstant;
 import com.xm.comment_serialize.module.mall.entity.SmConfigEntity;
 import com.xm.comment_serialize.module.user.constant.UserTypeConstant;
 import com.xm.comment_serialize.module.user.entity.SuConfigEntity;
 import com.xm.comment_serialize.module.user.entity.SuUserEntity;
-import com.xm.comment_utils.sql.MySqlUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Example;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service("configService")
 public class ConfigServiceImpl implements ConfigService {

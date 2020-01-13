@@ -4,12 +4,7 @@ import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.github.pagehelper.PageHelper;
-import com.xm.comment.exception.GlobleException;
-import com.xm.comment.module.mall.feign.MallFeignClient;
-import com.xm.comment.response.Msg;
-import com.xm.comment.response.MsgEnum;
 import com.xm.comment_mq.config.OrderMqConfig;
 import com.xm.comment_serialize.module.cron.entity.ScPddOrderSyncHistoryEntity;
 import com.xm.comment_serialize.module.user.entity.SuOrderEntity;
@@ -26,10 +21,8 @@ import org.springframework.stereotype.Component;
 import tk.mybatis.orderbyhelper.OrderByHelper;
 
 import javax.annotation.Resource;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 /**
  * 同步拼多多订单

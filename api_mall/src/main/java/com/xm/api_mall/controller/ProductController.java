@@ -4,17 +4,14 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.xm.api_mall.component.PlatformContext;
 import com.xm.api_mall.exception.ApiCallException;
-import com.xm.api_mall.utils.SentenceUtils;
 import com.xm.api_mall.utils.TextToGoodsUtils;
 import com.xm.comment.annotation.LoginUser;
 import com.xm.comment.annotation.Pid;
 import com.xm.comment.module.user.feign.UserFeignClient;
-import com.xm.comment.response.Msg;
-import com.xm.comment.response.MsgEnum;
-import com.xm.comment.response.R;
-import com.xm.comment.utils.GoodsPriceUtil;
+import com.xm.comment_utils.response.Msg;
+import com.xm.comment_utils.response.MsgEnum;
+import com.xm.comment_utils.response.R;
 import com.xm.comment_serialize.module.mall.bo.ProductIndexBo;
-import com.xm.comment_serialize.module.mall.entity.SmPidEntity;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
 import com.xm.comment_serialize.module.mall.ex.SmProductEntityEx;
 import com.xm.comment_serialize.module.mall.form.GetProductSaleInfoForm;
@@ -35,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
@@ -56,7 +52,7 @@ public class ProductController {
      * @return
      */
     @PostMapping("/list")
-    public Msg<Object> getProductList(@RequestBody @Valid ProductListForm productListForm, BindingResult bindingResult, @LoginUser(necessary = false) Integer userId,@Pid String pid) throws Exception {
+    public Msg<Object> getProductList(@RequestBody @Valid ProductListForm productListForm, BindingResult bindingResult, @LoginUser(necessary = false) Integer userId,@Pid(necessary = false) String pid) throws Exception {
         PageBean<SmProductEntityEx> pageBean = (PageBean<SmProductEntityEx>) productContext
                 .platformType(productListForm.getPlatformType())
                 .listType(productListForm.getListType())
@@ -82,7 +78,7 @@ public class ProductController {
      * @return
      */
     @GetMapping("/detail")
-    public Msg<SmProductVo> getProductDetail(@Valid ProductDetailForm productDetailForm, BindingResult bindingResult, @LoginUser(necessary = false) Integer userId,@Pid String pid) throws Exception {
+    public Msg<SmProductVo> getProductDetail(@Valid ProductDetailForm productDetailForm, BindingResult bindingResult, @LoginUser(necessary = false) Integer userId,@Pid(necessary = false) String pid) throws Exception {
         return R.sucess(getDetailVo(userId,pid,productDetailForm.getPlatformType(),productDetailForm.getGoodsId(),productDetailForm.getShareUserId()));
     }
 
@@ -157,13 +153,11 @@ public class ProductController {
                 .saleInfo(
                         userId,
                         pid,
-                        productSaleInfoForm.getAppType(),
-                        productSaleInfoForm.getShareUserId(),
-                        productSaleInfoForm.getGoodsId()));
+                        productSaleInfoForm));
     }
 
     @GetMapping("/url/parse")
-    public Msg<Object> parseUrl(@LoginUser(necessary = false) Integer userId,@Pid String pid,String url) throws Exception {
+    public Msg<Object> parseUrl(@LoginUser(necessary = false) Integer userId,@Pid(necessary = false) String pid,String url) throws Exception {
         if(StrUtil.isBlank(url))
             return R.error(MsgEnum.PARAM_VALID_ERROR);
         TextToGoodsUtils.GoodsSpec goodsSpec = TextToGoodsUtils.parse(url);

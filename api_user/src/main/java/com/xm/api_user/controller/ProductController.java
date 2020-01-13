@@ -1,23 +1,19 @@
 package com.xm.api_user.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.xm.api_user.service.ProductService;
 import com.xm.api_user.service.ShareService;
 import com.xm.comment.annotation.LoginUser;
 import com.xm.comment.module.mall.feign.MallFeignClient;
-import com.xm.comment.response.Msg;
-import com.xm.comment.response.R;
+import com.xm.comment_utils.response.Msg;
+import com.xm.comment_utils.response.R;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
 import com.xm.comment_serialize.module.mall.ex.SmProductEntityEx;
 import com.xm.comment_serialize.module.mall.form.*;
 import com.xm.comment_utils.mybatis.PageBean;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
@@ -94,6 +90,7 @@ public class ProductController {
      */
     @GetMapping
     public Msg<PageBean<SmProductEntityEx>> get(@LoginUser Integer userId, @Valid GetProductForm getProductForm,BindingResult bindingResult){
+        getProductForm.setPageSize(10);
         PageBean<SmProductEntity> pageBean = productService.getUserProduct(
                 userId,
                 getProductForm.getPageNum(),

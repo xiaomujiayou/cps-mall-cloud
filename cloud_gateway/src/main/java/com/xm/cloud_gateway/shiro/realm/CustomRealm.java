@@ -2,12 +2,11 @@ package com.xm.cloud_gateway.shiro.realm;
 
 import com.xm.cloud_gateway.shiro.token.WeChatToken;
 import com.xm.comment.module.user.feign.UserFeignClient;
-import com.xm.comment.response.Msg;
+import com.xm.comment_utils.response.Msg;
 import com.xm.comment_serialize.module.user.entity.SuPermissionEntity;
 import com.xm.comment_serialize.module.user.entity.SuUserEntity;
 import com.xm.comment_serialize.module.user.ex.RolePermissionEx;
 import com.xm.comment_serialize.module.user.form.GetUserInfoForm;
-import com.xm.comment_serialize.module.user.vo.UserInfoVo;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;

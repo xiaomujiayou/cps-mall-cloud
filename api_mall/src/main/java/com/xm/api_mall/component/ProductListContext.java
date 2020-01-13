@@ -1,17 +1,12 @@
 package com.xm.api_mall.component;
 
 import com.xm.api_mall.service.ProductService;
-import com.xm.comment.exception.GlobleException;
-import com.xm.comment.response.MsgEnum;
-import com.xm.comment_serialize.module.mall.constant.ProductListTypeConstant;
 import com.xm.comment_serialize.module.mall.constant.ProductListTypeEnum;
 import com.xm.comment_serialize.module.mall.form.ProductListForm;
 import com.xm.comment_utils.enu.EnumUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
 
 public class ProductListContext<T> {
 
