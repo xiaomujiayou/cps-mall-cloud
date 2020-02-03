@@ -1,6 +1,12 @@
 package com.xm.api_mini.drawable;
 
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.io.resource.ClassPathResource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
@@ -9,7 +15,10 @@ import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 图片工具类
@@ -18,7 +27,7 @@ import java.net.URL;
  */
 @Component
 public class ResourceUtils {
-
+    private static final HashMap<String,Resource> fileCache = new HashMap<>();
     /**
      * 获取图片
      * @param url
@@ -29,11 +38,14 @@ public class ResourceUtils {
         if (url.contains("://")) {
             return getImageFromUrl(url);
         }
-        File imgFile = org.springframework.util.ResourceUtils.getFile("classpath:img/"+url);
-        if (imgFile != null) {
-            return ImageIO.read(imgFile);
+        Resource img = null;
+        if(fileCache.get(url) == null){
+            img = resourceLoader("classpath:/img/"+url);
+            fileCache.put(url,img);
+        }else {
+            img = fileCache.get(url);
         }
-        throw new IOException("Can't get input stream from URL!");
+        return ImageIO.read(img.getInputStream());
     }
 
     /**
@@ -81,8 +93,21 @@ public class ResourceUtils {
         return image;
     }
 
-    public static File getFontFile(String font) throws IOException {
-        return org.springframework.util.ResourceUtils.getFile("classpath:ttf/"+font+".ttf");
+
+    public static InputStream getFontFile(String font) throws IOException {
+        Resource resource = null;
+        if(fileCache.get(font) == null){
+            resource = resourceLoader("classpath:/ttf/"+font+".ttf");
+            fileCache.put(font,resource);
+        }else {
+            resource = fileCache.get(font);
+        }
+        return resource.getInputStream();
+    }
+
+    public static Resource resourceLoader(String fileFullPath) throws IOException {
+        ResourceLoader resourceLoader = new DefaultResourceLoader();
+        return resourceLoader.getResource(fileFullPath);
     }
 
     /**

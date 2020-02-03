@@ -13,6 +13,7 @@ spring:
   rabbitmq:
     host: rabbitmq
     port: 5672
+    virtual-host: /share
     username: guest
     password: guest
     listener:

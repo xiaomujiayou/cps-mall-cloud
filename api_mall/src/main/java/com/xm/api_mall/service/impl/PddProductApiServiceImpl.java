@@ -121,10 +121,10 @@ public class PddProductApiServiceImpl implements ProductApiService {
     }
 
     @Override
-    public ShareLinkBo getShareLink(String customParams,String pId, Long goodsId) throws Exception {
+    public ShareLinkBo getShareLink(String customParams,String pId, String goodsId,String couponId) throws Exception {
         PddDdkGoodsPromotionUrlGenerateRequest request = new PddDdkGoodsPromotionUrlGenerateRequest();
         request.setPId(pId);
-        request.setGoodsIdList(Arrays.asList(goodsId));
+        request.setGoodsIdList(Arrays.asList(Long.valueOf(goodsId)));
         request.setCustomParameters(customParams);
         request.setGenerateShortUrl(true);
         request.setGenerateWeApp(true);

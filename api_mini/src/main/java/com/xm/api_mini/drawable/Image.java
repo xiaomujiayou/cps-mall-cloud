@@ -46,7 +46,6 @@ public class Image extends Drawable {
         if (borderRadius > 0) {
             image = ResourceUtils.setRadius(image, borderRadius * 4, 0, 0);
         }
-
         // 画图
         gd.drawImage(image, x, y, width, height, new ImageObserver() {
             @Override

@@ -16,6 +16,7 @@ public enum ConfigEnmu {
     PLATFORM_ID("platform_id","平台id"),
     PLATFORM_ALL_NAME("platform_all_name","所有平台名称"),
     PLATFORM_ALL_ID("platform_all_id","所有平台id"),
+    PAGE_HELP_STATE("page_help_state","页面帮助提示(0:关闭,1:打开)"),
     ;
     ConfigEnmu(String name, String desc) {
         this.name = name;

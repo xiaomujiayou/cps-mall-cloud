@@ -8,16 +8,26 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 public class Text extends Drawable {
+
+    private static final Map<String,Font> fontMapCache = new HashMap<>();
 
     @Override
     public void draw(Graphics2D gd, int posterWidth, int posterHeight) {
         Font drawFont;
 
         try {
-            drawFont = Font.createFont(fontWeight, ResourceUtils.getFontFile(font)).deriveFont((float) fontSize);
+            if(fontMapCache.get(font+":"+fontSize) == null){
+                drawFont = Font.createFont(fontWeight, ResourceUtils.getFontFile(font)).deriveFont((float) fontSize);
+                fontMapCache.put(font+":"+fontSize,drawFont);
+            }else {
+                drawFont = fontMapCache.get(font+":"+fontSize);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             drawFont = new Font("Default", fontWeight, fontSize);

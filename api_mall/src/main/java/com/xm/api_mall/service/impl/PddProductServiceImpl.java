@@ -203,7 +203,7 @@ public class PddProductServiceImpl implements ProductService {
         customParams.put("userId",userId);
         customParams.put("appType",productSaleInfoForm.getAppType());
         customParams.put("fromUser",productSaleInfoForm.getShareUserId());
-        return productApiService.getShareLink(JSON.toJSONString(customParams),pid,Long.valueOf(productSaleInfoForm.getGoodsId()));
+        return productApiService.getShareLink(JSON.toJSONString(customParams),pid,productSaleInfoForm.getGoodsId(),null);
     }
 
 }

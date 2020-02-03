@@ -14,4 +14,6 @@ public class WxCodeParamBean {
     private String gid;
     //默认为true，表示需要生成小程序码
     private String genWxcode;
+
+    private String feedBack;
 }

@@ -20,6 +20,7 @@ public class SmProductVo {
     private String salesTip;
     private Integer mallCps;
     private Integer hasCoupon;
+    private String couponId;
     private String serviceTags;
     private String activityType;
     private java.util.Date createTime;

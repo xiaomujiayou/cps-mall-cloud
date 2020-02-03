@@ -54,7 +54,7 @@ public interface ProductApiService {
      * @return
      * @throws Exception
      */
-    public ShareLinkBo getShareLink(String customParams,String pId, Long goodsId) throws Exception;
+    public ShareLinkBo getShareLink(String customParams,String pId, String goodsId,String couponId) throws Exception;
 
     /**
      * 生成推广位id

@@ -16,6 +16,7 @@ import com.pdd.pop.sdk.http.api.response.PddDdkGoodsPromotionUrlGenerateResponse
 import com.xm.api_mall.service.ProductApiService;
 import com.xm.comment.utils.GoodsPriceUtil;
 import com.xm.comment_api.client.MyMogujieClient;
+import com.xm.comment_api.config.MgjApiConfig;
 import com.xm.comment_api.module.mgj.*;
 import com.xm.comment_serialize.module.mall.bo.PddGoodsListItem;
 import com.xm.comment_serialize.module.mall.bo.PddThemeBo;
@@ -40,6 +41,8 @@ public class MgjProductApiServiceImpl implements ProductApiService {
 
     @Autowired
     private MyMogujieClient myMogujieClient;
+    @Autowired
+    private MgjApiConfig mgjApiConfig;
 
     @Resource(name = "mgjProductApiService")
     private ProductApiService mgjProductApiService;
@@ -105,7 +108,7 @@ public class MgjProductApiServiceImpl implements ProductApiService {
     }
 
     @Override
-    @Cacheable(value = "share.goods.detail.mgj",key = "#goodsId")
+//    @Cacheable(value = "share.goods.detail.mgj",key = "#goodsId")
     public SmProductEntity detail(String goodsId, String pid) throws Exception {
         XiaoDianCpsdataItemGetRequest request = new XiaoDianCpsdataItemGetRequest("https://shop.mogujie.com/detail/" + goodsId);
         MgjResponse<String> res = myMogujieClient.execute(request);
@@ -129,7 +132,7 @@ public class MgjProductApiServiceImpl implements ProductApiService {
         smProductEntity.setHasCoupon(goodsJson.getInteger("couponLeftCount") > 0 ? 1 : 0);
         smProductEntity.setCashPrice(GoodsPriceUtil.type(PlatformTypeConstant.MGJ).calcProfit(smProductEntity).intValue());
         smProductEntity.setServiceTags(String.join(",", goodsJson.getString("tag")));
-        smProductEntity.setCouponId(goodsJson.getString("promId"));
+        smProductEntity.setCouponId(goodsJson.getString("promid"));
         smProductEntity.setCreateTime(new Date());
         return smProductEntity;
     }
@@ -140,36 +143,18 @@ public class MgjProductApiServiceImpl implements ProductApiService {
     }
 
     @Override
-    public ShareLinkBo getShareLink(String customParams, String pId, Long goodsId) throws Exception {
-
-//        PddDdkGoodsPromotionUrlGenerateRequest request = new PddDdkGoodsPromotionUrlGenerateRequest();
-//        request.setPId(pId);
-//        request.setGoodsIdList(Arrays.asList(goodsId));
-//        request.setCustomParameters(customParams);
-//        request.setGenerateShortUrl(true);
-//        request.setGenerateWeApp(true);
-//        PddDdkGoodsPromotionUrlGenerateResponse response = popHttpClient.syncInvoke(request);
-//        ShareLinkBo shareLinkBo = new ShareLinkBo();
-//        PddDdkGoodsPromotionUrlGenerateResponse.GoodsPromotionUrlGenerateResponseGoodsPromotionUrlListItem item = response.getGoodsPromotionUrlGenerateResponse().getGoodsPromotionUrlList().get(0);
-//        shareLinkBo.setWeIconUrl(item.getWeAppInfo().getWeAppIconUrl());
-//        shareLinkBo.setWeBannerUrl(item.getWeAppInfo().getBannerUrl());
-//        shareLinkBo.setWeDesc(item.getWeAppInfo().getDesc());
-//        shareLinkBo.setWeSourceDisplayName(item.getWeAppInfo().getSourceDisplayName());
-//        shareLinkBo.setWePagePath(item.getWeAppInfo().getPagePath());
-//        shareLinkBo.setWeUserName(item.getWeAppInfo().getUserName());
-//        shareLinkBo.setWeTitle(item.getWeAppInfo().getTitle());
-//        shareLinkBo.setWeAppId(item.getWeAppInfo().getAppId());
-//        shareLinkBo.setShotUrl(item.getShortUrl());
-//        shareLinkBo.setLongUrl(item.getUrl());
-//        return shareLinkBo;
-
-//        WxCodeParamBean wxCodeParamBean = new WxCodeParamBean();
-//        wxCodeParamBean.setItemId("1m7bjww");
-//        wxCodeParamBean.setPromId("1hv62yll8");
-//        wxCodeParamBean.setUid("1et2402");
-//        MgjRequest<XiaoDianCpsdataWxcodeGetResponse> mgjRequest = new XiaoDianCpsdataWxcodeGetRequest(wxCodeParamBean);
-//        System.out.println(JSON.toJSONString(JSON.parse(client.execute(mgjRequest,token).getResult().getData()), SerializerFeature.PrettyFormat));
-        return null;
+    public ShareLinkBo getShareLink(String customParams, String pId, String goodsId,String couponId) throws Exception {
+        WxCodeParamBean wxCodeParamBean = new WxCodeParamBean();
+        wxCodeParamBean.setUid(mgjApiConfig.getUid());
+        wxCodeParamBean.setItemId(goodsId);
+        wxCodeParamBean.setPromId(couponId);
+        MgjRequest<XiaoDianCpsdataWxcodeGetResponse> mgjRequest = new XiaoDianCpsdataWxcodeGetRequest(wxCodeParamBean);
+        JSONObject shareBean = JSON.parseObject(myMogujieClient.execute(mgjRequest).getResult().getData());
+        ShareLinkBo shareLinkBo = new ShareLinkBo();
+//        shareLinkBo.setWePagePath(shareBean.getString("path") + "&feedback=" + customParams);
+        shareLinkBo.setWePagePath(shareBean.getString("path") + "&feedback=mogujie");
+        shareLinkBo.setWeAppId(mgjApiConfig.getWeAppId());
+        return shareLinkBo;
     }
 
     @Override

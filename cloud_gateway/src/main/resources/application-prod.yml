@@ -4,3 +4,4 @@ server:
 logging:
   logPath: /data/share/gateway-server
   logLevel: debug
+

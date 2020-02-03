@@ -17,14 +17,24 @@ public class MgjTest {
         promInfoQueryBean.setKeyword("女装");
 //        MgjRequest<XiaoDianCpsdataPromItemGetResponse> mgjRequest = new XiaoDianCpsdataPromItemGetRequest(promInfoQueryBean);
 //        System.out.println(JSON.toJSONString(JSON.parse(client.execute(mgjRequest,token).getResult().getData()), SerializerFeature.PrettyFormat));
-//        MgjRequest<XiaoDianCpsdataItemGetResponse> mgjRequest = new XiaoDianCpsdataItemGetRequest("https://shop.mogujie.com/detail/1m7bjww?ptp=31.LqLXfb.0.0.UjoG4vyS");
+//        MgjRequest<XiaoDianCpsdataItemGetResponse> mgjRequest = new XiaoDianCpsdataItemGetRequest("https://shop.mogujie.com/detail/1jwt9z0");
 //        System.out.println(JSON.toJSONString(JSON.parse(client.execute(mgjRequest,token).getResult().getData()), SerializerFeature.PrettyFormat));
 
-        WxCodeParamBean wxCodeParamBean = new WxCodeParamBean();
-        wxCodeParamBean.setItemId("1m7bjww");
-        wxCodeParamBean.setPromId("1hv62yll8");
-        wxCodeParamBean.setUid("1et2402");
-        MgjRequest<XiaoDianCpsdataWxcodeGetResponse> mgjRequest = new XiaoDianCpsdataWxcodeGetRequest(wxCodeParamBean);
+//        WxCodeParamBean wxCodeParamBean = new WxCodeParamBean();
+//        wxCodeParamBean.setItemId("1jwt9z0");
+//        wxCodeParamBean.setPromId("1hv62yll8");
+//        wxCodeParamBean.setUid("1et2402");
+//        wxCodeParamBean.setFeedBack("aaaaaaaa");
+//        MgjRequest<XiaoDianCpsdataWxcodeGetResponse> mgjRequest = new XiaoDianCpsdataWxcodeGetRequest(wxCodeParamBean);
+//        System.out.println(JSON.toJSONString(JSON.parse(client.execute(mgjRequest,token).getResult().getData()), SerializerFeature.PrettyFormat));
+
+
+        OrderInfoQueryBean orderInfoQueryBean = new OrderInfoQueryBean();
+        orderInfoQueryBean.setStart(20200115);
+        orderInfoQueryBean.setEnd(20200116);
+        orderInfoQueryBean.setPage(1);
+        orderInfoQueryBean.setPagesize(100);
+        MgjRequest<XiaoDianCpsdataOrderListGetResponse> mgjRequest = new XiaoDianCpsdataOrderListGetRequest(orderInfoQueryBean);
         System.out.println(JSON.toJSONString(JSON.parse(client.execute(mgjRequest,token).getResult().getData()), SerializerFeature.PrettyFormat));
 
     }

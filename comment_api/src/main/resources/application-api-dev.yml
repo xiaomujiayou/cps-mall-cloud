@@ -15,3 +15,4 @@ mgj:
   url: https://openapi.mogujie.com/invoke
   redirect-uri: http://xiaomujiayou.w3.luyouxia.net/api-mall/api/mgj/token
   uid: 1et2402
+  we-app-Id: wxca3957e5474b3670

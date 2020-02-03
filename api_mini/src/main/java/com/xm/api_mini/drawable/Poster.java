@@ -73,10 +73,11 @@ public class Poster {
      * @return File
      * @throws IOException
      */
-    public java.awt.Image draw() throws IOException {
+    public BufferedImage draw() throws IOException {
+        long s = System.currentTimeMillis();
         // 初始化图片
         BufferedImage image = new BufferedImage(width, height, format.equals("png") ? BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_3BYTE_BGR);
-
+        System.out.println("初始化图片:"+(System.currentTimeMillis() - s));
         // create graphics
         Graphics2D gd = image.createGraphics();
 
@@ -103,38 +104,29 @@ public class Poster {
                 push2map(indexMap, line);
             }
         }
-
         if (this.images != null) {
             // 遍历 images
             for (Image img : this.images) {
                 push2map(indexMap, img);
             }
         }
-
         if (this.texts != null) {
             // 遍历 texts
             for (Text text : this.texts) {
                 push2map(indexMap, text);
             }
         }
-
         // 按 index 顺序执行绘画过程
         for (Integer index : indexMap.keySet()) {
             drawables = indexMap.get(index);
             if (drawables != null) {
                 for (Drawable drawable : drawables) {
                     drawable.draw(gd, width, height);
+                    System.out.println(drawable.getClass().getName()+":"+(System.currentTimeMillis() - s));
                 }
             }
         }
-
         gd.dispose();
-
-        // 创建临时文件
-//        File file = File.createTempFile(this.key(), "." + format);
-//        ImageIO.write(image, format, file); // 把文件写入图片
-//        file.deleteOnExit(); // 使用完后删除文件
-
         return image;
     }
 

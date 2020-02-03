@@ -20,7 +20,5 @@ public class PageDetailReceiver {
 //    ))
 //    public void onMessage(SpProductBo spProductBo){
 //        log.debug(JSON.toJSONString(spProductBo));
-//
-//
 //    }
 }

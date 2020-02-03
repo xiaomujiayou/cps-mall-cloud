@@ -13,11 +13,12 @@ spring:
   rabbitmq:
     host: 47.92.6.56
     port: 5672
+    virtual-host: /share
     username: guest
     password: guest
     listener:
       simple:
-        acknowledge-mode: manual  #消费确认置为手动
+      acknowledge-mode: manual  #消费确认置为手动
   redis:
     host: 47.92.6.56
     port: 6379

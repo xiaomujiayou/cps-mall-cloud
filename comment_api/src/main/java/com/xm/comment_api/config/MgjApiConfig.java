@@ -19,6 +19,7 @@ public class MgjApiConfig {
     private String url;
     private String redirectUri;
     private String uid;
+    private String weAppId;
 
     @Bean
     public MyMogujieClient getMgjHttpClient(StringRedisTemplate stringRedisTemplate){

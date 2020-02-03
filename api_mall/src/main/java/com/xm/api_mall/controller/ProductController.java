@@ -144,7 +144,7 @@ public class ProductController {
     }
 
     @GetMapping("/sale")
-    public Msg getProductSaleInfo(@LoginUser Integer userId,@Pid String pid, @Valid GetProductSaleInfoForm productSaleInfoForm) throws Exception {
+    public Msg getProductSaleInfo(@LoginUser Integer userId,@Pid(necessary = false) String pid, @Valid GetProductSaleInfoForm productSaleInfoForm) throws Exception {
         if(userId.equals(productSaleInfoForm.getShareUserId()))
             productSaleInfoForm.setShareUserId(null);
         return R.sucess(productContext

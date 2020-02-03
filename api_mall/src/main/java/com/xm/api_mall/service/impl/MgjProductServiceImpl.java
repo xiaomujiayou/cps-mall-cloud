@@ -175,11 +175,10 @@ public class MgjProductServiceImpl implements ProductService {
 
     @Override
     public ShareLinkBo saleInfo(Integer userId, String pid, GetProductSaleInfoForm productSaleInfoForm) throws Exception {
-//        Map<String,Object> customParams = new HashMap<>();
-//        customParams.put("userId",userId);
-//        customParams.put("appType",appType);
-//        customParams.put("fromUser",fromUser);
-//        return productApiService.getShareLink(JSON.toJSONString(customParams),pid,Long.valueOf(goodsId));
-        return null;
+        Map<String,Object> customParams = new HashMap<>();
+        customParams.put("userId",userId);
+        customParams.put("appType",productSaleInfoForm.getAppType());
+        customParams.put("fromUser",productSaleInfoForm.getShareUserId());
+        return productApiService.getShareLink(JSON.toJSONString(customParams),pid,productSaleInfoForm.getGoodsId(),productSaleInfoForm.getCouponId());
     }
 }
