@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: api-lottery
+  profiles:
+    active: dev,plugin,cloud-dev,assembly-dev
+

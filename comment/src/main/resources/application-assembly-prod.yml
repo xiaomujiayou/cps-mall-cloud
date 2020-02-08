@@ -18,7 +18,9 @@ spring:
     password: guest
     listener:
       simple:
-        acknowledge-mode: manual  #消费确认置为手动
+        acknowledge-mode: manual #消费确认置为手动
+        concurrency: 5
+        max-concurrency: 10
   redis:
     host: redis
     port: 6379

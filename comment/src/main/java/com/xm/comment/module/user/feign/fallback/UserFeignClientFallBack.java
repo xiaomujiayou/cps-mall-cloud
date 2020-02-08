@@ -1,6 +1,8 @@
 package com.xm.comment.module.user.feign.fallback;
 
 import com.xm.comment.module.user.feign.UserFeignClient;
+import com.xm.comment_serialize.module.lottery.ex.SlPropSpecEx;
+import com.xm.comment_serialize.module.user.bo.SuBillToPayBo;
 import com.xm.comment_utils.response.Msg;
 import com.xm.comment_utils.response.MsgEnum;
 import com.xm.comment_utils.response.R;
@@ -53,6 +55,11 @@ public class UserFeignClientFallBack implements UserFeignClient {
 
     @Override
     public Msg addSearch(Integer userId, AddSearchForm addSearchForm) {
+        return R.error(MsgEnum.SERVICE_AVAILABLE);
+    }
+
+    @Override
+    public Msg<SuBillToPayBo> createByProp(SlPropSpecEx suBillEntity) {
         return R.error(MsgEnum.SERVICE_AVAILABLE);
     }
 

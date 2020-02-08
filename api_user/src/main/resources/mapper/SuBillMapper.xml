@@ -7,10 +7,11 @@
     <result column="from_user_id" property="fromUserId" jdbcType="INTEGER" />
     <result column="money" property="money" jdbcType="INTEGER" />
     <result column="type" property="type" jdbcType="INTEGER" />
-    <result column="order_id" property="orderId" jdbcType="INTEGER" />
+    <result column="attach" property="attach" jdbcType="INTEGER" />
     <result column="promotion_rate" property="promotionRate" jdbcType="INTEGER" />
     <result column="state" property="state" jdbcType="INTEGER" />
     <result column="income" property="income" jdbcType="INTEGER" />
+    <result column="des" property="des" jdbcType="VARCHAR" />
     <result column="fail_reason" property="failReason" jdbcType="VARCHAR" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />

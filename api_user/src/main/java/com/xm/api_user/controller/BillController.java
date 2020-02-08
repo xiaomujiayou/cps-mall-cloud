@@ -1,13 +1,16 @@
 package com.xm.api_user.controller;
 
+import com.xm.api_user.mapper.custom.SuBillMapperEx;
 import com.xm.api_user.service.BillService;
 import com.xm.comment.annotation.LoginUser;
+import com.xm.comment_serialize.module.lottery.ex.SlPropSpecEx;
+import com.xm.comment_serialize.module.user.bo.SuBillToPayBo;
+import com.xm.comment_serialize.module.user.entity.SuBillEntity;
 import com.xm.comment_utils.response.Msg;
+import com.xm.comment_utils.response.MsgEnum;
 import com.xm.comment_utils.response.R;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/bill")
@@ -19,5 +22,17 @@ public class BillController {
     @GetMapping
     public Msg get(@LoginUser Integer userId,Integer state,Integer type,Integer pageNum,Integer pageSize){
         return R.sucess(billService.getList(userId,state,type,pageNum,pageSize));
+    }
+
+    /**
+     * 生成道具购买账单，供道具服务调用
+     * @param slPropSpecEx
+     * @return
+     */
+    @PostMapping("/create/prop")
+    public Msg<SuBillToPayBo> createByProp(@RequestBody SlPropSpecEx slPropSpecEx){
+        if(slPropSpecEx == null)
+            return R.error(MsgEnum.PARAM_VALID_ERROR);
+        return R.sucess(billService.createByProp(slPropSpecEx));
     }
 }

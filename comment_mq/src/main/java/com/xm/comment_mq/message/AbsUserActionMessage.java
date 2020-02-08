@@ -1,8 +1,19 @@
 package com.xm.comment_mq.message;
 
+import lombok.Data;
+
+import java.io.Serializable;
+
 /**
  * 用户事件消息载体
  */
-public class AbsUserActionMessage {
+@Data
+public class AbsUserActionMessage implements Serializable {
+    public AbsUserActionMessage(Integer userId) {
+        this.userId = userId;
+    }
+
+    //所属用户
+    private Integer userId;
 
 }

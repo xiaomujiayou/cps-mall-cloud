@@ -2,6 +2,8 @@ package com.xm.comment.module.user.feign;
 
 import com.xm.comment.config.FeignConfiguration;
 import com.xm.comment.module.user.feign.fallback.UserFeignClientFallBack;
+import com.xm.comment_serialize.module.lottery.ex.SlPropSpecEx;
+import com.xm.comment_serialize.module.user.bo.SuBillToPayBo;
 import com.xm.comment_utils.response.Msg;
 import com.xm.comment_serialize.module.user.entity.SuConfigEntity;
 import com.xm.comment_serialize.module.user.entity.SuUserEntity;
@@ -42,4 +44,7 @@ public interface UserFeignClient {
 
     @PostMapping(value = "/search",consumes = "application/json")
     public Msg addSearch(@RequestParam Integer userId,@RequestBody AddSearchForm addSearchForm);
+
+    @PostMapping(value = "/create/prop" ,consumes = "application/json")
+    public Msg<SuBillToPayBo> createByProp(@RequestBody SlPropSpecEx slPropSpecEx);
 }

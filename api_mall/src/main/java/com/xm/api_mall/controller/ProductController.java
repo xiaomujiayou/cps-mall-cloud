@@ -48,7 +48,7 @@ public class ProductController {
     @Resource(name = "myExecutor")
     private ThreadPoolTaskExecutor executor;
     /**
-     * 推荐商品列表
+     * 商品列表
      * @return
      */
     @PostMapping("/list")
@@ -157,7 +157,7 @@ public class ProductController {
     }
 
     @GetMapping("/url/parse")
-    public Msg<Object> parseUrl(@LoginUser(necessary = false) Integer userId,@Pid(necessary = false) String pid,String url) throws Exception {
+    public Msg<TextToGoodsUtils.GoodsSpec> parseUrl(@LoginUser(necessary = false) Integer userId,@Pid(necessary = false) String pid,String url) throws Exception {
         if(StrUtil.isBlank(url))
             return R.error(MsgEnum.PARAM_VALID_ERROR);
         TextToGoodsUtils.GoodsSpec goodsSpec = TextToGoodsUtils.parse(url);

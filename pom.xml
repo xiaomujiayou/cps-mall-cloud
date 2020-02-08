@@ -24,6 +24,7 @@
     <modules>
         <module>cloud_eureka</module>
         <module>cloud_gateway</module>
+        <module>api_lottery</module>
         <module>api_mall</module>
         <module>api_mini</module>
         <module>api_user</module>
@@ -138,6 +139,11 @@
             <dependency>
                 <groupId>com.github.binarywang</groupId>
                 <artifactId>weixin-java-miniapp</artifactId>
+                <version>3.6.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.binarywang</groupId>
+                <artifactId>wx-java-pay-spring-boot-starter</artifactId>
                 <version>3.6.0</version>
             </dependency>
 

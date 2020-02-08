@@ -1,5 +1,6 @@
 package com.xm.api_user.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ArrayUtil;
@@ -12,11 +13,14 @@ import com.google.common.collect.Lists;
 import com.xm.api_user.mapper.SuBillMapper;
 import com.xm.api_user.mapper.SuOrderMapper;
 import com.xm.api_user.mapper.SuUserMapper;
+import com.xm.api_user.mapper.custom.SuBillMapperEx;
 import com.xm.api_user.service.BillService;
 import com.xm.comment.module.mall.feign.MallFeignClient;
 import com.xm.comment_mq.config.BillMqConfig;
+import com.xm.comment_serialize.module.lottery.ex.SlPropSpecEx;
 import com.xm.comment_serialize.module.mall.constant.ConfigEnmu;
 import com.xm.comment_serialize.module.mall.constant.ConfigTypeConstant;
+import com.xm.comment_serialize.module.user.bo.SuBillToPayBo;
 import com.xm.comment_serialize.module.user.constant.BillStateConstant;
 import com.xm.comment_serialize.module.user.constant.BillTypeConstant;
 import com.xm.comment_serialize.module.user.entity.SuBillEntity;
@@ -48,6 +52,8 @@ public class BillServiceImpl implements BillService {
     private SuUserMapper suUserMapper;
     @Autowired
     private SuOrderMapper suOrderMapper;
+    @Autowired
+    private BillService billService;
 
     @LcnTransaction
     @Transactional
@@ -81,7 +87,8 @@ public class BillServiceImpl implements BillService {
                 ConfigEnmu.PRODUCT_BUY_RATE.getName(),
                 ConfigTypeConstant.SYS_CONFIG).getData().getVal());
         SuBillEntity buyUserBill = createOrderBill(order.getUserId(),order,1,buyUserRate,null);
-        suBillMapper.insertSelective(buyUserBill);
+//        suBillMapper.insertSelective(buyUserBill);
+        billService.addBill(buyUserBill);
         //生成代理账单
         //获取代理层级
         Integer proxyLevel = Integer.valueOf(mallFeignClient.getOneConfig(
@@ -101,7 +108,8 @@ public class BillServiceImpl implements BillService {
             if(proxyUsers == null || proxyUsers.size() <= 0 || i > proxyUsers.size() - 1  || proxyUsers.get(i) == null)
                 break;
             SuBillEntity proxyBill = createOrderBill(proxyUsers.get(i).getId(),order,2,proxyRate.get(i),i==0?order.getUserId():proxyUsers.get(i-1).getId());
-            suBillMapper.insertSelective(proxyBill);
+//            suBillMapper.insertSelective(proxyBill);
+            billService.addBill(proxyBill);
         }
     }
 
@@ -119,14 +127,16 @@ public class BillServiceImpl implements BillService {
                 ConfigEnmu.PRODUCT_SHARE_USER_RATE.getName(),
                 ConfigTypeConstant.SYS_CONFIG).getData().getVal());
         SuBillEntity shareUserBill = createOrderBill(shareUserId,order,4,shareUserRate,order.getUserId());
-        suBillMapper.insertSelective(shareUserBill);
+//        suBillMapper.insertSelective(shareUserBill);
+        billService.addBill(shareUserBill);
         //生成购买者订单
         Integer buyUserRate = Integer.valueOf(mallFeignClient.getOneConfig(
                 order.getUserId(),
                 ConfigEnmu.PRODUCT_SHARE_BUY_RATE.getName(),
                 ConfigTypeConstant.SYS_CONFIG).getData().getVal());
         SuBillEntity buyUserBill = createOrderBill(order.getUserId(),order,3,buyUserRate,null);
-        suBillMapper.insertSelective(buyUserBill);
+//        suBillMapper.insertSelective(buyUserBill);
+        billService.addBill(buyUserBill);
     }
 
     /**
@@ -161,7 +171,7 @@ public class BillServiceImpl implements BillService {
         bill.setFromUserId(formUserId);
         bill.setMoney(PromotionUtils.calcByRate(order.getPromotionAmount(),rate));
         bill.setType(billType);
-        bill.setOrderId(order.getId());
+        bill.setAttach(order.getId());
         bill.setPromotionRate(rate);
         bill.setIncome(1);
         bill.setState(BillTypeConstant.ORDER);
@@ -177,9 +187,10 @@ public class BillServiceImpl implements BillService {
     public void payOutOrderBill(SuOrderEntity order) {
         List<SuBillEntity> suBillEntities = getOrderRelatedBill(order);
         suBillEntities.stream().forEach(o->{
-            o.setState(BillStateConstant.READY);
-            o.setUpdateTime(new Date());
-            suBillMapper.updateByPrimaryKeySelective(o);
+            billService.updateBillState(o,BillStateConstant.READY,null);
+//            o.setState(BillStateConstant.READY);
+//            o.setUpdateTime(new Date());
+//            suBillMapper.updateByPrimaryKeySelective(o);
             rabbitTemplate.convertAndSend(BillMqConfig.EXCHANGE,BillMqConfig.KEY,o);
         });
     }
@@ -190,10 +201,11 @@ public class BillServiceImpl implements BillService {
     public void invalidOrderBill(SuOrderEntity order) {
         List<SuBillEntity> suBillEntities = getOrderRelatedBill(order);
         suBillEntities.stream().forEach(o->{
-            o.setState(BillStateConstant.FAIL);
-            o.setFailReason(order.getFailReason());
-            o.setUpdateTime(new Date());
-            suBillMapper.updateByPrimaryKeySelective(o);
+            billService.updateBillState(o,BillStateConstant.FAIL,order.getFailReason());
+//            o.setState(BillStateConstant.FAIL);
+//            o.setFailReason(order.getFailReason());
+//            o.setUpdateTime(new Date());
+//            suBillMapper.updateByPrimaryKeySelective(o);
         });
     }
     /**
@@ -203,7 +215,7 @@ public class BillServiceImpl implements BillService {
      */
     private List<SuBillEntity> getOrderRelatedBill(SuOrderEntity suOrderEntity){
         SuBillEntity example = new SuBillEntity();
-        example.setOrderId(suOrderEntity.getId());
+        example.setAttach(suOrderEntity.getId());
         return suBillMapper.select(example);
     }
 
@@ -236,7 +248,7 @@ public class BillServiceImpl implements BillService {
             //查询订单相关信息
             if(Arrays.asList(1,3,4).contains(o.getKey())){
                 o.getValue().forEach(j ->{
-                    orderIdMap.put(j.getId(),j.getOrderId().toString());
+                    orderIdMap.put(j.getId(),j.getAttach().toString());
                 });
             }else if(Arrays.asList(2).contains(o.getKey())){
                 o.getValue().forEach(j ->{
@@ -258,6 +270,38 @@ public class BillServiceImpl implements BillService {
         CollUtil.removeNull(billVos);
         suBillPageBean.setList(billVos);
         return suBillPageBean;
+    }
+
+    @Override
+    public void addBill(SuBillEntity suBillEntity) {
+        suBillMapper.insertSelective(suBillEntity);
+    }
+
+    @Override
+    public void updateBillState(SuBillEntity suBillEntity, Integer newState,String failReason) {
+        suBillEntity.setState(newState);
+        suBillEntity.setFailReason(failReason);
+        suBillEntity.setUpdateTime(new Date());
+        suBillMapper.updateByPrimaryKeySelective(suBillEntity);
+    }
+
+    @Override
+    public SuBillToPayBo createByProp(SlPropSpecEx slPropSpecEx) {
+        SuBillEntity suBillEntity = new SuBillEntity();
+        suBillEntity.setUserId(slPropSpecEx.getSuUserEntity().getId());
+        suBillEntity.setMoney(slPropSpecEx.getPrice());
+        suBillEntity.setType(5);
+        suBillEntity.setAttach(slPropSpecEx.getId());
+        suBillEntity.setState(6);
+        suBillEntity.setIncome(2);
+        suBillEntity.setCreateTime(new Date());
+        suBillMapper.insertSelective(suBillEntity);
+
+        SuBillToPayBo suBillToPayBo = new SuBillToPayBo();
+        BeanUtil.copyProperties(suBillEntity,suBillToPayBo);
+        suBillToPayBo.setClientIp(slPropSpecEx.getClientIp());
+        suBillToPayBo.setOpenId(slPropSpecEx.getSuUserEntity().getOpenId());
+        return suBillToPayBo;
     }
 
     private BillVo covertBillVo(SuBillEntity suBillEntity,SuOrderEntity suOrderEntity,SuUserEntity suUserEntity){

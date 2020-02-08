@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -24,6 +25,24 @@ public class PlatformController {
     @Autowired
     private MallFeignClient mallFeignClient;
 
+    /**
+     *  平台按钮配置
+     * @param userId
+     * @return
+     */
+    @GetMapping("/config")
+    public Msg<Map<String,Object>> config(@LoginUser Integer userId){
+        Map<String,Object> result = new HashMap<>();
+        String isOn = mallFeignClient.getOneConfig(userId, ConfigEnmu.PLATFORM_CHOOSE_BTN.getName(), ConfigTypeConstant.PROXY_CONFIG).getData().getVal();
+        result.put("isOn",isOn.equals("1")?true:false);
+        return R.sucess(result);
+    }
+
+    /**
+     * 获取平台列表
+     * @param userId
+     * @return
+     */
     @GetMapping
     public Msg<Object> get(@LoginUser Integer userId){
         String[] platformNames = mallFeignClient.getOneConfig(userId, ConfigEnmu.PLATFORM_NAME.getName(), ConfigTypeConstant.PROXY_CONFIG).getData().getVal().split(",");

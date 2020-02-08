@@ -34,7 +34,10 @@ public enum  MsgEnum {
 
     /* 用户系列 */
     USER_NOFOUND_ERROR(100501,"用户不存在"),
-    USER_ID_ERROR(100502,"无效用户id")
+    USER_ID_ERROR(100502,"无效用户id"),
+
+    /* 支付相关 */
+    WX_PAY_ORDER_CREATE_FAIL(100601,"微信支付统一订单生成失败"),
     ;
     private Integer code;
     private String msg;

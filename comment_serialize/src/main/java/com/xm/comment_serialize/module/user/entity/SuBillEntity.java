@@ -28,14 +28,14 @@ public class SuBillEntity implements Serializable{
 	private Integer money;
 
 	/**
-	 * 账单类型(1:普通自购,2:代理收益,3:分享自购,4:分享收益)
+	 * 账单类型(1:普通自购,2:代理收益,3:分享自购,4:分享收益,5:购买道具)
 	 */
 	private Integer type;
 
 	/**
-	 * 订单id(账单类型为[1,2,3,4])
+	 * 相关id(账单类型为[1,2,3,4]为orderId,5:道具规格id)
 	 */
-	private Integer orderId;
+	private Integer attach;
 
 	/**
 	 * 佣金比例(千分比 账单类型为[1,2,3,4])
@@ -43,7 +43,7 @@ public class SuBillEntity implements Serializable{
 	private Integer promotionRate;
 
 	/**
-	 * 账单状态(1:待发放,2:准备发放,3:已发放,4:已失效)
+	 * 账单状态(1:待发放,2:准备发放,3:已发放,4:已失效,5:已处理,6:待支付,7:已支付)
 	 */
 	private Integer state;
 
@@ -51,6 +51,11 @@ public class SuBillEntity implements Serializable{
 	 * 收支类型(1:收入账单,2:支出)
 	 */
 	private Integer income;
+
+	/**
+	 * 账单简介(微信支付body)
+	 */
+	private String des;
 
 	/**
 	 * 账单失效原因

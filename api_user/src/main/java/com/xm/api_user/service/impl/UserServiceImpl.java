@@ -9,6 +9,9 @@ import com.xm.api_user.mapper.custom.SuOrderMapperEx;
 import com.xm.api_user.mapper.custom.SuRoleMapperEx;
 import com.xm.api_user.mapper.custom.SuUserMapperEx;
 import com.xm.api_user.service.UserService;
+import com.xm.comment_mq.config.UserActionConfig;
+import com.xm.comment_mq.message.impl.UserAddProxyMessage;
+import com.xm.comment_mq.message.impl.UserFristLoginMessage;
 import com.xm.comment_utils.exception.GlobleException;
 import com.xm.comment.module.mall.feign.MallFeignClient;
 import com.xm.comment_utils.response.MsgEnum;
@@ -27,6 +30,7 @@ import com.xm.comment_utils.encry.MD5;
 import com.xm.comment_utils.mybatis.PageBean;
 import me.chanjar.weixin.common.error.WxErrorException;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tk.mybatis.orderbyhelper.OrderByHelper;
@@ -59,7 +63,8 @@ public class UserServiceImpl implements UserService {
     private SuOrderMapper suOrderMapper;
     @Autowired
     private SuOrderMapperEx suOrderMapperEx;
-
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     @Override
     public SuUserEntity getUserInfo(GetUserInfoForm getUserInfoForm) throws WxErrorException {
@@ -85,7 +90,7 @@ public class UserServiceImpl implements UserService {
      * @param openId
      * @return
      */
-    private SuUserEntity addNewUser(String openId,Integer shareUserId){
+    public SuUserEntity addNewUser(String openId,Integer shareUserId){
         SmPidEntity smPidEntity = mallFeignClient.generatePid().getData();
         SuUserEntity user = new SuUserEntity();
         if(shareUserId != null)
@@ -99,7 +104,8 @@ public class UserServiceImpl implements UserService {
         suUserMapper.insertSelective(user);
         SuUserEntity record = new SuUserEntity();
         record.setOpenId(openId);
-        return suUserMapper.selectOne(record);
+        record = suUserMapper.selectOne(record);
+        return record;
     }
 
 
