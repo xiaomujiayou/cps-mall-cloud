@@ -10,7 +10,7 @@ public class UserOpenAppMessage extends AbsUserActionMessage {
         super(userId);
         this.appType = appType;
     }
-    private UserActionEnum userActionEnum = UserActionEnum.USER_OPEN_APP;
+    private final UserActionEnum userActionEnum = UserActionEnum.USER_OPEN_APP;
     //app类型
     private Integer appType;
 }

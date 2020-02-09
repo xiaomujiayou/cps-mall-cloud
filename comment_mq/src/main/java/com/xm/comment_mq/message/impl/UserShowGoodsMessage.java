@@ -12,7 +12,7 @@ public class UserShowGoodsMessage extends AbsUserActionMessage {
         super(userId);
         this.smProductEntity = smProductEntity;
     }
-    private UserActionEnum userActionEnum = UserActionEnum.USER_SHOW_GOODS;
+    private final UserActionEnum userActionEnum = UserActionEnum.USER_SHOW_GOODS;
     //用户浏览一个商品
     private SmProductEntityEx smProductEntity;
 }

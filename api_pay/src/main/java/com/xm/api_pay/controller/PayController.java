@@ -1,7 +1,11 @@
 package com.xm.api_pay.controller;
 
+import com.github.binarywang.wxpay.bean.notify.WxPayNotifyResponse;
+import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
 import com.github.binarywang.wxpay.bean.result.WxPayUnifiedOrderResult;
-import com.xm.api_pay.service.WxPayService;
+import com.github.binarywang.wxpay.exception.WxPayException;
+import com.github.binarywang.wxpay.service.WxPayService;
+import com.xm.api_pay.service.WxPayApiService;
 import com.xm.comment_serialize.module.pay.vo.WxPayOrderResultVo;
 import com.xm.comment_serialize.module.user.bo.SuBillToPayBo;
 import com.xm.comment_utils.response.Msg;
@@ -20,7 +24,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class PayController {
 
     @Autowired
-    private WxPayService wxPayService;
+    private WxPayApiService wxPayApiService;
+    @Autowired
+    private WxPayService wxService;
 
     /**
      * 微信支付
@@ -28,11 +34,20 @@ public class PayController {
      * @return
      */
     @PostMapping("/wx")
-    public Msg<WxPayOrderResultVo> wxPay(@RequestBody SuBillToPayBo suBillToPayBo){
-        WxPayUnifiedOrderResult wxPayUnifiedOrderResult = wxPayService.collection(suBillToPayBo);
-        WxPayOrderResultVo wxPayOrderResultVo = new WxPayOrderResultVo();
-        wxPayOrderResultVo.setPrepayId(wxPayUnifiedOrderResult.getPrepayId());
-        return R.sucess(wxPayOrderResultVo);
+    public Msg<WxPayOrderResultVo> wxPay(@RequestBody SuBillToPayBo suBillToPayBo) throws WxPayException {
+        return R.sucess(wxPayApiService.collection(suBillToPayBo));
+    }
+
+    @PostMapping("/wx/order/notify")
+    public String wxPayNotify(@RequestBody String xmlData)  {
+        try {
+            final WxPayOrderNotifyResult notifyResult = wxService.parseOrderNotifyResult(xmlData);
+            wxPayApiService.orderNotify(notifyResult);
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            return WxPayNotifyResponse.success("成功");
+        }
     }
 }
 

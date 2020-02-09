@@ -14,7 +14,7 @@ public class UserAddProxyMessage extends AbsUserActionMessage {
         this.level = level;
         this.proxyUser = proxyUser;
     }
-    private UserActionEnum userActionEnum = UserActionEnum.USER_ADD_PROXY;
+    private final UserActionEnum userActionEnum = UserActionEnum.USER_ADD_PROXY;
     //代理级别
     private Integer level;
     //代理用户

@@ -1,11 +1,9 @@
-package com.xm.comment.module.pay.feign.feign;
+package com.xm.comment.module.pay.feign;
 
 import com.xm.comment.config.FeignConfiguration;
-import com.xm.comment.module.pay.feign.feign.fallback.PayFeignClientFallBack;
+import com.xm.comment.module.pay.feign.fallback.PayFeignClientFallBack;
 import com.xm.comment_serialize.module.pay.vo.WxPayOrderResultVo;
 import com.xm.comment_serialize.module.user.bo.SuBillToPayBo;
-import com.xm.comment_serialize.module.user.entity.SuUserEntity;
-import com.xm.comment_serialize.module.user.form.GetUserInfoForm;
 import com.xm.comment_utils.response.Msg;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;

@@ -45,6 +45,6 @@ public interface UserFeignClient {
     @PostMapping(value = "/search",consumes = "application/json")
     public Msg addSearch(@RequestParam Integer userId,@RequestBody AddSearchForm addSearchForm);
 
-    @PostMapping(value = "/create/prop" ,consumes = "application/json")
+    @PostMapping(value = "/bill/create/prop" ,consumes = "application/json")
     public Msg<SuBillToPayBo> createByProp(@RequestBody SlPropSpecEx slPropSpecEx);
 }

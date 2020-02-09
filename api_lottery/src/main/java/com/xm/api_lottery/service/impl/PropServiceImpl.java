@@ -37,6 +37,7 @@ public class PropServiceImpl implements PropService {
     @Override
     public List<SlPropVo> getPropVo(Integer userId) {
         List<SlPropEntity> slPropEntities = slPropMapper.selectAll();
+        System.out.println(slPropEntities);
         return slPropEntities.stream().map(o ->{
             SlPropSpecEntity record = new SlPropSpecEntity();
             record.setPropId(o.getId());
@@ -54,10 +55,11 @@ public class PropServiceImpl implements PropService {
     private SlPropVo toSlPropVo(Integer userId,SlPropEntity slPropEntity, List<SlPropSpecEntity> slPropSpecEntities) {
         SlPropVo slPropVo = new SlPropVo();
         slPropVo.setName(slPropEntity.getName());
-        slPropVo.setPrice(slPropEntity.getPrice().toString());
+        slPropVo.setPrice(slPropEntity.getPrice());
         slPropVo.setHas(hasProp(userId,slPropEntity));
         slPropVo.setSpecDes(slPropEntity.getSpecDes());
         slPropVo.setDes(slPropEntity.getDes());
+        slPropVo.setImgUrl(slPropEntity.getImgUrl());
         List<SlPropVo.SpecBean> specBeans = slPropSpecEntities.stream().map(o ->{
             return toPropSpecVo(userId,o);
         }).collect(Collectors.toList());
@@ -90,9 +92,10 @@ public class PropServiceImpl implements PropService {
      */
     private SlPropVo.SpecBean toPropSpecVo(Integer userId, SlPropSpecEntity slPropSpecEntity) {
         SlPropVo.SpecBean specBean = new SlPropVo.SpecBean();
+        specBean.setId(slPropSpecEntity.getId());
         specBean.setName(slPropSpecEntity.getName());
-        specBean.setPrice(slPropSpecEntity.getPrice().toString());
-        specBean.setOriginalPrice(slPropSpecEntity.getOriginalPrice().toString());
+        specBean.setPrice(slPropSpecEntity.getPrice());
+        specBean.setOriginalPrice(slPropSpecEntity.getOriginalPrice());
         specBean.setDes(slPropSpecEntity.getDes());
         specBean.setChoose(slPropSpecEntity.getChoose()==1?true:false);
         specBean.setName(slPropSpecEntity.getName());

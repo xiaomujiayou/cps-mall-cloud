@@ -13,7 +13,7 @@ public class OrderStateChangeMessage extends AbsUserActionMessage {
         this.suOrderEntity = suOrderEntity;
         this.newState = newState;
     }
-    private UserActionEnum userActionEnum = UserActionEnum.ORDER_STATE_CHANGE;
+    private final UserActionEnum userActionEnum = UserActionEnum.ORDER_STATE_CHANGE;
     //相关订单
     private SuOrderEntity suOrderEntity;
     //新的状态(OrderStateContanst)

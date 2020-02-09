@@ -18,3 +18,14 @@ spring:
 logging:
   logPath: /data/share/api-pay
   logLevel: debug
+
+wx:
+  pay:
+    appId: wx77c95d4a2f1bfab0
+    mchId: 1572782521
+    mchKey: hsaohdsadljfsdjlfjsljfsdiojgsklg
+    subAppId:
+    subMchId:
+    keyPath: classpath:cert/apiclient_cert.p12
+    notifyUrl: https://share.xiaomujiayou.com/api-pay/pay/wx/order/notify
+    signKey: dhfsdfhjksdjfknkdnfjskdnfklsnfls

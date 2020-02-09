@@ -12,7 +12,7 @@ public class OrderSettlementFailMessage extends AbsUserActionMessage {
         this.suOrderEntity = suOrderEntity;
         this.failReason = failReason;
     }
-    private UserActionEnum userActionEnum = UserActionEnum.ORDER_SETTLEMENT_FAIL;
+    private final UserActionEnum userActionEnum = UserActionEnum.ORDER_SETTLEMENT_FAIL;
     //相关订单
     private SuOrderEntity suOrderEntity;
     //失败原因

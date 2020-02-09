@@ -12,6 +12,6 @@ public class UserBillCreateMessage extends AbsUserActionMessage {
         super(userId);
         this.suBillEntity = suBillEntity;
     }
-    private UserActionEnum userActionEnum = UserActionEnum.USER_BILL_CREATE;
+    private final UserActionEnum userActionEnum = UserActionEnum.USER_BILL_CREATE;
     private SuBillEntity suBillEntity;
 }

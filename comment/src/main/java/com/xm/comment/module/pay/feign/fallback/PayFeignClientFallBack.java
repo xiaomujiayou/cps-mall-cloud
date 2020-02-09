@@ -1,6 +1,6 @@
-package com.xm.comment.module.pay.feign.feign.fallback;
+package com.xm.comment.module.pay.feign.fallback;
 
-import com.xm.comment.module.pay.feign.feign.PayFeignClient;
+import com.xm.comment.module.pay.feign.PayFeignClient;
 import com.xm.comment_serialize.module.pay.vo.WxPayOrderResultVo;
 import com.xm.comment_serialize.module.user.bo.SuBillToPayBo;
 import com.xm.comment_utils.response.Msg;

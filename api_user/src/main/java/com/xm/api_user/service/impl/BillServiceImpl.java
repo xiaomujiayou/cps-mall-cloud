@@ -294,6 +294,7 @@ public class BillServiceImpl implements BillService {
         suBillEntity.setAttach(slPropSpecEx.getId());
         suBillEntity.setState(6);
         suBillEntity.setIncome(2);
+        suBillEntity.setDes(slPropSpecEx.getSlPropEntity().getName() + "-" + slPropSpecEx.getName());
         suBillEntity.setCreateTime(new Date());
         suBillMapper.insertSelective(suBillEntity);
 

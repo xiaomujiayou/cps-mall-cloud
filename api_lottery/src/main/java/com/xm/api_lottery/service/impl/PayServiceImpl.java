@@ -1,9 +1,10 @@
 package com.xm.api_lottery.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.xm.api_lottery.mapper.SlPropMapper;
 import com.xm.api_lottery.mapper.SlPropSpecMapper;
 import com.xm.api_lottery.service.PayService;
-import com.xm.comment.module.pay.feign.feign.PayFeignClient;
+import com.xm.comment.module.pay.feign.PayFeignClient;
 import com.xm.comment.module.user.feign.UserFeignClient;
 import com.xm.comment_serialize.module.lottery.entity.SlPropEntity;
 import com.xm.comment_serialize.module.lottery.entity.SlPropSpecEntity;
@@ -35,6 +36,7 @@ public class PayServiceImpl implements PayService {
             throw new GlobleException(MsgEnum.DATA_INVALID_ERROR, "propSpecId无效");
         SlPropEntity slPropEntity = slPropMapper.selectByPrimaryKey(slPropSpecEntity.getPropId());
         SlPropSpecEx slPropSpecEx = new SlPropSpecEx();
+        BeanUtil.copyProperties(slPropSpecEntity,slPropSpecEx);
         slPropSpecEx.setSuUserEntity(suUserEntity);
         slPropSpecEx.setClientIp(clientIp);
         slPropSpecEx.setSlPropEntity(slPropEntity);

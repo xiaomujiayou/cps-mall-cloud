@@ -12,21 +12,24 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_DECORATION_FILTER_ORDER;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
+
 /**
  * 获取客户端真实ip
  */
 @Slf4j
-@Component
+//@Component
 public class IpFilter extends ZuulFilter {
 
     @Override
     public String filterType() {
-        return null;
+        return PRE_TYPE;
     }
 
     @Override
     public int filterOrder() {
-        return 0;
+        return PRE_DECORATION_FILTER_ORDER -1;
     }
 
     @Override

@@ -13,7 +13,7 @@ public class UserFristLoginMessage extends AbsUserActionMessage {
         super(userId);
         this.userEntity = userEntity;
     }
-    private UserActionEnum userActionEnum = UserActionEnum.USER_FRIST_LOGIN;
+    private final UserActionEnum userActionEnum = UserActionEnum.USER_FRIST_LOGIN;
     //用户信息
     private SuUserEntity userEntity;
 }

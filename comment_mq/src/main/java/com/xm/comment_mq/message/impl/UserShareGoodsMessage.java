@@ -13,7 +13,7 @@ public class UserShareGoodsMessage extends AbsUserActionMessage {
         this.clickUserId = clickUserId;
         this.smProductEntityEx = smProductEntityEx;
     }
-    private UserActionEnum userActionEnum = UserActionEnum.USER_SHARE_GOODS;
+    private final UserActionEnum userActionEnum = UserActionEnum.USER_SHARE_GOODS;
     private Integer clickUserId;
     private SmProductEntityEx smProductEntityEx;
 }

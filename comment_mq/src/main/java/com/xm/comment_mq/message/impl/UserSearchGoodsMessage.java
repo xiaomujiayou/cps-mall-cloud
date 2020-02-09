@@ -13,7 +13,7 @@ public class UserSearchGoodsMessage extends AbsUserActionMessage {
         this.pageNum = pageNum;
     }
 
-    private UserActionEnum userActionEnum = UserActionEnum.USER_SEARCH_GOODS;
+    private final UserActionEnum userActionEnum = UserActionEnum.USER_SEARCH_GOODS;
     //平台类型
     private Integer platformType;
     //搜索关键字

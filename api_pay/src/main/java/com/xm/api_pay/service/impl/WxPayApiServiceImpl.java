@@ -3,50 +3,70 @@ package com.xm.api_pay.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
 import com.github.binarywang.wxpay.bean.result.WxPayUnifiedOrderResult;
 import com.github.binarywang.wxpay.constant.WxPayConstants;
 import com.github.binarywang.wxpay.exception.WxPayException;
+import com.github.binarywang.wxpay.service.WxPayService;
+import com.github.pagehelper.PageHelper;
 import com.xm.api_pay.config.WxPayPropertiesEx;
 import com.xm.api_pay.mapper.SpWxOrderInMapper;
-import com.xm.api_pay.service.WxPayService;
+import com.xm.api_pay.mapper.SpWxOrderNotifyMapper;
+import com.xm.api_pay.service.WxPayApiService;
+import com.xm.comment_mq.config.UserActionConfig;
+import com.xm.comment_mq.message.impl.PayOrderCreateMessage;
+import com.xm.comment_mq.message.impl.PayOrderSucessMessage;
 import com.xm.comment_serialize.module.pay.entity.SpWxOrderInEntity;
+import com.xm.comment_serialize.module.pay.entity.SpWxOrderNotifyEntity;
+import com.xm.comment_serialize.module.pay.vo.WxPayOrderResultVo;
 import com.xm.comment_serialize.module.user.bo.SuBillToPayBo;
 import com.xm.comment_serialize.module.user.entity.SuBillEntity;
 import com.xm.comment_utils.exception.GlobleException;
 import com.xm.comment_utils.response.MsgEnum;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-@Service("wxPayService")
-public class WxPayServiceImpl implements WxPayService {
+@Service("wxPayApiService")
+public class WxPayApiServiceImpl implements WxPayApiService {
 
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
     @Autowired
     private SpWxOrderInMapper spWxOrderInMapper;
     @Autowired
-    private com.github.binarywang.wxpay.service.WxPayService wxService;
+    private SpWxOrderNotifyMapper spWxOrderNotifyMapper;
     @Autowired
+    private WxPayService wxService;
+    @Resource(name = "wxPayPropertiesEx")
     private WxPayPropertiesEx wxPayPropertiesEx;
 
     @Override
-    public WxPayUnifiedOrderResult collection(SuBillToPayBo suBillToPayBo) {
+    public WxPayOrderResultVo collection(SuBillToPayBo suBillToPayBo) throws WxPayException {
         WxPayUnifiedOrderRequest request = createWxOrderRequest(suBillToPayBo);
         WxPayUnifiedOrderResult res = null;
-        try {
-            res = wxService.createOrder(request);
-            if(res.getReturnCode().equals("SUCCESS") && res.getResultCode().equals("SUCCESS")){
-                return res;
-            }
-        } catch (WxPayException e) {
-            e.printStackTrace();
-        }finally {
-            saveOrder(request,res.getReturnMsg(),res.getErrCode(),res.getErrCodeDes());
+        SpWxOrderInEntity spWxOrderInEntity = null;
+        WxPayOrderResultVo wxPayOrderResultVo = null;
+        res = wxService.createOrder(request);
+        spWxOrderInEntity = saveOrder(suBillToPayBo,request,res.getReturnMsg(),res.getErrCode(),res.getErrCodeDes());
+        if(res.getReturnCode().equals("SUCCESS") && res.getResultCode().equals("SUCCESS")){
+            wxPayOrderResultVo = new WxPayOrderResultVo();
+            wxPayOrderResultVo.setPrepayId(res.getPrepayId());
+            rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE,"",new PayOrderCreateMessage(suBillToPayBo.getUserId(),suBillToPayBo,spWxOrderInEntity,suBillToPayBo,wxPayOrderResultVo));
+            return wxPayOrderResultVo;
         }
         throw new GlobleException(MsgEnum.WX_PAY_ORDER_CREATE_FAIL);
     }
@@ -58,8 +78,9 @@ public class WxPayServiceImpl implements WxPayService {
      * @param errCode
      * @param errCodeDes
      */
-    private void saveOrder(WxPayUnifiedOrderRequest request, String returnMsg, String errCode, String errCodeDes) {
+    private SpWxOrderInEntity saveOrder(SuBillToPayBo suBillToPayBo,WxPayUnifiedOrderRequest request, String returnMsg, String errCode, String errCodeDes) {
         SpWxOrderInEntity spWxOrderInEntity = new SpWxOrderInEntity();
+        spWxOrderInEntity.setReqBo(JSON.toJSONString(suBillToPayBo));
         BeanUtil.copyProperties(request,spWxOrderInEntity);
         spWxOrderInEntity.setState(0);
         JSONObject errMsgJson = new JSONObject();
@@ -68,6 +89,7 @@ public class WxPayServiceImpl implements WxPayService {
         errMsgJson.put("errCodeDes",errCodeDes);
         spWxOrderInEntity.setErrMsg(errMsgJson.toJSONString());
         spWxOrderInMapper.insertSelective(spWxOrderInEntity);
+        return  spWxOrderInEntity;
     }
 
 
@@ -77,26 +99,41 @@ public class WxPayServiceImpl implements WxPayService {
      * @return
      */
     private WxPayUnifiedOrderRequest createWxOrderRequest(SuBillToPayBo suBillToPayBo){
-
         WxPayUnifiedOrderRequest wxPayUnifiedOrderRequest = new WxPayUnifiedOrderRequest();
         wxPayUnifiedOrderRequest.setAppid(wxPayPropertiesEx.getAppId());
         wxPayUnifiedOrderRequest.setMchId(wxPayPropertiesEx.getMchId());
-//        wxPayUnifiedOrderRequest.setNonceStr(RandomUtil.randomString(32));
         wxPayUnifiedOrderRequest.setBody(suBillToPayBo.getDes());
-        wxPayUnifiedOrderRequest.setAttach(suBillToPayBo.getId()+"");
+        Map<String,Object> attach = new HashMap<>();
+        attach.put("billId",suBillToPayBo.getId());
+        attach.put("userId",suBillToPayBo.getUserId());
+        wxPayUnifiedOrderRequest.setAttach(JSON.toJSONString(attach));
         wxPayUnifiedOrderRequest.setOutTradeNo(DateUtil.format(new Date(),"yyyyMMddHHmmss")+RandomUtil.randomNumbers(3));
         wxPayUnifiedOrderRequest.setTotalFee(suBillToPayBo.getMoney());
         wxPayUnifiedOrderRequest.setSpbillCreateIp(suBillToPayBo.getClientIp());
         wxPayUnifiedOrderRequest.setNotifyUrl(wxPayPropertiesEx.getNotifyUrl());
         wxPayUnifiedOrderRequest.setTradeType(WxPayConstants.TradeType.JSAPI);
         wxPayUnifiedOrderRequest.setOpenid(suBillToPayBo.getOpenId());
-//        wxPayUnifiedOrderRequest.setSign(SignUtils.createSign(wxPayUnifiedOrderRequest,"MD5",wxPayPropertiesEx.getSignKey(),null));
         return wxPayUnifiedOrderRequest;
     }
 
     @Override
     public void payment(List<SuBillEntity> suBillEntities) {
 
+    }
+
+    @Override
+    public void orderNotify(WxPayOrderNotifyResult notifyResult) {
+        Integer userId = JSON.parseObject(notifyResult.getAttach()).getInteger("userId");
+        SpWxOrderNotifyEntity spWxOrderNotifyEntity = new SpWxOrderNotifyEntity();
+        BeanUtil.copyProperties(notifyResult,spWxOrderNotifyEntity);
+        spWxOrderNotifyMapper.insertSelective(spWxOrderNotifyEntity);
+
+        PageHelper.startPage(1,1).count(false);
+        SpWxOrderInEntity spWxOrderInEntity = new SpWxOrderInEntity();
+        spWxOrderInEntity.setOutTradeNo(spWxOrderNotifyEntity.getOutTradeNo());
+        spWxOrderInEntity = spWxOrderInMapper.selectOne(spWxOrderInEntity);
+        SuBillToPayBo suBillToPayBo = JSON.parseObject(spWxOrderInEntity.getReqBo(),SuBillToPayBo.class);
+        rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE,"",new PayOrderSucessMessage(userId,suBillToPayBo,spWxOrderNotifyEntity));
     }
 
     public static String getIpAddress(ServerHttpRequest request) {

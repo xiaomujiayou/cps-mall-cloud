@@ -11,7 +11,7 @@ public class UserShareAppMessage extends AbsUserActionMessage {
         this.clickUserId = clickUserId;
         this.appType = appType;
     }
-    private UserActionEnum userActionEnum = UserActionEnum.USER_SHARE_APP;
+    private final UserActionEnum userActionEnum = UserActionEnum.USER_SHARE_APP;
     //点击用户id
     private Integer clickUserId;
     //app类型

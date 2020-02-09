@@ -13,7 +13,7 @@ public class OrderCommissionSucessMessage extends AbsUserActionMessage {
         this.suOrderEntity = suOrderEntity;
         this.suBillEntity = suBillEntity;
     }
-    private UserActionEnum userActionEnum = UserActionEnum.ORDER_COMMISSION_SUCESS;
+    private final UserActionEnum userActionEnum = UserActionEnum.ORDER_COMMISSION_SUCESS;
     //相关订单
     private SuOrderEntity suOrderEntity;
     //相关账单

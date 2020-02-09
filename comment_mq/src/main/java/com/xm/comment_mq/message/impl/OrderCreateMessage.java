@@ -12,7 +12,7 @@ public class OrderCreateMessage extends AbsUserActionMessage {
         super(userId);
         this.suOrderEntity = suOrderEntity;
     }
-    private UserActionEnum userActionEnum = UserActionEnum.ORDER_CREATE;
+    private final UserActionEnum userActionEnum = UserActionEnum.ORDER_CREATE;
     //相关订单
     private SuOrderEntity suOrderEntity;
 }

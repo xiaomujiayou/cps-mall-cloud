@@ -13,7 +13,7 @@ public class UserSmartSearchGoodsMessage extends AbsUserActionMessage {
         this.goodsUrl = goodsUrl;
         this.goodsName = goodsName;
     }
-    private UserActionEnum userActionEnum = UserActionEnum.USER_SMART_SEARCH_GOODS;
+    private final UserActionEnum userActionEnum = UserActionEnum.USER_SMART_SEARCH_GOODS;
     //商品信息
     private SmProductEntityEx smProductEntityEx;
     //商品链接

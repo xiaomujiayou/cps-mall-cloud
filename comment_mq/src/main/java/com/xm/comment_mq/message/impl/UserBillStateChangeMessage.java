@@ -15,7 +15,7 @@ public class UserBillStateChangeMessage extends AbsUserActionMessage {
         this.newState = newState;
         this.failReason = failReason;
     }
-    private UserActionEnum userActionEnum = UserActionEnum.USER_BILL_STATE_CHANGE;
+    private final UserActionEnum userActionEnum = UserActionEnum.USER_BILL_STATE_CHANGE;
     private SuBillEntity oldBill;
     private Integer newState;
     private String failReason;

@@ -18,10 +18,11 @@ public class SlPropVo {
      * spec : [{"name":"7天","price":"5","des":"返5元","choose":true}]
      */
     private String name;
-    private String price;
-    private boolean has;
+    private Integer price;
+    private Boolean has;
     private String specDes;
     private String des;
+    private String imgUrl;
     private List<SpecBean> spec;
 
     @Data
@@ -32,12 +33,13 @@ public class SlPropVo {
          * des : 返5元
          * choose : true
          */
+        private Integer id;
         private String name;
-        private String price;
-        private String originalPrice;
+        private Integer price;
+        private Integer originalPrice;
         private String des;
-        private boolean choose;
-        private boolean disable;
+        private Boolean choose;
+        private Boolean disable;
         private String disableTips;
     }
 }

@@ -4,13 +4,4 @@ spring:
   profiles:
     active: dev,plugin,cloud-dev,assembly-dev
 
-wx:
-  pay:
-    appId: wx77c95d4a2f1bfab0
-    mchId: 1572782521
-    mchKey: hsaohdsadljfsdjlfjsljfsdiojgsklg
-    subAppId:
-    subMchId:
-    keyPath: classpath:cert/apiclient_cert.p12
-    notifyUrl:
-    signKey: dhfsdfhjksdjfknkdnfjskdnfklsnfls
+

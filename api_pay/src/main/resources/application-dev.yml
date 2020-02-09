@@ -8,7 +8,7 @@ spring:
       test-on-borrow: true
       stat-view-servlet:
         allow: true
-      max-active: 20
+      max-active: 10
       initial-size: 1
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://47.92.6.56:3306/share_pay?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
@@ -18,3 +18,14 @@ spring:
 logging:
   logPath: D:\java\data\log\share\api-pay
   logLevel: debug
+
+wx:
+  pay:
+    appId: wx77c95d4a2f1bfab0
+    mchId: 1572782521
+    mchKey: hsaohdsadljfsdjlfjsljfsdiojgsklg
+    subAppId:
+    subMchId:
+    keyPath: classpath:cert/apiclient_cert.p12
+    notifyUrl: http://xiaomujiayou.w3.luyouxia.net/api-pay/pay/wx/order/notify
+    signKey: dhfsdfhjksdjfknkdnfjskdnfklsnfls

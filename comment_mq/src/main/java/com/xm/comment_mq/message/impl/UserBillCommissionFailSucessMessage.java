@@ -12,7 +12,7 @@ public class UserBillCommissionFailSucessMessage extends AbsUserActionMessage {
         super(userId);
         this.suBillEntity = suBillEntity;
     }
-    private UserActionEnum userActionEnum = UserActionEnum.USER_BILL_COMMISSION_FAIL;
+    private final UserActionEnum userActionEnum = UserActionEnum.USER_BILL_COMMISSION_FAIL;
     private SuBillEntity suBillEntity;
     private String failReason;
 }

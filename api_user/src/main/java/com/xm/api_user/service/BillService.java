@@ -44,5 +44,10 @@ public interface BillService {
      */
     public void updateBillState(SuBillEntity suBillEntity,Integer newState,String failReason);
 
+    /**
+     * 创建道具订单
+     * @param suBillEntity
+     * @return
+     */
     public SuBillToPayBo createByProp(SlPropSpecEx suBillEntity);
 }

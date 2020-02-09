@@ -16,7 +16,7 @@ public class OrderCommissionFailMessage extends AbsUserActionMessage {
         this.failReason = failReason;
     }
 
-    private UserActionEnum userActionEnum = UserActionEnum.ORDER_COMMISSION_FAIL;
+    private final UserActionEnum userActionEnum = UserActionEnum.ORDER_COMMISSION_FAIL;
     //相关订单
     private SuOrderEntity suOrderEntity;
     //相关账单

@@ -12,6 +12,6 @@ public class UserBillCommissionSucessMessage extends AbsUserActionMessage {
         super(userId);
         this.suBillEntity = suBillEntity;
     }
-    private UserActionEnum userActionEnum = UserActionEnum.USER_BILL_COMMISSION_SUCESS;
+    private final UserActionEnum userActionEnum = UserActionEnum.USER_BILL_COMMISSION_SUCESS;
     private SuBillEntity suBillEntity;
 }

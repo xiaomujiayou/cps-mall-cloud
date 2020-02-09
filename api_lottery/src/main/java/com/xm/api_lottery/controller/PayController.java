@@ -30,6 +30,6 @@ public class PayController {
     public Msg<WxPayOrderResultVo> wxPay(@LoginUser SuUserEntity suUserEntity, Integer propSpecId){
         if(propSpecId == null)
             return R.error(MsgEnum.PARAM_VALID_ERROR,"propId不可为空");
-        return R.sucess(payService.wxPay(suUserEntity,propSpecId,""));
+        return R.sucess(payService.wxPay(suUserEntity,propSpecId," 223.91.199.172"));
     }
 }
