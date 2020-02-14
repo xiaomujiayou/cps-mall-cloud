@@ -1,8 +1,7 @@
 package com.xm.cloud_gateway.controller;
 
 import com.xm.cloud_gateway.shiro.token.WeChatToken;
-import com.xm.comment.module.user.feign.UserFeignClient;
-import com.xm.comment_utils.response.Msg;
+import com.xm.comment_feign.module.user.feign.UserFeignClient;
 import com.xm.comment_utils.response.R;
 import com.xm.comment_serialize.module.user.entity.SuUserEntity;
 import com.xm.comment_serialize.module.user.form.GetUserInfoForm;
@@ -24,13 +23,19 @@ public class LoginController {
     @Autowired
     private UserFeignClient userFeignClient;
 
+    /**
+     * shiro 解决方案
+     * @param wechatLoginForm
+     * @param bindingResult
+     * @return
+     */
     @PostMapping("/login")
     public Object login(@Valid @RequestBody WechatLoginForm wechatLoginForm, BindingResult bindingResult){
         GetUserInfoForm form = new GetUserInfoForm();
         form.setCode(wechatLoginForm.getCode());
         form.setShareUserId(wechatLoginForm.getShareUserId());
-        Msg<SuUserEntity> msg = userFeignClient.getUserInfo(form);
-        WeChatToken token = new WeChatToken(msg.getData().getOpenId());
+        SuUserEntity msg = userFeignClient.getUserInfo(form);
+        WeChatToken token = new WeChatToken(msg.getOpenId());
         if(!SecurityUtils.getSubject().isAuthenticated()){
             SecurityUtils.getSubject().login(token);
         }
@@ -46,5 +51,7 @@ public class LoginController {
         result.put("userInfo",userInfo);
         return R.sucess(result);
     }
+
+
 
 }

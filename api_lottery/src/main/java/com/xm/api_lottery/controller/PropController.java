@@ -25,8 +25,8 @@ public class PropController {
      * @return
      */
     @GetMapping
-    public Msg<List<SlPropVo>> list(@LoginUser(necessary = false) Integer userId){
-        return R.sucess(propService.getPropVo(userId));
+    public List<SlPropVo> list(@LoginUser(necessary = false) Integer userId){
+        return propService.getPropVo(userId);
     }
 }
 

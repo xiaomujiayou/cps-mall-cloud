@@ -21,7 +21,7 @@ public class ProfitController {
     private ProfitService profitService;
 
     @PostMapping("/calc")
-    public Msg<List<SmProductEntityEx>> calc(@RequestBody CalcProfitForm calcProfitForm){
-        return R.sucess( profitService.calcProfit(calcProfitForm.getSmProductEntities(),calcProfitForm.getUserId()));
+    public List<SmProductEntityEx> calc(@RequestBody CalcProfitForm calcProfitForm){
+        return profitService.calcProfit(calcProfitForm.getSmProductEntities(),calcProfitForm.getUserId());
     }
 }

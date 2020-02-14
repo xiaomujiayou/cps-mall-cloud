@@ -20,17 +20,17 @@ public class ConfigController {
     private SuConfigMapper suConfigMapper;
 
     @GetMapping("/all")
-    public Msg<List<SuConfigEntity>> getAllConfig(Integer userId){
+    public List<SuConfigEntity> getAllConfig(Integer userId){
         Example example = new Example(SuConfigEntity.class);
         example.createCriteria().andEqualTo("userId",userId);
-        return R.sucess(suConfigMapper.selectByExample(example));
+        return suConfigMapper.selectByExample(example);
     }
     @GetMapping("/one")
-    public Msg<SuConfigEntity> getOneConfig(Integer userId, String name){
+    public SuConfigEntity getOneConfig(Integer userId, String name){
         Example example = new Example(SuConfigEntity.class);
         example.createCriteria()
                 .andEqualTo("userId",userId)
                 .andEqualTo("name",name);
-        return R.sucess(suConfigMapper.selectOneByExample(example));
+        return suConfigMapper.selectOneByExample(example);
     }
 }

@@ -33,7 +33,7 @@ public class OrderController {
      * @return
      */
     @GetMapping
-    public Msg<PageBean<OrderBillVo>> myOrder(@LoginUser Integer userId, @Valid GetOrderForm getOrderForm, BindingResult bindingResult){
+    public PageBean<OrderBillVo> myOrder(@LoginUser Integer userId, @Valid GetOrderForm getOrderForm, BindingResult bindingResult){
         PageBean<OrderBillDto> pageBean = orderService.getOrderBill(userId,getOrderForm.getType(),getOrderForm.getPlatformType(),getOrderForm.getState(),getOrderForm.getPageNum(),getOrderForm.getPageSize());
         List<OrderBillVo> vos = pageBean.getList().stream().map(o->{
             OrderBillVo vo = new OrderBillVo();
@@ -57,6 +57,6 @@ public class OrderController {
         result.setPageNum(pageBean.getPageNum());
         result.setPageSize(pageBean.getPageSize());
         result.setTotal(pageBean.getTotal());
-        return R.sucess(result);
+        return result;
     }
 }

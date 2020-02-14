@@ -7,10 +7,10 @@ import com.xm.api_mall.exception.ApiCallException;
 import com.xm.api_mall.utils.TextToGoodsUtils;
 import com.xm.comment.annotation.LoginUser;
 import com.xm.comment.annotation.Pid;
-import com.xm.comment.module.user.feign.UserFeignClient;
-import com.xm.comment_utils.response.Msg;
+import com.xm.comment_feign.module.user.feign.UserFeignClient;
+import com.xm.comment_serialize.module.mall.bo.ShareLinkBo;
+import com.xm.comment_utils.exception.GlobleException;
 import com.xm.comment_utils.response.MsgEnum;
-import com.xm.comment_utils.response.R;
 import com.xm.comment_serialize.module.mall.bo.ProductIndexBo;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
 import com.xm.comment_serialize.module.mall.ex.SmProductEntityEx;
@@ -52,7 +52,7 @@ public class ProductController {
      * @return
      */
     @PostMapping("/list")
-    public Msg<Object> getProductList(@RequestBody @Valid ProductListForm productListForm, BindingResult bindingResult, @LoginUser(necessary = false) Integer userId,@Pid(necessary = false) String pid) throws Exception {
+    public Object getProductList(@RequestBody @Valid ProductListForm productListForm, BindingResult bindingResult, @LoginUser(necessary = false) Integer userId,@Pid(necessary = false) String pid) throws Exception {
         PageBean<SmProductEntityEx> pageBean = (PageBean<SmProductEntityEx>) productContext
                 .platformType(productListForm.getPlatformType())
                 .listType(productListForm.getListType())
@@ -70,7 +70,7 @@ public class ProductController {
         productVoPageBean.setPageNum(pageBean.getPageNum());
         productVoPageBean.setPageSize(pageBean.getPageSize());
         productVoPageBean.setTotal(pageBean.getTotal());
-        return R.sucess(productVoPageBean);
+        return productVoPageBean;
     }
 
     /**
@@ -78,8 +78,8 @@ public class ProductController {
      * @return
      */
     @GetMapping("/detail")
-    public Msg<SmProductVo> getProductDetail(@Valid ProductDetailForm productDetailForm, BindingResult bindingResult, @LoginUser(necessary = false) Integer userId,@Pid(necessary = false) String pid) throws Exception {
-        return R.sucess(getDetailVo(userId,pid,productDetailForm.getPlatformType(),productDetailForm.getGoodsId(),productDetailForm.getShareUserId()));
+    public SmProductVo getProductDetail(@Valid ProductDetailForm productDetailForm, BindingResult bindingResult, @LoginUser(necessary = false) Integer userId,@Pid(necessary = false) String pid) throws Exception {
+        return getDetailVo(userId,pid,productDetailForm.getPlatformType(),productDetailForm.getGoodsId(),productDetailForm.getShareUserId());
     }
 
     private SmProductVo getDetailVo(Integer userId,String pid,Integer platformType,String goodsId,Integer shareUserId) throws Exception {
@@ -101,11 +101,11 @@ public class ProductController {
      * @return
      */
     @GetMapping("/details")
-    public Msg<List<SmProductEntity>> getProductDetails(Integer platformType,@RequestParam("goodsIds") List<String> goodsIds) throws Exception {
-        return R.sucess(productContext
+    public List<SmProductEntity> getProductDetails(Integer platformType,@RequestParam("goodsIds") List<String> goodsIds) throws Exception {
+        return productContext
                 .platformType(platformType)
                 .getService()
-                .details(goodsIds));
+                .details(goodsIds);
     }
 
     /**
@@ -113,7 +113,7 @@ public class ProductController {
      * @return
      */
     @PostMapping("/details")
-    public Msg<List<SmProductEntity>> getProductDetails(@RequestBody List<ProductIndexBo> productIndexBos) throws Exception {
+    public List<SmProductEntity> getProductDetails(@RequestBody List<ProductIndexBo> productIndexBos) throws Exception {
         Map<Integer, List<ProductIndexBo>> group = productIndexBos.stream().collect(Collectors.groupingBy(ProductIndexBo::getPlatformType));
         List<Future<List<SmProductEntity>>> futures = new ArrayList<>();
         for (Map.Entry<Integer, List<ProductIndexBo>> integerListEntry : group.entrySet()) {
@@ -140,26 +140,26 @@ public class ProductController {
                 e.printStackTrace();
             }
         });
-        return R.sucess(result);
+        return result;
     }
 
     @GetMapping("/sale")
-    public Msg getProductSaleInfo(@LoginUser Integer userId,@Pid(necessary = false) String pid, @Valid GetProductSaleInfoForm productSaleInfoForm) throws Exception {
+    public ShareLinkBo getProductSaleInfo(@LoginUser Integer userId, @Pid(necessary = false) String pid, @Valid GetProductSaleInfoForm productSaleInfoForm) throws Exception {
         if(userId.equals(productSaleInfoForm.getShareUserId()))
             productSaleInfoForm.setShareUserId(null);
-        return R.sucess(productContext
+        return productContext
                 .platformType(productSaleInfoForm.getPlatformType())
                 .getService()
                 .saleInfo(
                         userId,
                         pid,
-                        productSaleInfoForm));
+                        productSaleInfoForm);
     }
 
     @GetMapping("/url/parse")
-    public Msg<TextToGoodsUtils.GoodsSpec> parseUrl(@LoginUser(necessary = false) Integer userId,@Pid(necessary = false) String pid,String url) throws Exception {
+    public TextToGoodsUtils.GoodsSpec parseUrl(@LoginUser(necessary = false) Integer userId,@Pid(necessary = false) String pid,String url) throws Exception {
         if(StrUtil.isBlank(url))
-            return R.error(MsgEnum.PARAM_VALID_ERROR);
+            throw new GlobleException(MsgEnum.PARAM_VALID_ERROR);
         TextToGoodsUtils.GoodsSpec goodsSpec = TextToGoodsUtils.parse(url);
         switch (goodsSpec.getParseType()){
             case 1:{
@@ -173,7 +173,7 @@ public class ProductController {
                 }
             }
         }
-        return R.sucess(goodsSpec);
+        return goodsSpec;
     }
     
 }

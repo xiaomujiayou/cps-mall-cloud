@@ -3,10 +3,8 @@ package com.xm.api_user.controller;
 import com.xm.api_user.service.ShareService;
 import com.xm.comment.annotation.LoginUser;
 import com.xm.comment_utils.exception.GlobleException;
-import com.xm.comment.module.mall.feign.MallFeignClient;
-import com.xm.comment_utils.response.Msg;
+import com.xm.comment_feign.module.mall.feign.MallFeignClient;
 import com.xm.comment_utils.response.MsgEnum;
-import com.xm.comment_utils.response.R;
 import com.xm.comment_serialize.module.user.form.GetUserShareForm;
 import com.xm.comment_serialize.module.user.vo.ShareVo;
 import com.xm.comment_utils.mybatis.PageBean;
@@ -24,21 +22,20 @@ public class ShareController {
 
 
     @GetMapping
-    public Msg<PageBean<ShareVo>> get(@LoginUser Integer userId, GetUserShareForm getUserShareForm){
-        return R.sucess(shareService.getList(
+    public PageBean<ShareVo> get(@LoginUser Integer userId, GetUserShareForm getUserShareForm){
+        return shareService.getList(
                 userId,
                 getUserShareForm.getOrderType(),
                 getUserShareForm.getOrder(),
                 getUserShareForm.getPageNum(),
-                getUserShareForm.getPageSize()));
+                getUserShareForm.getPageSize());
 
     }
 
     @DeleteMapping("/{id}")
-    public Msg deleteAll(@LoginUser Integer userId,@PathVariable("id")Integer id){
+    public void deleteAll(@LoginUser Integer userId,@PathVariable("id")Integer id){
         if(id == null || id == 0)
             throw new GlobleException(MsgEnum.PARAM_VALID_ERROR);
         shareService.del(userId,id);
-        return R.sucess();
     }
 }

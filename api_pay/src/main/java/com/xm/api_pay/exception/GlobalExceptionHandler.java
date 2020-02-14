@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
  * 异常处理器
  */
 @Slf4j
-@ControllerAdvice
+//@ControllerAdvice
 public class GlobalExceptionHandler extends DefaultExceptionHandler {
 
 }

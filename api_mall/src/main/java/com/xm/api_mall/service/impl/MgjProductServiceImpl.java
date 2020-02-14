@@ -6,7 +6,7 @@ import com.xm.api_mall.service.OptionService;
 import com.xm.api_mall.service.ProductApiService;
 import com.xm.api_mall.service.ProductService;
 import com.xm.api_mall.service.ProfitService;
-import com.xm.comment.module.user.feign.UserFeignClient;
+import com.xm.comment_feign.module.user.feign.UserFeignClient;
 import com.xm.comment_serialize.module.mall.bo.ProductCriteriaBo;
 import com.xm.comment_serialize.module.mall.bo.ShareLinkBo;
 import com.xm.comment_serialize.module.mall.constant.GoodsSortContant;

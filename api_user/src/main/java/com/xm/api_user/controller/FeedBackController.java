@@ -24,13 +24,13 @@ public class FeedBackController {
     private SuFeedbackMapper suFeedbackMapper;
 
     @PostMapping
-    public Msg add(@LoginUser Integer userId, @Valid @RequestBody AddFeedBackForm addFeedBackForm, BindingResult bindingResult){
+    public String add(@LoginUser Integer userId, @Valid @RequestBody AddFeedBackForm addFeedBackForm, BindingResult bindingResult){
         SuFeedbackEntity entity = new SuFeedbackEntity();
         entity.setUserId(userId);
         entity.setDes(addFeedBackForm.getDesc());
         entity.setImages(addFeedBackForm.getImgs() == null?null:String.join(",",addFeedBackForm.getImgs()));
         entity.setCreateTime(new Date());
         suFeedbackMapper.insertSelective(entity);
-        return R.sucess();
+        return "";
     }
 }

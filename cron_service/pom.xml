@@ -30,7 +30,7 @@
         <!-- 公共资源项目 -->
         <dependency>
             <groupId>com.xm</groupId>
-            <artifactId>comment</artifactId>
+            <artifactId>comment_web</artifactId>
             <version>${project.current.version}</version>
         </dependency>
 

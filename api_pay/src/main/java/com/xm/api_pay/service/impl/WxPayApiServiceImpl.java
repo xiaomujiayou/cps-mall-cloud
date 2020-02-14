@@ -68,7 +68,7 @@ public class WxPayApiServiceImpl implements WxPayApiService {
             rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE,"",new PayOrderCreateMessage(suBillToPayBo.getUserId(),suBillToPayBo,spWxOrderInEntity,suBillToPayBo,wxPayOrderResultVo));
             return wxPayOrderResultVo;
         }
-        throw new GlobleException(MsgEnum.WX_PAY_ORDER_CREATE_FAIL);
+        throw new GlobleException(MsgEnum.WX_PAY_ORDER_CREATE_FAIL,"a:b","c:d");
     }
 
     /**

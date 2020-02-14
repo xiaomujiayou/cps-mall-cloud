@@ -31,15 +31,24 @@
         <module>api_proxy</module>
         <module>cron_service</module>
         <module>wind_control</module>
-        <module>comment</module>
+        <module>comment_api</module>
+        <module>comment_web</module>
+        <module>comment_feign</module>
         <module>comment_mq</module>
         <module>comment_serialize</module>
         <module>comment_utils</module>
-        <module>comment_api</module>
     </modules>
 
     <dependencyManagement>
         <dependencies>
+            <!-- jwt -->
+            <dependency>
+                <groupId>com.auth0</groupId>
+                <artifactId>java-jwt</artifactId>
+                <version>3.9.0</version>
+            </dependency>
+
+
             <!-- 引入springcloud版本管理器 -->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>

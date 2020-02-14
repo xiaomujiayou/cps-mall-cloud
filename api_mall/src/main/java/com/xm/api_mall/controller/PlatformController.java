@@ -2,9 +2,7 @@ package com.xm.api_mall.controller;
 
 import cn.hutool.core.map.MapUtil;
 import com.xm.comment.annotation.LoginUser;
-import com.xm.comment.module.mall.feign.MallFeignClient;
-import com.xm.comment_utils.response.Msg;
-import com.xm.comment_utils.response.R;
+import com.xm.comment_feign.module.mall.feign.MallFeignClient;
 import com.xm.comment_serialize.module.mall.constant.ConfigEnmu;
 import com.xm.comment_serialize.module.mall.constant.ConfigTypeConstant;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +29,11 @@ public class PlatformController {
      * @return
      */
     @GetMapping("/config")
-    public Msg<Map<String,Object>> config(@LoginUser Integer userId){
+    public Map<String,Object> config(@LoginUser Integer userId){
         Map<String,Object> result = new HashMap<>();
-        String isOn = mallFeignClient.getOneConfig(userId, ConfigEnmu.PLATFORM_CHOOSE_BTN.getName(), ConfigTypeConstant.PROXY_CONFIG).getData().getVal();
+        String isOn = mallFeignClient.getOneConfig(userId, ConfigEnmu.PLATFORM_CHOOSE_BTN.getName(), ConfigTypeConstant.PROXY_CONFIG).getVal();
         result.put("isOn",isOn.equals("1")?true:false);
-        return R.sucess(result);
+        return result;
     }
 
     /**
@@ -44,9 +42,9 @@ public class PlatformController {
      * @return
      */
     @GetMapping
-    public Msg<Object> get(@LoginUser Integer userId){
-        String[] platformNames = mallFeignClient.getOneConfig(userId, ConfigEnmu.PLATFORM_NAME.getName(), ConfigTypeConstant.PROXY_CONFIG).getData().getVal().split(",");
-        String[] platformIds = mallFeignClient.getOneConfig(userId, ConfigEnmu.PLATFORM_ID.getName(), ConfigTypeConstant.PROXY_CONFIG).getData().getVal().split(",");
+    public Object get(@LoginUser Integer userId){
+        String[] platformNames = mallFeignClient.getOneConfig(userId, ConfigEnmu.PLATFORM_NAME.getName(), ConfigTypeConstant.PROXY_CONFIG).getVal().split(",");
+        String[] platformIds = mallFeignClient.getOneConfig(userId, ConfigEnmu.PLATFORM_ID.getName(), ConfigTypeConstant.PROXY_CONFIG).getVal().split(",");
         List<Map<String,Object>> result = IntStream
                 .range(0,platformIds.length)
                 .boxed()
@@ -59,7 +57,7 @@ public class PlatformController {
                         .build())
                 .collect(Collectors.toList());
 
-        return R.sucess(result);
+        return result;
     }
 
 }

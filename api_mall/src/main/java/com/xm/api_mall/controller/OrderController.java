@@ -17,23 +17,8 @@ public class OrderController {
     @Resource(name = "pddProductApiService")
     private ProductApiService pddProductApiService;
 
-    /**
-     * 拼多多按更新时间查询订单
-     * @param form
-     * @param bindingResult
-     * @return
-     * @throws Exception
-     */
-//    @GetMapping("/pdd/increment")
-//    public Msg<PageBean<SuOrderEntity>> getIncrement(@Valid OrderIncrementListForm form, BindingResult bindingResult) throws Exception {
-//        return R.sucess(pddProductApiService.getOrderByIncrement(form.getStartUpdateTime(),form.getEndUpdateTime(),form.getPageNum(),form.getPageSize()));
-//    }
-
     @GetMapping("/time")
-    public Msg<Date> getTime() throws Exception {
-        return R.sucess(pddProductApiService.getTime());
+    public Date getTime() throws Exception {
+        return pddProductApiService.getTime();
     }
-
-
-
 }

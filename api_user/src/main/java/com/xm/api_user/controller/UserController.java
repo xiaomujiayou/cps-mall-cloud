@@ -5,6 +5,7 @@ import cn.hutool.core.util.NumberUtil;
 import com.xm.api_user.mapper.SuUserMapper;
 import com.xm.api_user.service.UserService;
 import com.xm.comment.annotation.LoginUser;
+import com.xm.comment_utils.exception.GlobleException;
 import com.xm.comment_utils.response.Msg;
 import com.xm.comment_utils.response.MsgEnum;
 import com.xm.comment_utils.response.R;
@@ -39,18 +40,20 @@ public class UserController{
      * @return/*-+
      */
     @PostMapping("/info")
-    public Msg<SuUserEntity> info(@RequestBody GetUserInfoForm getUserInfoForm) throws WxErrorException {
+    public SuUserEntity info(@RequestBody GetUserInfoForm getUserInfoForm) throws WxErrorException {
         if(StringUtils.isAllBlank(getUserInfoForm.getCode(),getUserInfoForm.getOpenId()))
-            return R.error(MsgEnum.PARAM_VALID_ERROR);
+            throw new GlobleException(MsgEnum.PARAM_VALID_ERROR);
         try {
             SuUserEntity userEntity = userService.getUserInfo(getUserInfoForm);
             UserInfoVo userInfoVo = new UserInfoVo();
             BeanUtil.copyProperties(userEntity,userInfoVo);
             SuUserEntity result = new SuUserEntity();
             BeanUtil.copyProperties(userInfoVo,result);
-            return userEntity != null ? R.sucess(result):R.error(MsgEnum.DATA_ALREADY_NOT_EXISTS);
+            if(userEntity != null)
+                return result;
+            throw new GlobleException(MsgEnum.DATA_ALREADY_NOT_EXISTS);
         }catch (WxErrorException e){
-            return R.error(MsgEnum.SYSTEM_INVALID_USER_ERROR);
+            throw new GlobleException(MsgEnum.SYSTEM_INVALID_USER_ERROR);
         }
     }
 
@@ -60,8 +63,11 @@ public class UserController{
      * @throws WxErrorException
      */
     @GetMapping("/info/detail")
-    public Msg<SuUserEntity> infoDetail(Integer userId) throws WxErrorException {
-        return userId != null ? R.sucess(suUserMapper.selectByPrimaryKey(userId)):R.error(MsgEnum.DATA_ALREADY_NOT_EXISTS);
+    public SuUserEntity infoDetail(Integer userId) throws WxErrorException {
+        if(userId != null)
+            return suUserMapper.selectByPrimaryKey(userId);
+        throw new GlobleException(MsgEnum.DATA_ALREADY_NOT_EXISTS);
+
     }
 
     /**
@@ -69,12 +75,12 @@ public class UserController{
      * @return
      */
     @PostMapping("/update")
-    public Msg<UserInfoVo> info(@Valid @RequestBody UpdateUserInfoForm updateUserInfoForm, BindingResult bindingResult, @LoginUser Integer userId) throws WxErrorException {
+    public UserInfoVo info(@Valid @RequestBody UpdateUserInfoForm updateUserInfoForm, BindingResult bindingResult, @LoginUser Integer userId) throws WxErrorException {
         userService.updateUserInfo(userId,updateUserInfoForm);
         SuUserEntity userEntity = suUserMapper.selectByPrimaryKey(userId);
         UserInfoVo userInfoVo = new UserInfoVo();
         BeanUtil.copyProperties(userEntity,userInfoVo);
-        return R.sucess(userInfoVo);
+        return userInfoVo;
     }
 
     /**
@@ -82,8 +88,8 @@ public class UserController{
      * @return
      */
     @GetMapping("/role")
-    public Msg<List<RolePermissionEx>> role(@LoginUser Integer userId) {
-        return R.sucess(userService.getUserRole(userId));
+    public List<RolePermissionEx> role(@LoginUser Integer userId) {
+        return userService.getUserRole(userId);
     }
 
     /**
@@ -94,7 +100,7 @@ public class UserController{
      */
     @GetMapping("/superUser")
     public Object superUser(Integer userId, int userType) {
-        return R.sucess(userService.getSuperUser(userId,userType));
+        return userService.getSuperUser(userId,userType);
     }
 
     /**
@@ -103,7 +109,7 @@ public class UserController{
      * @return
      */
     @GetMapping("/profit")
-    public Msg getUserProft(@LoginUser Integer userId) {
+    public Map<String,String> getUserProft(@LoginUser Integer userId) {
         UserProfitVo userProfitVo = userService.getUserProft(userId);
         Map<String,String> result = new HashMap<>();
         result.put("totalCoupon",NumberUtil.roundStr(NumberUtil.div(Double.valueOf(userProfitVo.getTotalCoupon()).doubleValue() ,100d),2));
@@ -112,7 +118,7 @@ public class UserController{
         result.put("totalConsumption",NumberUtil.roundStr(NumberUtil.div(Double.valueOf(userProfitVo.getTotalConsumption()).doubleValue() ,100d),2));
         result.put("totalShare",NumberUtil.roundStr(NumberUtil.div(Double.valueOf(userProfitVo.getTotalShare()).doubleValue() ,100d),2));
         result.put("totalProxyUser",userProfitVo.getTotalProxyUser().toString());
-        return R.sucess(result);
+        return result;
     }
 
 }

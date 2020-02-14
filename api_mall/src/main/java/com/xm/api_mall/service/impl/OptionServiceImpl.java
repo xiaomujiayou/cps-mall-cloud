@@ -4,7 +4,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.xm.api_mall.mapper.SmOptMapper;
 import com.xm.api_mall.service.ConfigService;
 import com.xm.api_mall.service.OptionService;
-import com.xm.comment.module.user.feign.UserFeignClient;
+import com.xm.comment_feign.module.user.feign.UserFeignClient;
 import com.xm.comment_serialize.module.mall.constant.ConfigEnmu;
 import com.xm.comment_serialize.module.mall.constant.ConfigTypeConstant;
 import com.xm.comment_serialize.module.mall.entity.SmOptEntity;
@@ -19,9 +19,7 @@ import tk.mybatis.orderbyhelper.OrderByHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 @Service("optionService")
@@ -65,7 +63,7 @@ public class OptionServiceImpl implements OptionService {
     public List<SmOptEntity> getChildOption(Integer userId,Integer parentId) {
         SuUserEntity suUserEntity = null;
         if(userId != null)
-            suUserEntity = userFeignClient.superUser(userId, UserTypeConstant.SELF).getData();
+            suUserEntity = userFeignClient.superUser(userId, UserTypeConstant.SELF);
         List<SmOptEntity> smOptEntities = null;
         Example example = new Example(SmOptEntity.class);
         if(parentId == null || parentId == 0){

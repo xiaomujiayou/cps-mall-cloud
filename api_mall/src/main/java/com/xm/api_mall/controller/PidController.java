@@ -1,8 +1,6 @@
 package com.xm.api_mall.controller;
 
 import com.xm.api_mall.service.PidService;
-import com.xm.comment_utils.response.Msg;
-import com.xm.comment_utils.response.R;
 import com.xm.comment_serialize.module.mall.entity.SmPidEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,11 +18,11 @@ public class PidController {
     private PidService pidService;
 
     @GetMapping("/generate")
-    public Msg<SmPidEntity> generatePid() throws Exception {
-        return R.sucess(pidService.generatePid());
+    public SmPidEntity generatePid() throws Exception {
+        return pidService.generatePid();
     }
     @GetMapping
-    public Msg<SmPidEntity> getPid(Integer id) throws Exception {
-        return R.sucess(pidService.getPid(id));
+    public SmPidEntity getPid(Integer id) throws Exception {
+        return pidService.getPid(id);
     }
 }

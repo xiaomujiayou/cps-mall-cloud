@@ -19,13 +19,8 @@ public class OptionController {
     @Autowired
     private OptionService optionService;
 
-//    @GetMapping()
-//    public Msg<List<OptEx>> get(){
-//        return R.sucess(optionService.getOption());
-//    }
-
     @GetMapping
-    public Msg<List<SmOptEntity>> get(@LoginUser(necessary = false) Integer userId,Integer parentOptId){
-        return R.sucess(optionService.getChildOption(userId,parentOptId));
+    public List<SmOptEntity> get(@LoginUser(necessary = false) Integer userId,Integer parentOptId){
+        return optionService.getChildOption(userId,parentOptId);
     }
 }

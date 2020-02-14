@@ -33,9 +33,9 @@ public class BannerController {
      * @throws Exception
      */
     @GetMapping("/{type}")
-    public Msg<List<SmBannerEntity>> banner(@PathVariable("type") Integer type) throws Exception {
+    public List<SmBannerEntity> banner(@PathVariable("type") Integer type) throws Exception {
         List<SmBannerEntity> smBannerEntities = bannerService.getBannerByType(EnumUtils.getEnum(BannerTypeEnum.class,"type",type));
-        return R.sucess(smBannerEntities);
+        return smBannerEntities;
     }
 
     /**
@@ -45,12 +45,12 @@ public class BannerController {
      * @throws Exception
      */
     @GetMapping("/theme")
-    public Msg<List<SmBannerEntity>> themeBanner(Integer platformType) throws Exception {
+    public List<SmBannerEntity> themeBanner(Integer platformType) throws Exception {
         if(platformType == null)
             throw new GlobleException(MsgEnum.PARAM_VALID_ERROR);
-        return R.sucess(productContext
+        return productContext
                 .platformType(platformType)
                 .getService()
-                .themes());
+                .themes();
     }
 }

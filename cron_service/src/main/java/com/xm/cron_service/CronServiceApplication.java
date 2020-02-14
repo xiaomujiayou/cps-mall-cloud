@@ -15,7 +15,7 @@ import java.util.TimeZone;
 @EnableDistributedTransaction
 @ComponentScan("com.xm")
 @MapperScan(basePackages = {"com.xm.*.mapper","com.xm.*.mapper.custom"})
-@EnableFeignClients(basePackages = {"com.xm.comment.module.*.feign"})
+@EnableFeignClients(basePackages = {"com.xm.comment_feign.module.*.feign"})
 @EnableDiscoveryClient
 @SpringBootApplication
 public class CronServiceApplication {

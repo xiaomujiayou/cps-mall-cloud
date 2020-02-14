@@ -7,6 +7,7 @@ import com.alibaba.fastjson.JSON;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
+import com.xm.cloud_gateway.config.ShiroConfig;
 import com.xm.comment.constants.TokenConstants;
 import com.xm.comment_serialize.module.user.entity.SuUserEntity;
 import com.xm.comment_serialize.module.user.vo.UserInfoVo;
@@ -32,10 +33,14 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 /**
  * 用户信息过滤器
  * 如果用户已登录并且存在，则将用户信息设置到request header中，以便其他服务通过@LoginUser注解获取
+ * 向service服务表明该请求来源于zuul，以便ExceptionAspect正常工作
  */
 @Slf4j
 @Component
 public class UserInfoFilter extends ZuulFilter {
+
+    @Autowired
+    private ShiroConfig shiroConfig;
 
     //拦截白名单
 //    private static String[] whiteList = new String[]{"/user/register","/user/login"};
@@ -70,8 +75,10 @@ public class UserInfoFilter extends ZuulFilter {
     @Override
     public Object run() throws ZuulException {
         RequestContext requestContext = RequestContext.getCurrentContext();
+        //向service表明该请求来自zuul，以便触发ExceptionAspect工作
+        requestContext.addZuulRequestHeader("from", "zuul");
         HttpServletRequest request = requestContext.getRequest();
-        String token = request.getHeader("token");
+        String token = request.getHeader(shiroConfig.getSessionIdName());
 
         if(StrUtil.isBlank(token))
             return null;

@@ -9,7 +9,7 @@ import com.xm.api_mall.service.ProfitService;
 import com.xm.comment_serialize.module.mall.constant.GoodsSortContant;
 import com.xm.comment_serialize.module.mall.form.GetProductSaleInfoForm;
 import com.xm.comment_utils.exception.GlobleException;
-import com.xm.comment.module.user.feign.UserFeignClient;
+import com.xm.comment_feign.module.user.feign.UserFeignClient;
 import com.xm.comment_utils.response.MsgEnum;
 import com.xm.comment_serialize.module.mall.bo.ProductCriteriaBo;
 import com.xm.comment_serialize.module.mall.bo.ShareLinkBo;

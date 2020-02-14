@@ -9,11 +9,8 @@ import com.xm.api_user.mapper.custom.SuOrderMapperEx;
 import com.xm.api_user.mapper.custom.SuRoleMapperEx;
 import com.xm.api_user.mapper.custom.SuUserMapperEx;
 import com.xm.api_user.service.UserService;
-import com.xm.comment_mq.config.UserActionConfig;
-import com.xm.comment_mq.message.impl.UserAddProxyMessage;
-import com.xm.comment_mq.message.impl.UserFristLoginMessage;
 import com.xm.comment_utils.exception.GlobleException;
-import com.xm.comment.module.mall.feign.MallFeignClient;
+import com.xm.comment_feign.module.mall.feign.MallFeignClient;
 import com.xm.comment_utils.response.MsgEnum;
 import com.xm.comment_serialize.module.mall.constant.ConfigEnmu;
 import com.xm.comment_serialize.module.mall.constant.ConfigTypeConstant;
@@ -91,7 +88,7 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     public SuUserEntity addNewUser(String openId,Integer shareUserId){
-        SmPidEntity smPidEntity = mallFeignClient.generatePid().getData();
+        SmPidEntity smPidEntity = mallFeignClient.generatePid();
         SuUserEntity user = new SuUserEntity();
         if(shareUserId != null)
             user.setParentId(shareUserId);
@@ -164,7 +161,7 @@ public class UserServiceImpl implements UserService {
                 if(self.getParentId() == null || self.getParentId() == 0){
                     return null;
                 }
-                Integer level = Integer.valueOf(mallFeignClient.getOneConfig(userId, ConfigEnmu.PROXY_LEVEL.getName(), ConfigTypeConstant.SYS_CONFIG).getData().getVal());
+                Integer level = Integer.valueOf(mallFeignClient.getOneConfig(userId, ConfigEnmu.PROXY_LEVEL.getName(), ConfigTypeConstant.SYS_CONFIG).getVal());
                 SuUserEntity target = null;
                 for (int i = 0; i < level; i++) {
                     target = suUserMapper.selectByPrimaryKey(self.getParentId());

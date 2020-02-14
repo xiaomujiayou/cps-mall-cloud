@@ -11,7 +11,7 @@ import tk.mybatis.spring.annotation.MapperScan;
 //开启分布式事务
 @EnableDistributedTransaction
 @ComponentScan("com.xm")
-@EnableFeignClients(basePackages = {"com.xm.comment.module.*.feign"})
+@EnableFeignClients(basePackages = {"com.xm.comment_feign.module.*.feign"})
 @EnableDiscoveryClient
 @MapperScan(basePackages = {"com.xm.*.mapper","com.xm.*.mapper.custom"})
 @SpringBootApplication

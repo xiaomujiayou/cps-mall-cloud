@@ -15,3 +15,8 @@ zuul:
 feign:
   hystrix:
     enabled: true
+
+
+shiro:
+  sessionIdName: token
+  sessionTimeout: 10000

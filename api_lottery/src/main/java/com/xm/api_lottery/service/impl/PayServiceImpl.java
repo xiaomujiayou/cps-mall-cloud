@@ -4,8 +4,8 @@ import cn.hutool.core.bean.BeanUtil;
 import com.xm.api_lottery.mapper.SlPropMapper;
 import com.xm.api_lottery.mapper.SlPropSpecMapper;
 import com.xm.api_lottery.service.PayService;
-import com.xm.comment.module.pay.feign.PayFeignClient;
-import com.xm.comment.module.user.feign.UserFeignClient;
+import com.xm.comment_feign.module.pay.feign.PayFeignClient;
+import com.xm.comment_feign.module.user.feign.UserFeignClient;
 import com.xm.comment_serialize.module.lottery.entity.SlPropEntity;
 import com.xm.comment_serialize.module.lottery.entity.SlPropSpecEntity;
 import com.xm.comment_serialize.module.lottery.ex.SlPropSpecEx;
@@ -41,8 +41,8 @@ public class PayServiceImpl implements PayService {
         slPropSpecEx.setClientIp(clientIp);
         slPropSpecEx.setSlPropEntity(slPropEntity);
         //保存账单
-        SuBillToPayBo suBillToPayBo = userFeignClient.createByProp(slPropSpecEx).getData();
+        SuBillToPayBo suBillToPayBo = userFeignClient.createByProp(slPropSpecEx);
         //统一下单
-        return payFeignClient.wxPay(suBillToPayBo).getData();
+        return payFeignClient.wxPay(suBillToPayBo);
     }
 }

@@ -21,7 +21,7 @@ public class ConfigController  {
     private ConfigService configService;
 
     @GetMapping("/one")
-    public Msg<SmConfigEntity> getOneConfig(Integer userId, String configName, Integer configType) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        return R.sucess(configService.getConfig(userId, EnumUtils.getEnum(ConfigEnmu.class,"name",configName),configType));
+    public SmConfigEntity getOneConfig(Integer userId, String configName, Integer configType) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        return configService.getConfig(userId, EnumUtils.getEnum(ConfigEnmu.class,"name",configName),configType);
     }
 }

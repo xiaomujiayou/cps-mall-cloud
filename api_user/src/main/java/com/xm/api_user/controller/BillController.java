@@ -6,11 +6,16 @@ import com.xm.comment.annotation.LoginUser;
 import com.xm.comment_serialize.module.lottery.ex.SlPropSpecEx;
 import com.xm.comment_serialize.module.user.bo.SuBillToPayBo;
 import com.xm.comment_serialize.module.user.entity.SuBillEntity;
+import com.xm.comment_serialize.module.user.vo.BillVo;
+import com.xm.comment_utils.exception.GlobleException;
+import com.xm.comment_utils.mybatis.PageBean;
 import com.xm.comment_utils.response.Msg;
 import com.xm.comment_utils.response.MsgEnum;
 import com.xm.comment_utils.response.R;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/bill")
@@ -20,8 +25,8 @@ public class BillController {
     private BillService billService;
 
     @GetMapping
-    public Msg get(@LoginUser Integer userId,Integer state,Integer type,Integer pageNum,Integer pageSize){
-        return R.sucess(billService.getList(userId,state,type,pageNum,pageSize));
+    public PageBean<BillVo> get(@LoginUser Integer userId, Integer state, Integer type, Integer pageNum, Integer pageSize){
+        return billService.getList(userId,state,type,pageNum,pageSize);
     }
 
     /**
@@ -30,9 +35,9 @@ public class BillController {
      * @return
      */
     @PostMapping("/create/prop")
-    public Msg<SuBillToPayBo> createByProp(@RequestBody SlPropSpecEx slPropSpecEx){
+    public SuBillToPayBo createByProp(@RequestBody SlPropSpecEx slPropSpecEx){
         if(slPropSpecEx == null)
-            return R.error(MsgEnum.PARAM_VALID_ERROR);
-        return R.sucess(billService.createByProp(slPropSpecEx));
+            throw new GlobleException(MsgEnum.PARAM_VALID_ERROR);
+        return billService.createByProp(slPropSpecEx);
     }
 }

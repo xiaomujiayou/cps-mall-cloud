@@ -2,10 +2,9 @@ package com.xm.api_user.service.impl;
 
 import cn.hutool.core.date.DateUtil;
 import com.github.pagehelper.PageHelper;
-import com.xm.api_user.mapper.SuSearchMapper;
 import com.xm.api_user.mapper.SuShareMapper;
 import com.xm.api_user.service.ShareService;
-import com.xm.comment.module.mall.feign.MallFeignClient;
+import com.xm.comment_feign.module.mall.feign.MallFeignClient;
 import com.xm.comment.utils.GoodsPriceUtil;
 import com.xm.comment_serialize.module.mall.bo.ProductIndexBo;
 import com.xm.comment_serialize.module.mall.constant.ConfigEnmu;
@@ -90,7 +89,7 @@ public class ShareServiceImpl implements ShareService {
         example.setPlatformType(suOrderEntity.getPlatformType());
         example = suShareMapper.selectOne(example);
         if(example != null && example.getId() != null){
-            String userShareRate = mallFeignClient.getOneConfig(suOrderEntity.getShareUserId(), ConfigEnmu.PRODUCT_SHARE_USER_RATE.getName(),ConfigTypeConstant.SELF_CONFIG).getData().getVal();
+            String userShareRate = mallFeignClient.getOneConfig(suOrderEntity.getShareUserId(), ConfigEnmu.PRODUCT_SHARE_USER_RATE.getName(),ConfigTypeConstant.SELF_CONFIG).getVal();
             Integer willGetMoney = GoodsPriceUtil.type(suOrderEntity.getPlatformType()).calcUserShareProfit(Double.valueOf(suOrderEntity.getPromotionAmount()),Double.valueOf(userShareRate)).intValue();
             example.setWillMakeMoney(example.getWillMakeMoney() + willGetMoney);
             example.setSell(example.getSell() + 1);
@@ -141,14 +140,14 @@ public class ShareServiceImpl implements ShareService {
         example.setDel(1);
         List<SuShareEntity> suShareEntities = suShareMapper.select(example);
         PageBean pageBean = new PageBean(suShareEntities);
-         String userBuyRate = mallFeignClient.getOneConfig(userId, ConfigEnmu.PRODUCT_BUY_RATE.getName(),ConfigTypeConstant.PROXY_CONFIG).getData().getVal();
-        String userShareRate = mallFeignClient.getOneConfig(userId, ConfigEnmu.PRODUCT_SHARE_USER_RATE.getName(),ConfigTypeConstant.SELF_CONFIG).getData().getVal();
+         String userBuyRate = mallFeignClient.getOneConfig(userId, ConfigEnmu.PRODUCT_BUY_RATE.getName(),ConfigTypeConstant.PROXY_CONFIG).getVal();
+        String userShareRate = mallFeignClient.getOneConfig(userId, ConfigEnmu.PRODUCT_SHARE_USER_RATE.getName(),ConfigTypeConstant.SELF_CONFIG).getVal();
         List<SmProductEntity> smProductEntities = mallFeignClient.getProductDetails(suShareEntities.stream().map(o->{
             ProductIndexBo productIndexBo = new ProductIndexBo();
             productIndexBo.setGoodsId(o.getGoodsId());
             productIndexBo.setPlatformType(o.getPlatformType());
             return productIndexBo;
-        }).collect(Collectors.toList())).getData();
+        }).collect(Collectors.toList()));
 
         List<ShareVo> shareVos = suShareEntities.stream().map(o ->{
             SmProductEntity smProductEntity = smProductEntities.stream().filter(j->{return o.getGoodsId().equals(j.getGoodsId());}).findFirst().get();

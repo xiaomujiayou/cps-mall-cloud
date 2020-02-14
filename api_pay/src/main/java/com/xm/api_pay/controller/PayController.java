@@ -34,8 +34,8 @@ public class PayController {
      * @return
      */
     @PostMapping("/wx")
-    public Msg<WxPayOrderResultVo> wxPay(@RequestBody SuBillToPayBo suBillToPayBo) throws WxPayException {
-        return R.sucess(wxPayApiService.collection(suBillToPayBo));
+    public WxPayOrderResultVo wxPay(@RequestBody SuBillToPayBo suBillToPayBo) throws WxPayException {
+        return wxPayApiService.collection(suBillToPayBo);
     }
 
     @PostMapping("/wx/order/notify")

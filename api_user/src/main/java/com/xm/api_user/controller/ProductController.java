@@ -3,9 +3,7 @@ package com.xm.api_user.controller;
 import com.xm.api_user.service.ProductService;
 import com.xm.api_user.service.ShareService;
 import com.xm.comment.annotation.LoginUser;
-import com.xm.comment.module.mall.feign.MallFeignClient;
-import com.xm.comment_utils.response.Msg;
-import com.xm.comment_utils.response.R;
+import com.xm.comment_feign.module.mall.feign.MallFeignClient;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
 import com.xm.comment_serialize.module.mall.ex.SmProductEntityEx;
 import com.xm.comment_serialize.module.mall.form.*;
@@ -40,8 +38,8 @@ public class ProductController {
      * @return
      */
     @GetMapping("/collect/is")
-    public Msg collect(@LoginUser Integer userId, @Valid ProductCollectIsForm productCollectIsForm, BindingResult bindingResult){
-        return R.sucess(productService.isCollect(userId,productCollectIsForm.getPlatformType(),productCollectIsForm.getGoodsId()));
+    public Boolean collect(@LoginUser Integer userId, @Valid ProductCollectIsForm productCollectIsForm, BindingResult bindingResult){
+        return productService.isCollect(userId,productCollectIsForm.getPlatformType(),productCollectIsForm.getGoodsId());
     }
 
     /**
@@ -51,11 +49,10 @@ public class ProductController {
      * @return
      */
     @PostMapping("/collect")
-    public Msg collect(@LoginUser Integer userId, @Valid @RequestBody ProductCollectForm productCollectForm,BindingResult bindingResult){
+    public void collect(@LoginUser Integer userId, @Valid @RequestBody ProductCollectForm productCollectForm,BindingResult bindingResult){
         if(productCollectForm.getShareUserId() != null && userId.equals(productCollectForm.getShareUserId()))
             productCollectForm.setShareUserId(null);
         productService.collect(userId,productCollectForm.getPlatformType(),productCollectForm.getGoodsId(),productCollectForm.getShareUserId(),productCollectForm.getIsCollect());
-        return R.sucess();
     }
 
     /**
@@ -65,9 +62,8 @@ public class ProductController {
      * @return
      */
     @DeleteMapping("/history/{id}")
-    public Msg delHistory(@LoginUser Integer userId, @PathVariable Integer id){
+    public void delHistory(@LoginUser Integer userId, @PathVariable Integer id){
         productService.delHistory(userId,id,false);
-        return R.sucess();
     }
 
     /**
@@ -76,9 +72,8 @@ public class ProductController {
      * @return
      */
     @DeleteMapping("/history")
-    public Msg delHistory(@LoginUser Integer userId){
+    public void delHistory(@LoginUser Integer userId){
         productService.delHistory(userId,null,true);
-        return R.sucess();
     }
 
     /**
@@ -89,7 +84,7 @@ public class ProductController {
      * @return
      */
     @GetMapping
-    public Msg<PageBean<SmProductEntityEx>> get(@LoginUser Integer userId, @Valid GetProductForm getProductForm,BindingResult bindingResult){
+    public PageBean<SmProductEntityEx> get(@LoginUser Integer userId, @Valid GetProductForm getProductForm,BindingResult bindingResult){
         getProductForm.setPageSize(10);
         PageBean<SmProductEntity> pageBean = productService.getUserProduct(
                 userId,
@@ -101,7 +96,7 @@ public class ProductController {
         CalcProfitForm calcProfitForm = new CalcProfitForm();
         calcProfitForm.setUserId(userId);
         calcProfitForm.setSmProductEntities(pageBean.getList());
-        List<SmProductEntityEx> smProductEntityExes = mallFeignClient.calc(calcProfitForm).getData();
+        List<SmProductEntityEx> smProductEntityExes = mallFeignClient.calc(calcProfitForm);
         smProductEntityExes.stream().forEach(o->{
             o.setShareUserId(shareUserMap.get(o.getGoodsId()));
         });
@@ -110,7 +105,7 @@ public class ProductController {
         smProductEntityExPageBean.setPageNum(pageBean.getPageNum());
         smProductEntityExPageBean.setPageSize(pageBean.getPageSize());
         smProductEntityExPageBean.setTotal(pageBean.getTotal());
-        return R.sucess(smProductEntityExPageBean);
+        return smProductEntityExPageBean;
     }
 
     /**
@@ -119,7 +114,7 @@ public class ProductController {
      * @return
      */
     @PostMapping("/history")
-    public Msg get(@LoginUser Integer userId,@RequestBody @Valid AddUserHistoryForm addUserHistoryForm,BindingResult bindingResult){
+    public void get(@LoginUser Integer userId,@RequestBody @Valid AddUserHistoryForm addUserHistoryForm,BindingResult bindingResult){
         if(userId != null) {
             Integer shareUserId = addUserHistoryForm.getShareUserId()== null?null:userId.equals(addUserHistoryForm.getShareUserId())?null:addUserHistoryForm.getShareUserId();
             productService.addHistory(userId,addUserHistoryForm.getPlatformType(),addUserHistoryForm.getGoodsId(),shareUserId);
@@ -128,7 +123,6 @@ public class ProductController {
         if(addUserHistoryForm.getShareUserId() != null && !addUserHistoryForm.getShareUserId().equals(userId)){
             shareService.show(addUserHistoryForm.getShareUserId(),addUserHistoryForm.getGoodsId(),addUserHistoryForm.getPlatformType());
         }
-        return R.sucess();
     }
 
 }

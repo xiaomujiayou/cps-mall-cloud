@@ -3,7 +3,6 @@ package com.xm.api_user.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -13,9 +12,8 @@ import com.google.common.collect.Lists;
 import com.xm.api_user.mapper.SuBillMapper;
 import com.xm.api_user.mapper.SuOrderMapper;
 import com.xm.api_user.mapper.SuUserMapper;
-import com.xm.api_user.mapper.custom.SuBillMapperEx;
 import com.xm.api_user.service.BillService;
-import com.xm.comment.module.mall.feign.MallFeignClient;
+import com.xm.comment_feign.module.mall.feign.MallFeignClient;
 import com.xm.comment_mq.config.BillMqConfig;
 import com.xm.comment_serialize.module.lottery.ex.SlPropSpecEx;
 import com.xm.comment_serialize.module.mall.constant.ConfigEnmu;
@@ -85,7 +83,7 @@ public class BillServiceImpl implements BillService {
         Integer buyUserRate = Integer.valueOf(mallFeignClient.getOneConfig(
                 order.getUserId(),
                 ConfigEnmu.PRODUCT_BUY_RATE.getName(),
-                ConfigTypeConstant.SYS_CONFIG).getData().getVal());
+                ConfigTypeConstant.SYS_CONFIG).getVal());
         SuBillEntity buyUserBill = createOrderBill(order.getUserId(),order,1,buyUserRate,null);
 //        suBillMapper.insertSelective(buyUserBill);
         billService.addBill(buyUserBill);
@@ -94,11 +92,11 @@ public class BillServiceImpl implements BillService {
         Integer proxyLevel = Integer.valueOf(mallFeignClient.getOneConfig(
                 null,
                 ConfigEnmu.PROXY_LEVEL.getName(),
-                ConfigTypeConstant.SYS_CONFIG).getData().getVal());
+                ConfigTypeConstant.SYS_CONFIG).getVal());
         List<Integer> proxyRate = Lists.newArrayList(mallFeignClient.getOneConfig(
                 null,
                 ConfigEnmu.PRODUCT_PROXY_RATE.getName(),
-                ConfigTypeConstant.SYS_CONFIG).getData().getVal().split(","))
+                ConfigTypeConstant.SYS_CONFIG).getVal().split(","))
                 .stream()
                 .map(o->{return Integer.valueOf(o);})
                 .collect(Collectors.toList());
@@ -125,7 +123,7 @@ public class BillServiceImpl implements BillService {
         Integer shareUserRate = Integer.valueOf(mallFeignClient.getOneConfig(
                 shareUserId,
                 ConfigEnmu.PRODUCT_SHARE_USER_RATE.getName(),
-                ConfigTypeConstant.SYS_CONFIG).getData().getVal());
+                ConfigTypeConstant.SYS_CONFIG).getVal());
         SuBillEntity shareUserBill = createOrderBill(shareUserId,order,4,shareUserRate,order.getUserId());
 //        suBillMapper.insertSelective(shareUserBill);
         billService.addBill(shareUserBill);
@@ -133,7 +131,7 @@ public class BillServiceImpl implements BillService {
         Integer buyUserRate = Integer.valueOf(mallFeignClient.getOneConfig(
                 order.getUserId(),
                 ConfigEnmu.PRODUCT_SHARE_BUY_RATE.getName(),
-                ConfigTypeConstant.SYS_CONFIG).getData().getVal());
+                ConfigTypeConstant.SYS_CONFIG).getVal());
         SuBillEntity buyUserBill = createOrderBill(order.getUserId(),order,3,buyUserRate,null);
 //        suBillMapper.insertSelective(buyUserBill);
         billService.addBill(buyUserBill);

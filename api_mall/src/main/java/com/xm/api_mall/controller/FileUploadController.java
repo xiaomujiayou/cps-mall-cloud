@@ -26,17 +26,6 @@ public class FileUploadController {
     @Autowired
     private OSSConfig ossConfig;
 
-//    @Value("${oss.ali.endpoint}")
-//    private String endpoint;
-//    @Value("${oss.ali.accessKeyId}")
-//    private String accessKeyId;
-//    @Value("${oss.ali.accessKeySecret}")
-//    private String accessKeySecret;
-//    @Value("${oss.ali.bucketName}")
-//    private String bucketName;
-//    @Value("${spring.profiles.active}")
-//    private String profile;
-
     @Resource(name = "ossClient")
     private OSS ossClient;
 
@@ -47,7 +36,7 @@ public class FileUploadController {
         String dir = "user/"+userId+"/feedback/";
         //限定文件大小
         Integer maxSize = 10;
-        return R.sucess(createSign(30,dir,maxSize));
+        return createSign(30,dir,maxSize);
     }
 
     /**

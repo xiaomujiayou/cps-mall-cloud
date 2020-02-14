@@ -2,9 +2,7 @@ package com.xm.api_user.controller;
 
 import com.xm.api_user.service.SearchService;
 import com.xm.comment.annotation.LoginUser;
-import com.xm.comment.module.mall.feign.MallFeignClient;
-import com.xm.comment_utils.response.Msg;
-import com.xm.comment_utils.response.R;
+import com.xm.comment_feign.module.mall.feign.MallFeignClient;
 import com.xm.comment_serialize.module.mall.constant.ConfigEnmu;
 import com.xm.comment_serialize.module.mall.constant.ConfigTypeConstant;
 import com.xm.comment_serialize.module.user.entity.SuSearchEntity;
@@ -28,26 +26,24 @@ public class SearchController {
 
 
     @GetMapping
-    public Msg<String[]> getSearch(@LoginUser Integer userId,Integer pageNum,Integer pageSize){
+    public String[] getSearch(@LoginUser Integer userId,Integer pageNum,Integer pageSize){
         PageBean<SuSearchEntity> result = searchService.get(userId,pageNum,pageSize);
-        return R.sucess(result.getList().stream().map(SuSearchEntity::getKeyword).collect(Collectors.toList()).toArray(new String[0]));
+        return result.getList().stream().map(SuSearchEntity::getKeyword).collect(Collectors.toList()).toArray(new String[0]);
     }
 
     @DeleteMapping
-    public Msg deleteAll(@LoginUser Integer userId){
+    public void deleteAll(@LoginUser Integer userId){
         searchService.deleteAll(userId);
-        return R.sucess();
     }
 
     @PostMapping
-    public Msg add(@LoginUser Integer userId, @RequestBody @Valid AddSearchForm addSearchForm, BindingResult bindingResult){
+    public void add(@LoginUser Integer userId, @RequestBody @Valid AddSearchForm addSearchForm, BindingResult bindingResult){
         searchService.add(userId,addSearchForm.getKeyWords());
-        return R.sucess();
     }
 
     @GetMapping("/recommend")
-    public Msg<String[]> getRecommend(@LoginUser(necessary = false) Integer userId, Integer pageNum, Integer pageSize){
-        String suggestStr = mallFeignClient.getOneConfig(userId, ConfigEnmu.PRODUCT_SEARCH_RECOMMEND.getName(),ConfigTypeConstant.SYS_CONFIG).getData().getVal();
-        return R.sucess(suggestStr.split(","));
+    public String[] getRecommend(@LoginUser(necessary = false) Integer userId, Integer pageNum, Integer pageSize){
+        String suggestStr = mallFeignClient.getOneConfig(userId, ConfigEnmu.PRODUCT_SEARCH_RECOMMEND.getName(),ConfigTypeConstant.SYS_CONFIG).getVal();
+        return suggestStr.split(",");
     }
 }

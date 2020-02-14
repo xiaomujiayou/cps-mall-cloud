@@ -30,7 +30,7 @@ public class ProxyController {
      * @return
      */
     @GetMapping("/profit")
-    public Msg<PageBean<ProxyProfitDto>> get(@LoginUser Integer userId, @Valid GetProxyProfitForm getProxyProfitForm, BindingResult bindingResult){
+    public PageBean<ProxyProfitDto> get(@LoginUser Integer userId, @Valid GetProxyProfitForm getProxyProfitForm, BindingResult bindingResult){
         PageBean<ProxyProfitDto> pageBean = userService.getProxyProfit(
                 userId,
                 getProxyProfitForm.getState() == null? null:getProxyProfitForm.getState() == 0?null:getProxyProfitForm.getState(),
@@ -42,14 +42,14 @@ public class ProxyController {
 //            o.setProxyName(StrUtil.hide(o.getProxyName(),3,4));
             o.setCreateTime(DateUtil.format(DateUtil.parse(o.getCreateTime()),"MM-dd HH:mm"));
         });
-        return R.sucess(pageBean);
+        return pageBean;
     }
 
     /**
      *  获取用户代理详情
      */
     @GetMapping("/info")
-    public Msg<ProxyInfoVo> getInfo(@LoginUser Integer userId){
-        return R.sucess(userService.getProxyInfo(userId));
+    public ProxyInfoVo getInfo(@LoginUser Integer userId){
+        return userService.getProxyInfo(userId);
     }
 }

@@ -5,7 +5,7 @@ import com.github.pagehelper.PageHelper;
 import com.xm.api_user.mapper.SuProductMapper;
 import com.xm.api_user.service.ProductService;
 import com.xm.comment_utils.exception.GlobleException;
-import com.xm.comment.module.mall.feign.MallFeignClient;
+import com.xm.comment_feign.module.mall.feign.MallFeignClient;
 import com.xm.comment_utils.response.MsgEnum;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
 import com.xm.comment_serialize.module.mall.ex.SmProductEntityEx;
@@ -43,7 +43,7 @@ public class ProductServiceImpl implements ProductService {
         Map<Integer,List<SuProductEntity>> groups = suProductEntities.stream().collect(Collectors.groupingBy(SuProductEntity::getPlatformType));
         List<SmProductEntity> smProductEntities = groups.entrySet().stream().map(o->{
             List<String> goodsIds = o.getValue().stream().map(SuProductEntity::getGoodsId).collect(Collectors.toList());
-            return mallFeignClient.getProductDetails(o.getKey(),goodsIds).getData();
+            return mallFeignClient.getProductDetails(o.getKey(),goodsIds);
         }).flatMap(o-> o.stream().map(i->{
             i.setId(idMap.get(i.getGoodsId()));
             return i;

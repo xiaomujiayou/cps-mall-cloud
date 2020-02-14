@@ -3,7 +3,7 @@ package com.xm.api_mall.service.impl;
 import com.xm.api_mall.mapper.SmConfigMapper;
 import com.xm.api_mall.service.ConfigService;
 import com.xm.comment_utils.exception.GlobleException;
-import com.xm.comment.module.user.feign.UserFeignClient;
+import com.xm.comment_feign.module.user.feign.UserFeignClient;
 import com.xm.comment_utils.response.Msg;
 import com.xm.comment_utils.response.MsgEnum;
 import com.xm.comment_serialize.module.mall.constant.ConfigEnmu;
@@ -47,14 +47,14 @@ public class ConfigServiceImpl implements ConfigService {
                 SmConfigEntity smConfigEntity = smConfigMapper.selectOneByExample(example);
                 if(userId == null)
                     return smConfigEntity;
-                SuConfigEntity suConfigEntity = userFeignClient.getOneConfig(userId,configEnmu.getName()).getData();
+                SuConfigEntity suConfigEntity = userFeignClient.getOneConfig(userId,configEnmu.getName());
                 if(suConfigEntity != null){
                     smConfigEntity.setVal(suConfigEntity.getVal());
                 }
                 return smConfigEntity;
             }
             case ConfigTypeConstant.PARENT_CONFIG:{
-                SuUserEntity parent = userFeignClient.superUser(userId, UserTypeConstant.PARENT).getData();
+                SuUserEntity parent = userFeignClient.superUser(userId, UserTypeConstant.PARENT);
                 if(parent == null){
                     Example example = new Example(SmConfigEntity.class);
                     example.createCriteria().andEqualTo("name",configEnmu.getName());
@@ -64,7 +64,7 @@ public class ConfigServiceImpl implements ConfigService {
                     Example example = new Example(SmConfigEntity.class);
                     example.createCriteria().andEqualTo("name",configEnmu.getName());
                     SmConfigEntity smConfigEntity = smConfigMapper.selectOneByExample(example);
-                    SuConfigEntity suConfigEntity = userFeignClient.getOneConfig(parent.getId(),configEnmu.getName()).getData();
+                    SuConfigEntity suConfigEntity = userFeignClient.getOneConfig(parent.getId(),configEnmu.getName());
                     if(suConfigEntity != null){
                         smConfigEntity.setVal(suConfigEntity.getVal());
                     }
@@ -73,8 +73,7 @@ public class ConfigServiceImpl implements ConfigService {
             }
             case ConfigTypeConstant.PROXY_CONFIG:{
 
-                Object msg = userFeignClient.superUser(userId, UserTypeConstant.PROXY);
-                SuUserEntity proxy = ((Msg<SuUserEntity>)msg).getData();
+                SuUserEntity proxy = userFeignClient.superUser(userId, UserTypeConstant.PROXY);
                 if(proxy == null){
                     Example example = new Example(SmConfigEntity.class);
                     example.createCriteria().andEqualTo("name",configEnmu.getName());
@@ -84,7 +83,7 @@ public class ConfigServiceImpl implements ConfigService {
                     Example example = new Example(SmConfigEntity.class);
                     example.createCriteria().andEqualTo("name",configEnmu.getName());
                     SmConfigEntity smConfigEntity = smConfigMapper.selectOneByExample(example);
-                    SuConfigEntity suConfigEntity = userFeignClient.getOneConfig(proxy.getId(),configEnmu.getName()).getData();
+                    SuConfigEntity suConfigEntity = userFeignClient.getOneConfig(proxy.getId(),configEnmu.getName());
                     if(suConfigEntity != null){
                         smConfigEntity.setVal(suConfigEntity.getVal());
                     }
@@ -103,7 +102,7 @@ public class ConfigServiceImpl implements ConfigService {
                 return smConfigEntitys;
             }
             case ConfigTypeConstant.SELF_CONFIG:{
-                List<SuConfigEntity> suConfigEntities = userFeignClient.getAllConfig(userId).getData();
+                List<SuConfigEntity> suConfigEntities = userFeignClient.getAllConfig(userId);
                 if(suConfigEntities == null)
                     return smConfigEntitys;
                 smConfigEntitys.forEach(o ->{
@@ -117,11 +116,11 @@ public class ConfigServiceImpl implements ConfigService {
                 return smConfigEntitys;
             }
             case ConfigTypeConstant.PARENT_CONFIG:{
-                SuUserEntity parent = userFeignClient.superUser(userId, UserTypeConstant.PARENT).getData();
+                SuUserEntity parent = userFeignClient.superUser(userId, UserTypeConstant.PARENT);
                 if(parent == null){
                     return smConfigEntitys;
                 }else {
-                    List<SuConfigEntity> suConfigEntities = userFeignClient.getAllConfig(parent.getId()).getData();
+                    List<SuConfigEntity> suConfigEntities = userFeignClient.getAllConfig(parent.getId());
                     if(suConfigEntities == null)
                         return smConfigEntitys;
                     smConfigEntitys = unionConfig(smConfigEntitys,suConfigEntities);
@@ -129,11 +128,11 @@ public class ConfigServiceImpl implements ConfigService {
                 }
             }
             case ConfigTypeConstant.PROXY_CONFIG:{
-                SuUserEntity proxy = userFeignClient.superUser(userId, UserTypeConstant.PROXY).getData();
+                SuUserEntity proxy = userFeignClient.superUser(userId, UserTypeConstant.PROXY);
                 if(proxy == null){
                     return smConfigEntitys;
                 }else {
-                    List<SuConfigEntity> suConfigEntities = userFeignClient.getAllConfig(proxy.getId()).getData();
+                    List<SuConfigEntity> suConfigEntities = userFeignClient.getAllConfig(proxy.getId());
                     if(suConfigEntities == null)
                         return smConfigEntitys;
                     smConfigEntitys = unionConfig(smConfigEntitys,suConfigEntities);
