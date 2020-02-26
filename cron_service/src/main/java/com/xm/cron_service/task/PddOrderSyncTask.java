@@ -5,7 +5,7 @@ import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
-import com.xm.comment_mq.config.OrderMqConfig;
+import com.xm.comment_mq.message.config.OrderMqConfig;
 import com.xm.comment_serialize.module.cron.entity.ScPddOrderSyncHistoryEntity;
 import com.xm.comment_serialize.module.user.entity.SuOrderEntity;
 import com.xm.comment_utils.mybatis.PageBean;

@@ -8,6 +8,7 @@ import lombok.Data;
 
 @Data
 public class OrderCommissionFailMessage extends AbsUserActionMessage {
+    public OrderCommissionFailMessage() {}
 
     public OrderCommissionFailMessage(Integer userId, SuOrderEntity suOrderEntity, SuBillEntity suBillEntity, String failReason) {
         super(userId);

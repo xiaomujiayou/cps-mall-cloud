@@ -19,4 +19,4 @@ feign:
 
 shiro:
   sessionIdName: token
-  sessionTimeout: 10000
+  sessionTimeout: 100000

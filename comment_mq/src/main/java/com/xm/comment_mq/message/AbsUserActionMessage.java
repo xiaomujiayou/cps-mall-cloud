@@ -9,10 +9,11 @@ import java.io.Serializable;
  */
 @Data
 public class AbsUserActionMessage implements Serializable {
+    public AbsUserActionMessage() {}
+
     public AbsUserActionMessage(Integer userId) {
         this.userId = userId;
     }
-
     //所属用户
     private Integer userId;
 

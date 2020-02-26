@@ -8,11 +8,9 @@ import com.xm.comment_serialize.module.user.entity.SuUserEntity;
 import com.xm.comment_serialize.module.user.ex.RolePermissionEx;
 import com.xm.comment_serialize.module.user.form.AddSearchForm;
 import com.xm.comment_serialize.module.user.form.GetUserInfoForm;
+import com.xm.comment_serialize.module.user.vo.MenuTipVo;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -45,4 +43,16 @@ public interface UserFeignClient {
 
     @PostMapping(value = "/bill/create/prop" ,consumes = "application/json")
     public SuBillToPayBo createByProp(@RequestBody SlPropSpecEx slPropSpecEx);
+
+    @PostMapping(value = "/menu/tips/num",consumes = "application/json")
+    public void addNum(@RequestParam Integer userId,@RequestBody List<Integer> menuIds);
+
+    @PostMapping(value = "/menu/tips/point",consumes = "application/json")
+    public void addRedPoint(@RequestParam Integer userId,@RequestBody List<Integer> menuIds);
+
+    @PostMapping(value = "/menu/tips/del",consumes = "application/json")
+    public void del(@RequestParam Integer userId,@RequestBody List<Integer> menuIds);
+
+    @GetMapping("/menu/tips")
+    public List<MenuTipVo> get(@RequestParam Integer userId, @RequestParam List<Integer> menuIds);
 }

@@ -7,6 +7,9 @@ import lombok.Data;
 
 @Data
 public class OrderSettlementSucessMessage extends AbsUserActionMessage {
+
+    public OrderSettlementSucessMessage() {}
+
     public OrderSettlementSucessMessage(Integer userId, SuOrderEntity suOrderEntity) {
         super(userId);
         this.suOrderEntity = suOrderEntity;

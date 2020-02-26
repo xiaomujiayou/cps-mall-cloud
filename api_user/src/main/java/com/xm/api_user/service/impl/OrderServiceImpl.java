@@ -15,6 +15,7 @@ import com.xm.comment_serialize.module.user.dto.OrderBillDto;
 import com.xm.comment_serialize.module.user.entity.SuOrderEntity;
 import com.xm.comment_utils.mybatis.PageBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.orderbyhelper.OrderByHelper;
@@ -30,6 +31,7 @@ import java.util.List;
 @Service("orderService")
 public class OrderServiceImpl implements OrderService {
 
+    @Lazy
     @Autowired
     private OrderService orderService;
     @Autowired

@@ -7,6 +7,7 @@ import lombok.Data;
 
 @Data
 public class UserBillCreateMessage extends AbsUserActionMessage {
+    public UserBillCreateMessage() {}
 
     public UserBillCreateMessage(Integer userId, SuBillEntity suBillEntity) {
         super(userId);

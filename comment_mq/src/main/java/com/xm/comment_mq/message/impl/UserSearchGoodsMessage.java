@@ -6,6 +6,9 @@ import lombok.Data;
 
 @Data
 public class UserSearchGoodsMessage extends AbsUserActionMessage {
+
+    public UserSearchGoodsMessage() {}
+
     public UserSearchGoodsMessage(Integer userId, Integer platformType, String keywords, Integer pageNum) {
         super(userId);
         this.platformType = platformType;

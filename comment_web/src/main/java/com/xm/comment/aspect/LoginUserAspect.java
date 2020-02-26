@@ -4,10 +4,13 @@ import cn.hutool.core.codec.Base64;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.xm.comment.annotation.LoginUser;
+import com.xm.comment_utils.exception.GlobleException;
 import com.xm.comment_utils.response.MsgEnum;
 import com.xm.comment_utils.response.R;
 import com.xm.comment_serialize.module.user.entity.SuUserEntity;
 import com.xm.comment_feign.module.user.feign.UserFeignClient;
+import io.netty.util.concurrent.GlobalEventExecutor;
+import jdk.nashorn.internal.objects.Global;
 import org.apache.commons.lang3.ArrayUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -15,6 +18,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -57,8 +61,12 @@ public class LoginUserAspect {
                 break;
             }
         }
-        if(!annotationFlag || joinPoint.getArgs()[index] != null) {
-            return joinPoint.proceed();
+        if(!annotationFlag || (joinPoint.getArgs()[index] != null )) {
+            if(joinPoint.getArgs()[index] instanceof SuUserEntity && ((SuUserEntity)joinPoint.getArgs()[index]).getId() != null) {
+                return joinPoint.proceed();
+            }else if(joinPoint.getArgs()[index] instanceof Integer){
+                return joinPoint.proceed();
+            }
         }
 
         HttpServletRequest request =((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
@@ -66,7 +74,7 @@ public class LoginUserAspect {
         String userInfo = request.getHeader("user-info");
 
         if(annotation.necessary() && StrUtil.hasBlank(userId,userId))
-            return R.error(MsgEnum.SYSTEM_INVALID_USER_ERROR);
+            throw new GlobleException(MsgEnum.SYSTEM_INVALID_USER_ERROR);
 
         if(isObjInfo && StrUtil.isNotBlank(userInfo)){
             if(annotation.latest()){
@@ -83,4 +91,5 @@ public class LoginUserAspect {
         }
         return joinPoint.proceed(joinPoint.getArgs());
     }
+
 }

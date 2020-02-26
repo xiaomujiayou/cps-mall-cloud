@@ -10,9 +10,8 @@ import org.springframework.stereotype.Component;
 @Component("wxPayPropertiesEx")
 @ConfigurationProperties(prefix = "wx.pay")
 public class WxPayPropertiesEx {
-    private String notifyUrl;
-    private String signKey;
 
+    private String notifyUrl;
     /**
      * 设置微信公众号或者小程序等的appid.
      */

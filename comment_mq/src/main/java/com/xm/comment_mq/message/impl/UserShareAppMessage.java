@@ -6,6 +6,9 @@ import lombok.Data;
 
 @Data
 public class UserShareAppMessage extends AbsUserActionMessage {
+
+    public UserShareAppMessage() {}
+
     public UserShareAppMessage(Integer userId, Integer clickUserId, Integer appType) {
         super(userId);
         this.clickUserId = clickUserId;

@@ -7,6 +7,9 @@ import lombok.Data;
 
 @Data
 public class OrderSettlementFailMessage extends AbsUserActionMessage {
+
+    public OrderSettlementFailMessage() {}
+
     public OrderSettlementFailMessage(Integer userId, SuOrderEntity suOrderEntity, String failReason) {
         super(userId);
         this.suOrderEntity = suOrderEntity;

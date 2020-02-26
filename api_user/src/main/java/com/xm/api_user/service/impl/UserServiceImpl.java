@@ -223,7 +223,6 @@ public class UserServiceImpl implements UserService {
         userProfitVo.setTodayProfit(suOrderMapperEx.getUserTotalCommission(userId,null, DateUtil.parse(DateUtil.today()),new Date()).intValue());
         userProfitVo.setTotalConsumption(orderInfo.get("totalConsumption").intValue());
         userProfitVo.setTotalShare(suOrderMapperEx.getUserShareOrderAbout(userId).intValue());
-
         ProxyInfoVo proxyInfoVo = getProxyInfo(userId);
         userProfitVo.setTotalProxyUser(proxyInfoVo.getTotalDirectProxy()+proxyInfoVo.getTotalIndirectProxy());
         return userProfitVo;

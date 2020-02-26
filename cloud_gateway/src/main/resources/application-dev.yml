@@ -5,20 +5,6 @@ eureka:
 server:
   port: 8102
 
-#spring:
-#  datasource:
-#    druid:
-#      min-idle: 1
-#      test-on-borrow: true
-#      stat-view-servlet:
-#        allow: true
-#      max-active: 20
-#      initial-size: 1
-#    driver-class-name: com.mysql.cj.jdbc.Driver
-#    url: jdbc:mysql://47.92.6.56:3306/mall_user?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
-#    username: root
-#    password: xm123456
-
 logging:
   logPath: D:\java\data\log\share\gateway-server
   logLevel: debug

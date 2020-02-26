@@ -8,6 +8,7 @@ import lombok.Data;
 @Data
 public class UserBillStateChangeMessage extends AbsUserActionMessage {
 
+    public UserBillStateChangeMessage() {}
 
     public UserBillStateChangeMessage(Integer userId, SuBillEntity oldBill, Integer newState, String failReason) {
         super(userId);

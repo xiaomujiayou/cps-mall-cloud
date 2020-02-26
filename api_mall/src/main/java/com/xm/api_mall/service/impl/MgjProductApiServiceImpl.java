@@ -28,6 +28,7 @@ import com.xm.comment_serialize.module.mall.vo.SmProductSimpleVo;
 import com.xm.comment_utils.mybatis.PageBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -44,6 +45,7 @@ public class MgjProductApiServiceImpl implements ProductApiService {
     @Autowired
     private MgjApiConfig mgjApiConfig;
 
+    @Lazy
     @Resource(name = "mgjProductApiService")
     private ProductApiService mgjProductApiService;
 

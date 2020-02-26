@@ -50,4 +50,16 @@ public interface BillService {
      * @return
      */
     public SuBillToPayBo createByProp(SlPropSpecEx suBillEntity);
+
+    /**
+     * 待支付账单超时
+     * @param suBillEntity
+     */
+    public void payOvertime(SuBillEntity suBillEntity);
+
+    /**
+     * 账单支付成功(付款)
+     * @param suBillEntity
+     */
+    public void paySucess(SuBillEntity suBillEntity);
 }

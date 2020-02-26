@@ -8,6 +8,8 @@ import lombok.Data;
 @Data
 public class UserBillCommissionSucessMessage extends AbsUserActionMessage {
 
+    public UserBillCommissionSucessMessage() {}
+
     public UserBillCommissionSucessMessage(Integer userId, SuBillEntity suBillEntity) {
         super(userId);
         this.suBillEntity = suBillEntity;

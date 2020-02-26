@@ -9,6 +9,9 @@ import lombok.Data;
 @Data
 public class PayOrderSucessMessage extends AbsUserActionMessage {
 
+    public PayOrderSucessMessage() {}
+
+
     public PayOrderSucessMessage(Integer userId, SuBillToPayBo suBillToPayBo, SpWxOrderNotifyEntity spWxOrderNotifyEntity) {
         super(userId);
         this.suBillToPayBo = suBillToPayBo;

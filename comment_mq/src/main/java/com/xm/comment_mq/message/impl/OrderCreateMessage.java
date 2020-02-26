@@ -8,6 +8,8 @@ import lombok.Data;
 @Data
 public class OrderCreateMessage extends AbsUserActionMessage {
 
+    public OrderCreateMessage() {}
+
     public OrderCreateMessage(Integer userId, SuOrderEntity suOrderEntity) {
         super(userId);
         this.suOrderEntity = suOrderEntity;

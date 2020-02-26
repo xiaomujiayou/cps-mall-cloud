@@ -1,5 +1,6 @@
 package com.xm.comment.aspect;
 
+import com.xm.comment_utils.exception.GlobleException;
 import com.xm.comment_utils.response.MsgEnum;
 import com.xm.comment_utils.response.R;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -47,7 +48,7 @@ public class ParamValidAspect {
                     return joinPoint.proceed();
                 }else {
                     String errorMsg = bindingResult.getAllErrors().get(0).getDefaultMessage();
-                    return R.error(MsgEnum.PARAM_VALID_ERROR,errorMsg);
+                    throw new GlobleException(MsgEnum.PARAM_VALID_ERROR,errorMsg);
                 }
             }
         }

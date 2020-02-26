@@ -6,7 +6,7 @@
     <result column="user_id" property="userId" jdbcType="INTEGER" />
     <result column="money" property="money" jdbcType="INTEGER" />
     <result column="b_type" property="type" jdbcType="INTEGER" />
-    <result column="order_id" property="orderId" jdbcType="INTEGER" />
+    <result column="attach" property="attach" jdbcType="INTEGER" />
     <result column="b_promotion_rate" property="promotionRate" jdbcType="INTEGER" />
     <result column="b_state" property="state" jdbcType="INTEGER" />
     <result column="fail_reason" property="failReason" jdbcType="VARCHAR" />
@@ -73,7 +73,7 @@
         su_bill sb
     LEFT JOIN
         su_order so
-            ON sb.order_id = so.id
+            ON sb.attach = so.id
     LEFT JOIN
         su_user su
             ON su.id = so.user_id

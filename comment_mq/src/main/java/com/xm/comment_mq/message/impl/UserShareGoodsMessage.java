@@ -8,6 +8,9 @@ import lombok.Data;
 
 @Data
 public class UserShareGoodsMessage extends AbsUserActionMessage {
+
+    public UserShareGoodsMessage() {}
+
     public UserShareGoodsMessage(Integer userId, Integer clickUserId, SmProductEntityEx smProductEntityEx) {
         super(userId);
         this.clickUserId = clickUserId;

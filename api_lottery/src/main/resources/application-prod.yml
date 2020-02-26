@@ -3,14 +3,8 @@ server:
 
 spring:
   datasource:
-    druid:
-      min-idle: 1
-      test-on-borrow: true
-      stat-view-servlet:
-        allow: true
-      max-active: 20
-      initial-size: 1
     driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
     url: jdbc:mysql://mysql:3306/share_lottery?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
     password: kxy521yu

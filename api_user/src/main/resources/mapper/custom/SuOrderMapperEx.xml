@@ -24,6 +24,7 @@
             <if test="endTime != null">
                 <![CDATA[ AND sb.create_time < #{endTime} ]]>
             </if>
+            AND income = 1
         </where>
     </select>
 

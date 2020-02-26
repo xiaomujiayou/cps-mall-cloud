@@ -3,12 +3,15 @@ package com.xm.api_mini.controller;
 import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.binarywang.wx.miniapp.bean.WxMaMessage;
 import cn.binarywang.wx.miniapp.constant.WxMaConstants;
+import cn.hutool.core.io.IoUtil;
 import com.xm.api_mini.config.WxMaConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Objects;
 
 @RestController
@@ -17,11 +20,12 @@ public class WxPortalController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @GetMapping(produces = "text/plain;charset=utf-8")
-    public String authGet(@PathVariable String appid,
+    public void authGet(   HttpServletResponse response,
+                          @PathVariable String appid,
                           @RequestParam(name = "signature", required = false) String signature,
                           @RequestParam(name = "timestamp", required = false) String timestamp,
                           @RequestParam(name = "nonce", required = false) String nonce,
-                          @RequestParam(name = "echostr", required = false) String echostr) {
+                          @RequestParam(name = "echostr", required = false) String echostr) throws IOException {
         this.logger.info("\n接收到来自微信服务器的认证消息：signature = [{}], timestamp = [{}], nonce = [{}], echostr = [{}]",
             signature, timestamp, nonce, echostr);
 
@@ -32,10 +36,12 @@ public class WxPortalController {
         final WxMaService wxService = WxMaConfiguration.getMaService(appid);
 
         if (wxService.checkSignature(timestamp, nonce, signature)) {
-            return echostr;
+            System.out.println("签名成功:" + echostr);
+            IoUtil.write(response.getOutputStream(),true,echostr.getBytes());
+//            return echostr;
         }
-
-        return "非法请求";
+        System.out.println("签名失败");
+//        return "非法请求";
     }
 
     @PostMapping(produces = "application/xml; charset=UTF-8")

@@ -4,6 +4,7 @@ import com.xm.api_mall.service.ProductService;
 import com.xm.comment_utils.exception.GlobleException;
 import com.xm.comment_utils.response.MsgEnum;
 import com.xm.comment_serialize.module.mall.constant.PlatformTypeConstant;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;

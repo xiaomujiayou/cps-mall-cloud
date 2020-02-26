@@ -1,7 +1,10 @@
 package com.xm.cloud_gateway.controller;
 
+import cn.hutool.core.util.StrUtil;
 import com.xm.cloud_gateway.shiro.token.WeChatToken;
 import com.xm.comment_feign.module.user.feign.UserFeignClient;
+import com.xm.comment_utils.exception.GlobleException;
+import com.xm.comment_utils.response.MsgEnum;
 import com.xm.comment_utils.response.R;
 import com.xm.comment_serialize.module.user.entity.SuUserEntity;
 import com.xm.comment_serialize.module.user.form.GetUserInfoForm;
@@ -24,17 +27,30 @@ public class LoginController {
     private UserFeignClient userFeignClient;
 
     /**
-     * shiro 解决方案
+     * 登录到shiro
      * @param wechatLoginForm
      * @param bindingResult
      * @return
      */
     @PostMapping("/login")
     public Object login(@Valid @RequestBody WechatLoginForm wechatLoginForm, BindingResult bindingResult){
+        long s = System.currentTimeMillis();
         GetUserInfoForm form = new GetUserInfoForm();
         form.setCode(wechatLoginForm.getCode());
         form.setShareUserId(wechatLoginForm.getShareUserId());
-        SuUserEntity msg = userFeignClient.getUserInfo(form);
+        SuUserEntity msg = null;
+        try {
+            msg = userFeignClient.getUserInfo(form);
+        }catch (Exception e){
+            e.printStackTrace();
+            return R.error(MsgEnum.UNKNOWN_ERROR);
+//            if(e.getMsgEnum() == null)
+//                return R.error(MsgEnum.UNKNOWN_ERROR);
+//            if(StrUtil.isNotBlank(e.getMsg())){
+//                return R.error(e.getMsgEnum(),e.getMsg());
+//            }
+//            return R.error(e.getMsgEnum());
+        }
         WeChatToken token = new WeChatToken(msg.getOpenId());
         if(!SecurityUtils.getSubject().isAuthenticated()){
             SecurityUtils.getSubject().login(token);
@@ -49,6 +65,7 @@ public class LoginController {
         userInfo.put("sex",userEntity.getSex());
         userInfo.put("state",userEntity.getState());
         result.put("userInfo",userInfo);
+        System.out.println(System.currentTimeMillis() - s);
         return R.sucess(result);
     }
 

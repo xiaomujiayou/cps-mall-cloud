@@ -27,6 +27,6 @@ public class PayController {
     public WxPayOrderResultVo wxPay(@LoginUser SuUserEntity suUserEntity, Integer propSpecId){
         if(propSpecId == null)
             throw new GlobleException(MsgEnum.PARAM_VALID_ERROR,"propId不可为空");
-        return payService.wxPay(suUserEntity,propSpecId," 223.91.199.172");
+        return payService.wxPay(suUserEntity,propSpecId,"23.91.200.25");
     }
 }

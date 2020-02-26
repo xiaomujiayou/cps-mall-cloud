@@ -7,6 +7,9 @@ import lombok.Data;
 
 @Data
 public class UserSmartSearchGoodsMessage extends AbsUserActionMessage {
+
+    public UserSmartSearchGoodsMessage() {}
+
     public UserSmartSearchGoodsMessage(Integer userId, SmProductEntityEx smProductEntityEx, String goodsUrl, String goodsName) {
         super(userId);
         this.smProductEntityEx = smProductEntityEx;

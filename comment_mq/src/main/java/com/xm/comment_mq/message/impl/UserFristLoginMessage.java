@@ -9,6 +9,8 @@ import lombok.Data;
 @Data
 public class UserFristLoginMessage extends AbsUserActionMessage {
 
+    public UserFristLoginMessage() {}
+
     public UserFristLoginMessage(Integer userId, SuUserEntity userEntity) {
         super(userId);
         this.userEntity = userEntity;

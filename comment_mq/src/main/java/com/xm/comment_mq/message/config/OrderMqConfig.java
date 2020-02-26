@@ -1,10 +1,16 @@
-package com.xm.comment_mq.config;
+package com.xm.comment_mq.message.config;
 
 import com.xm.comment_serialize.module.user.entity.SuOrderEntity;
 
 public class OrderMqConfig {
+
+    //待处理的原始账单
     public static final String EXCHANGE = "order";
     public static final String KEY = "original";
     public static final String QUEUE = EXCHANGE  + "." + KEY + ".queue";
-    public static final Class MESSAGE_CLASS = SuOrderEntity.class;
+
+    //处理失败的订单队列
+    public static final String KEY_PROCESS_FAIL = EXCHANGE  + ".process.fail";
+    public static final String QUEUE_PROCESS_FAIL = KEY_PROCESS_FAIL  + ".queue";
+
 }

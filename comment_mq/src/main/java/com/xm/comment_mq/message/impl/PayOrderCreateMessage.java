@@ -11,6 +11,8 @@ import lombok.Data;
 @Data
 public class PayOrderCreateMessage extends AbsUserActionMessage {
 
+    public PayOrderCreateMessage() {}
+
     public PayOrderCreateMessage(Integer userId, SuBillEntity suBillEntity, SpWxOrderInEntity spWxOrderInEntity, SuBillToPayBo suBillToPayBo, WxPayOrderResultVo wxPayOrderResultVo) {
         super(userId);
         this.suBillEntity = suBillEntity;

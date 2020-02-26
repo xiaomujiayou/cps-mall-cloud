@@ -8,6 +8,9 @@ import lombok.Data;
 
 @Data
 public class OrderStateChangeMessage extends AbsUserActionMessage {
+
+    public OrderStateChangeMessage() {}
+
     public OrderStateChangeMessage(Integer userId, SuOrderEntity suOrderEntity, Integer newState) {
         super(userId);
         this.suOrderEntity = suOrderEntity;

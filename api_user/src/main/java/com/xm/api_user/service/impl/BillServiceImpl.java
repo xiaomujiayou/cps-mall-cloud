@@ -14,7 +14,7 @@ import com.xm.api_user.mapper.SuOrderMapper;
 import com.xm.api_user.mapper.SuUserMapper;
 import com.xm.api_user.service.BillService;
 import com.xm.comment_feign.module.mall.feign.MallFeignClient;
-import com.xm.comment_mq.config.BillMqConfig;
+import com.xm.comment_mq.message.config.BillMqConfig;
 import com.xm.comment_serialize.module.lottery.ex.SlPropSpecEx;
 import com.xm.comment_serialize.module.mall.constant.ConfigEnmu;
 import com.xm.comment_serialize.module.mall.constant.ConfigTypeConstant;
@@ -29,6 +29,7 @@ import com.xm.comment_utils.mybatis.PageBean;
 import com.xm.comment_utils.project.PromotionUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
@@ -50,6 +51,7 @@ public class BillServiceImpl implements BillService {
     private SuUserMapper suUserMapper;
     @Autowired
     private SuOrderMapper suOrderMapper;
+    @Lazy
     @Autowired
     private BillService billService;
 
@@ -293,14 +295,34 @@ public class BillServiceImpl implements BillService {
         suBillEntity.setState(6);
         suBillEntity.setIncome(2);
         suBillEntity.setDes(slPropSpecEx.getSlPropEntity().getName() + "-" + slPropSpecEx.getName());
-        suBillEntity.setCreateTime(new Date());
+        suBillEntity.setUpdateTime(new Date());
+        suBillEntity.setCreateTime(suBillEntity.getUpdateTime());
         suBillMapper.insertSelective(suBillEntity);
-
+        //订单支付超时
+        rabbitTemplate.convertAndSend(BillMqConfig.EXCHANGE,BillMqConfig.KEY_PAY_OVERTIME,suBillEntity);
         SuBillToPayBo suBillToPayBo = new SuBillToPayBo();
         BeanUtil.copyProperties(suBillEntity,suBillToPayBo);
         suBillToPayBo.setClientIp(slPropSpecEx.getClientIp());
         suBillToPayBo.setOpenId(slPropSpecEx.getSuUserEntity().getOpenId());
         return suBillToPayBo;
+    }
+
+    @Override
+    public void payOvertime(SuBillEntity suBillEntity) {
+        SuBillEntity suBillEntity1 = suBillMapper.selectByPrimaryKey(suBillEntity.getId());
+        if(suBillEntity1 == null || suBillEntity1.getState().equals(7))
+            return;
+        suBillMapper.deleteByPrimaryKey(suBillEntity.getId());
+    }
+
+    @Override
+    public void paySucess(SuBillEntity suBillEntity) {
+        SuBillEntity suBillEntity1 = suBillMapper.selectByPrimaryKey(suBillEntity.getId());
+        if(suBillEntity1 == null)
+            return;
+        suBillEntity1.setState(7);
+        suBillEntity1.setUpdateTime(new Date());
+        suBillMapper.updateByPrimaryKeySelective(suBillEntity1);
     }
 
     private BillVo covertBillVo(SuBillEntity suBillEntity,SuOrderEntity suOrderEntity,SuUserEntity suUserEntity){

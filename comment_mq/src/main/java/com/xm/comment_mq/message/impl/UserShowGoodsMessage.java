@@ -8,6 +8,9 @@ import lombok.Data;
 
 @Data
 public class UserShowGoodsMessage extends AbsUserActionMessage {
+
+    public UserShowGoodsMessage() {}
+
     public UserShowGoodsMessage(Integer userId, SmProductEntityEx smProductEntity) {
         super(userId);
         this.smProductEntity = smProductEntity;

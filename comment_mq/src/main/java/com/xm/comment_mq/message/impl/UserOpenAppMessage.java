@@ -6,6 +6,9 @@ import lombok.Data;
 
 @Data
 public class UserOpenAppMessage extends AbsUserActionMessage {
+
+    public UserOpenAppMessage() {}
+
     public UserOpenAppMessage(Integer userId, Integer appType) {
         super(userId);
         this.appType = appType;

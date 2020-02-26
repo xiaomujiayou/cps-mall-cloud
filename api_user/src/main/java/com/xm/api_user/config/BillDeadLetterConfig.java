@@ -1,0 +1,34 @@
+package com.xm.api_user.config;
+
+import com.xm.comment_mq.constant.RabbitMqConstant;
+import com.xm.comment_mq.message.config.BillMqConfig;
+import org.springframework.amqp.core.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * 账单死信队列的配置
+ * 用于用户下单后未支付，延时删除账单
+ */
+@Configuration
+public class BillDeadLetterConfig {
+
+    // 待付款账单队列
+    @Bean
+    public Queue waittingPayBillQueue(){
+        Map<String, Object> args = new HashMap<String, Object>();
+        //待支付账单超时时间
+        args.put(RabbitMqConstant.TTL_QUEUE_ARG_NAME,10 * 60 * 1000);
+        args.put(RabbitMqConstant.DEAD_QUEUE_ARG_EXCHANGE_NAME,BillMqConfig.EXCHANGE);
+        args.put(RabbitMqConstant.DEAD_QUEUE_ARG_KEY_NAME,BillMqConfig.KEY_PAY_OVERTIME_DEAD);
+        return new Queue(BillMqConfig.QUEUE_PAY_OVERTIME,true,false,false,args);
+    }
+    // 声明死信队列绑定关系
+    @Bean
+    public Binding billLetterBinding(Queue waittingPayBillQueue){
+        return BindingBuilder.bind(waittingPayBillQueue).to(new DirectExchange(BillMqConfig.EXCHANGE)).with(BillMqConfig.KEY_PAY_OVERTIME);
+    }
+}

@@ -8,6 +8,9 @@ import lombok.Data;
 
 @Data
 public class OrderCommissionSucessMessage extends AbsUserActionMessage {
+
+    public OrderCommissionSucessMessage() {}
+
     public OrderCommissionSucessMessage(Integer userId, SuOrderEntity suOrderEntity, SuBillEntity suBillEntity) {
         super(userId);
         this.suOrderEntity = suOrderEntity;

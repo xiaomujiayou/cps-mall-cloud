@@ -9,6 +9,8 @@ import lombok.Data;
 @Data
 public class UserAddProxyMessage extends AbsUserActionMessage {
 
+    public UserAddProxyMessage() {}
+
     public UserAddProxyMessage(Integer userId, Integer level, SuUserEntity proxyUser) {
         super(userId);
         this.level = level;

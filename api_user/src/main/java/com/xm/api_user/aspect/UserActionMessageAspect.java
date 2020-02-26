@@ -1,9 +1,8 @@
 package com.xm.api_user.aspect;
 
 import com.xm.api_user.mapper.SuUserMapper;
-import com.xm.comment_mq.config.UserActionConfig;
+import com.xm.comment_mq.message.config.UserActionConfig;
 import com.xm.comment_mq.message.impl.*;
-import com.xm.comment_serialize.module.mall.ex.SmProductEntityEx;
 import com.xm.comment_serialize.module.user.entity.SuBillEntity;
 import com.xm.comment_serialize.module.user.entity.SuOrderEntity;
 import com.xm.comment_serialize.module.user.entity.SuUserEntity;
@@ -12,13 +11,9 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 
 /**
  * 消息生成器
@@ -46,8 +41,13 @@ public class UserActionMessageAspect {
      * @throws Throwable
      */
     @Around("addNewUserPointCut()")
-    public Object addNewUser(ProceedingJoinPoint joinPoint) throws Throwable{
-        SuUserEntity suUserEntity = (SuUserEntity)joinPoint.proceed();
+    public Object addNewUser(ProceedingJoinPoint joinPoint) throws Throwable {
+        SuUserEntity suUserEntity = null;
+        try {
+            suUserEntity = (SuUserEntity)joinPoint.proceed();
+        } catch (Throwable throwable) {
+            throw throwable;
+        }
         //首次登录消息
         rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE,"",new UserFristLoginMessage(suUserEntity.getId(),suUserEntity));
         if(suUserEntity.getParentId() != null) {
@@ -70,8 +70,13 @@ public class UserActionMessageAspect {
      * @throws Throwable
      */
     @Around("addNewUserPointCut()")
-    public Object onOrderCreatePointCut(ProceedingJoinPoint joinPoint) throws Throwable{
-        Object obj = joinPoint.proceed();
+    public Object onOrderCreatePointCut(ProceedingJoinPoint joinPoint) throws Throwable {
+        Object obj = null;
+        try {
+            obj = joinPoint.proceed();
+        } catch (Throwable throwable) {
+            throw throwable;
+        }
         SuOrderEntity suOrderEntity = (SuOrderEntity)joinPoint.getArgs()[0];
         rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE,"",new OrderCreateMessage(suOrderEntity.getUserId(),suOrderEntity));
         return obj;
@@ -87,8 +92,13 @@ public class UserActionMessageAspect {
      * @throws Throwable
      */
     @Around("updateOrderStatePointCut()")
-    public Object updateOrderStatePointCut(ProceedingJoinPoint joinPoint) throws Throwable{
-        Object obj = joinPoint.proceed();
+    public Object updateOrderStatePointCut(ProceedingJoinPoint joinPoint) throws Throwable {
+        Object obj = null;
+        try {
+            obj = joinPoint.proceed();
+        } catch (Throwable throwable) {
+            throw throwable;
+        }
         SuOrderEntity newOrder = (SuOrderEntity)joinPoint.getArgs()[0];
         SuOrderEntity oldOrder = (SuOrderEntity)joinPoint.getArgs()[1];
         rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE,"",new OrderStateChangeMessage(newOrder.getUserId(),oldOrder,newOrder.getState()));
@@ -105,8 +115,13 @@ public class UserActionMessageAspect {
      * @throws Throwable
      */
     @Around("payOutOrderBillPointCut()")
-    public Object payOutOrderBillPointCut(ProceedingJoinPoint joinPoint) throws Throwable{
-        Object obj = joinPoint.proceed();
+    public Object payOutOrderBillPointCut(ProceedingJoinPoint joinPoint) throws Throwable {
+        Object obj = null;
+        try {
+            obj = joinPoint.proceed();
+        } catch (Throwable throwable) {
+            throw throwable;
+        }
         SuOrderEntity sucessOrder = (SuOrderEntity)joinPoint.getArgs()[0];
         rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE,"",new OrderSettlementSucessMessage(sucessOrder.getUserId(),sucessOrder));
         return obj;
@@ -122,8 +137,13 @@ public class UserActionMessageAspect {
      * @throws Throwable
      */
     @Around("invalidOrderBillPointCut()")
-    public Object invalidOrderBillPointCut(ProceedingJoinPoint joinPoint) throws Throwable{
-        Object obj = joinPoint.proceed();
+    public Object invalidOrderBillPointCut(ProceedingJoinPoint joinPoint) throws Throwable {
+        Object obj = null;
+        try {
+            obj = joinPoint.proceed();
+        } catch (Throwable throwable) {
+            throw throwable;
+        }
         SuOrderEntity sucessOrder = (SuOrderEntity)joinPoint.getArgs()[0];
         rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE,"",new OrderSettlementFailMessage(sucessOrder.getUserId(),sucessOrder,sucessOrder.getFailReason()));
         return obj;
@@ -139,8 +159,13 @@ public class UserActionMessageAspect {
      * @throws Throwable
      */
     @Around("addBillPointCut()")
-    public Object addBillPointCut(ProceedingJoinPoint joinPoint) throws Throwable{
-        Object obj = joinPoint.proceed();
+    public Object addBillPointCut(ProceedingJoinPoint joinPoint) throws Throwable {
+        Object obj = null;
+        try {
+            obj = joinPoint.proceed();
+        } catch (Throwable throwable) {
+            throw throwable;
+        }
         SuBillEntity suBillEntity = (SuBillEntity)joinPoint.getArgs()[0];
         rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE,"",new UserBillCreateMessage(suBillEntity.getUserId(),suBillEntity));
         return obj;
@@ -156,8 +181,13 @@ public class UserActionMessageAspect {
      * @throws Throwable
      */
     @Around("updateBillStatePointCut()")
-    public Object updateBillStatePointCut(ProceedingJoinPoint joinPoint) throws Throwable{
-        Object obj = joinPoint.proceed();
+    public Object updateBillStatePointCut(ProceedingJoinPoint joinPoint) throws Throwable {
+        Object obj = null;
+        try {
+            obj = joinPoint.proceed();
+        } catch (Throwable throwable) {
+            throw throwable;
+        }
         SuBillEntity suBillEntity = (SuBillEntity)joinPoint.getArgs()[0];
         Integer newState = (Integer)joinPoint.getArgs()[1];
         String failReason = (String) joinPoint.getArgs()[2];

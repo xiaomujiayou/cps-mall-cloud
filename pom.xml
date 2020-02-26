@@ -135,6 +135,13 @@
                 <version>1.1.5</version>
             </dependency>
 
+            <!-- druid 连接池-->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid-spring-boot-starter</artifactId>
+                <version>1.1.10</version>
+            </dependency>
+
             <!--rabbitmq系统http接口-->
             <!-- ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓-->
             <dependency>

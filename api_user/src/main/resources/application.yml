@@ -5,7 +5,7 @@ spring:
     active: dev,plugin,cloud-dev,assembly-dev,api-dev
 
 wx:
-  appId: wx77c95d4a2f1bfab0
-  secret: 149a2853db7a9aa718aca580b0883fbb
-#  token: GiOleLZJjps03G4dLq3Ogj0ooT2d3DKI
-#  encodingAESKey: y45Ljp45d5DQIt42TzL0iJPZePDoeIjd5jHoTQEQLe2
+#  appId: wx77c95d4a2f1bfab0
+#  secret: 149a2853db7a9aa718aca580b0883fbb
+  appId: wxd14f92d77787943c
+  secret: 94da25d907a63e22cf0a0061f6547cce
