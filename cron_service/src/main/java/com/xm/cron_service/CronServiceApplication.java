@@ -1,6 +1,5 @@
 package com.xm.cron_service;
 
-import com.codingapi.txlcn.tc.config.EnableDistributedTransaction;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -12,7 +11,7 @@ import javax.annotation.PostConstruct;
 import java.util.TimeZone;
 
 //开启分布式事务
-@EnableDistributedTransaction
+//@EnableDistributedTransaction
 @ComponentScan("com.xm")
 @MapperScan(basePackages = {"com.xm.*.mapper","com.xm.*.mapper.custom"})
 @EnableFeignClients(basePackages = {"com.xm.comment_feign.module.*.feign"})

@@ -13,6 +13,7 @@ import com.xm.comment_utils.exception.GlobleException;
 import com.xm.comment_utils.response.Msg;
 import com.xm.comment_utils.response.MsgEnum;
 import com.xm.comment_utils.response.R;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
@@ -44,16 +46,17 @@ public class PayController {
         return wxPayApiService.collection(suBillToPayBo);
     }
 
-    @PostMapping("/wx/order/notify")
-    public String wxPayNotify(HttpServletRequest request) throws IOException {
+    @RequestMapping("/wx/order/notify")
+    public void wxPayNotify(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String xmlData = IoUtil.read(request.getReader());
         try {
-            final WxPayOrderNotifyResult notifyResult = wxService.parseOrderNotifyResult(xmlData);
+            WxPayOrderNotifyResult notifyResult = wxService.parseOrderNotifyResult(xmlData);
             wxPayApiService.orderNotify(notifyResult);
         } catch (Exception e){
             e.printStackTrace();
         } finally {
-            return WxPayNotifyResponse.success("成功");
+            response.setContentType("text/xml");
+            IoUtil.write(response.getOutputStream(),"UTF-8",true,WxPayNotifyResponse.success("OK"));
         }
     }
 }

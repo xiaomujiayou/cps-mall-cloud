@@ -14,6 +14,7 @@ import com.xm.comment_serialize.module.user.bo.SuBillToPayBo;
 import com.xm.comment_serialize.module.user.entity.SuUserEntity;
 import com.xm.comment_utils.exception.GlobleException;
 import com.xm.comment_utils.response.MsgEnum;
+import io.seata.spring.annotation.GlobalTransactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +30,7 @@ public class PayServiceImpl implements PayService {
     @Autowired
     private SlPropSpecMapper slPropSpecMapper;
 
+    @GlobalTransactional(rollbackFor = Exception.class)
     @Override
     public WxPayOrderResultVo wxPay(SuUserEntity suUserEntity, Integer propSpecId, String clientIp) {
         SlPropSpecEntity slPropSpecEntity = slPropSpecMapper.selectByPrimaryKey(propSpecId);

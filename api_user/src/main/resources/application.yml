@@ -2,7 +2,7 @@ spring:
   application:
     name: api-user
   profiles:
-    active: dev,plugin,cloud-dev,assembly-dev,api-dev
+    active: dev,plugin,cloud-dev,assembly-dev,api-dev,seata-dev
 
 wx:
 #  appId: wx77c95d4a2f1bfab0

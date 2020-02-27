@@ -8,6 +8,7 @@ import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
 import com.xm.comment_utils.response.R;
+import org.apache.http.protocol.ResponseContent;
 import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants;
 import org.springframework.stereotype.Component;
 
@@ -71,6 +72,10 @@ public class ResponseFilter extends ZuulFilter {
                 context.addZuulResponseHeader("Content-Type","application/json");
                 context.getResponse().setCharacterEncoding("UTF-8");
                 context.setResponseBody(JSON.toJSONString(R.sucess()));
+            }else {
+                context.addZuulResponseHeader("Content-Type",context.getResponse().getContentType());
+                context.getResponse().setCharacterEncoding(context.getResponse().getCharacterEncoding());
+                context.setResponseBody(resBody);
             }
         }
         return null;

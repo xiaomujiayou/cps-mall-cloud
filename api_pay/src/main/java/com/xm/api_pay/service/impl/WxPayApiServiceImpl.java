@@ -13,11 +13,13 @@ import com.github.binarywang.wxpay.constant.WxPayConstants;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
 import com.github.pagehelper.PageHelper;
+import com.sun.media.jfxmedia.logging.Logger;
 import com.xm.api_pay.config.WxPayPropertiesEx;
 import com.xm.api_pay.mapper.SpWxOrderInMapper;
 import com.xm.api_pay.mapper.SpWxOrderNotifyMapper;
 import com.xm.api_pay.service.WxPayApiService;
 import com.xm.comment_mq.message.config.BillMqConfig;
+import com.xm.comment_mq.message.config.PayMqConfig;
 import com.xm.comment_mq.message.config.UserActionConfig;
 import com.xm.comment_mq.message.impl.PayOrderCreateMessage;
 import com.xm.comment_mq.message.impl.PayOrderSucessMessage;
@@ -28,6 +30,9 @@ import com.xm.comment_serialize.module.user.bo.SuBillToPayBo;
 import com.xm.comment_serialize.module.user.entity.SuBillEntity;
 import com.xm.comment_utils.exception.GlobleException;
 import com.xm.comment_utils.response.MsgEnum;
+import io.seata.core.context.RootContext;
+import io.seata.spring.annotation.GlobalTransactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,6 +43,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service("wxPayApiService")
 public class WxPayApiServiceImpl implements WxPayApiService {
 
@@ -115,7 +121,7 @@ public class WxPayApiServiceImpl implements WxPayApiService {
         wxPayUnifiedOrderRequest.setNotifyUrl(wxPayPropertiesEx.getNotifyUrl());
         wxPayUnifiedOrderRequest.setTradeType(WxPayConstants.TradeType.JSAPI);
         wxPayUnifiedOrderRequest.setOpenid(suBillToPayBo.getOpenId());
-        System.out.println(suBillToPayBo.getOpenId());
+        int a = 1/0;
         return wxPayUnifiedOrderRequest;
     }
 
@@ -126,20 +132,33 @@ public class WxPayApiServiceImpl implements WxPayApiService {
 
     @Override
     public void orderNotify(WxPayOrderNotifyResult notifyResult) {
-        Integer userId = JSON.parseObject(notifyResult.getAttach()).getInteger("userId");
+        //判断是否已处理
+        SpWxOrderNotifyEntity record = new SpWxOrderNotifyEntity();
+        record.setOutTradeNo(notifyResult.getOutTradeNo());
+        if(spWxOrderNotifyMapper.selectCount(record) > 0){
+            log.debug("微信支付回调：该支付信息已被处理 单号：[{}]",notifyResult.getOutTradeNo());
+            return;
+        }
+
         SpWxOrderNotifyEntity spWxOrderNotifyEntity = new SpWxOrderNotifyEntity();
         BeanUtil.copyProperties(notifyResult,spWxOrderNotifyEntity);
         spWxOrderNotifyEntity.setCreateTime(new Date());
         spWxOrderNotifyMapper.insertSelective(spWxOrderNotifyEntity);
+        rabbitTemplate.convertAndSend(PayMqConfig.EXCHANGE,PayMqConfig.KEY_WX_NOTIFY,spWxOrderNotifyEntity);
+    }
 
+    @GlobalTransactional(rollbackFor = Exception.class)
+    @Override
+    public void onPaySucess(SpWxOrderNotifyEntity spWxOrderNotifyEntity) {
+        Integer userId = JSON.parseObject(spWxOrderNotifyEntity.getAttach()).getInteger("userId");
         PageHelper.startPage(1,1).count(false);
         SpWxOrderInEntity spWxOrderInEntity = new SpWxOrderInEntity();
         spWxOrderInEntity.setOutTradeNo(spWxOrderNotifyEntity.getOutTradeNo());
         spWxOrderInEntity = spWxOrderInMapper.selectOne(spWxOrderInEntity);
+    System.out.println(JSON.toJSONString(spWxOrderInEntity));
         SuBillToPayBo suBillToPayBo = JSON.parseObject(spWxOrderInEntity.getReqBo(),SuBillToPayBo.class);
         rabbitTemplate.convertAndSend(BillMqConfig.EXCHANGE,BillMqConfig.KEY_PAY_SUCESS,suBillToPayBo);
         rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE,"",new PayOrderSucessMessage(userId,suBillToPayBo,spWxOrderNotifyEntity));
     }
 
-    
 }

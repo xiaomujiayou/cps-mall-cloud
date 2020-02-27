@@ -36,6 +36,7 @@
         <module>comment_feign</module>
         <module>comment_mq</module>
         <module>comment_serialize</module>
+        <module>comment_seata</module>
         <module>comment_utils</module>
     </modules>
 
@@ -59,15 +60,26 @@
             </dependency>
 
             <!--分布式事务相关-->
+<!--            <dependency>-->
+<!--                <groupId>com.codingapi.txlcn</groupId>-->
+<!--                <artifactId>txlcn-tc</artifactId>-->
+<!--                <version>5.0.2.RELEASE</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>com.codingapi.txlcn</groupId>-->
+<!--                <artifactId>txlcn-txmsg-netty</artifactId>-->
+<!--                <version>5.0.2.RELEASE</version>-->
+<!--            </dependency>-->
+            <!--seata-->
             <dependency>
-                <groupId>com.codingapi.txlcn</groupId>
-                <artifactId>txlcn-tc</artifactId>
-                <version>5.0.2.RELEASE</version>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-seata</artifactId>
+                <version>2.1.0.RELEASE</version>
             </dependency>
             <dependency>
-                <groupId>com.codingapi.txlcn</groupId>
-                <artifactId>txlcn-txmsg-netty</artifactId>
-                <version>5.0.2.RELEASE</version>
+                <groupId>io.seata</groupId>
+                <artifactId>seata-all</artifactId>
+                <version>1.1.0</version>
             </dependency>
 
             <!--  hanlp分词工具 -->

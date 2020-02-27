@@ -2,7 +2,6 @@ package com.xm.api_user.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.codingapi.txlcn.tc.annotation.LcnTransaction;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
 import com.xm.api_user.mapper.SuOrderMapper;
@@ -14,6 +13,7 @@ import com.xm.comment_serialize.module.user.constant.OrderStateConstant;
 import com.xm.comment_serialize.module.user.dto.OrderBillDto;
 import com.xm.comment_serialize.module.user.entity.SuOrderEntity;
 import com.xm.comment_utils.mybatis.PageBean;
+import io.seata.spring.annotation.GlobalTransactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -49,8 +49,9 @@ public class OrderServiceImpl implements OrderService {
      * ②:更新旧订单
      * @param order
      */
-    @LcnTransaction
-    @Transactional(rollbackFor = Exception.class)
+//    @LcnTransaction
+    @GlobalTransactional(rollbackFor = Exception.class)
+//    @Transactional(rollbackFor = Exception.class)
     @Override
     public void receiveOrderMsg(SuOrderEntity order) {
         //判断是否为新收录订单（系统未曾收录的）
@@ -99,8 +100,9 @@ public class OrderServiceImpl implements OrderService {
      * ②:计算相关用户收益
      * @param order
      */
-    @LcnTransaction
-    @Transactional(rollbackFor = Exception.class)
+//    @LcnTransaction
+//    @Transactional(rollbackFor = Exception.class)
+    @GlobalTransactional(rollbackFor = Exception.class)
     @Override
     public void onOrderCreate(SuOrderEntity order) {
         //保存订单
@@ -130,8 +132,9 @@ public class OrderServiceImpl implements OrderService {
      * @param newOrder
      * @param oldOrder
      */
-    @LcnTransaction
-    @Transactional(rollbackFor = Exception.class)
+//    @LcnTransaction
+//    @Transactional(rollbackFor = Exception.class)
+    @GlobalTransactional(rollbackFor = Exception.class)
     @Override
     public void updateOrderState(SuOrderEntity newOrder,SuOrderEntity oldOrder) {
         if(checkState(newOrder,oldOrder, OrderStateConstant.CHECK_SUCESS, OrderStateConstant.ALREADY_SETTLED)){

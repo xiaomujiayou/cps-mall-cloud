@@ -24,15 +24,20 @@
             <artifactId>hanlp</artifactId>
         </dependency>
 
+        <!-- 公共项目资源 -->
+        <dependency>
+            <groupId>com.xm</groupId>
+            <artifactId>comment_web</artifactId>
+            <version>${project.current.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.xm</groupId>
             <artifactId>comment_api</artifactId>
             <version>${project.current.version}</version>
         </dependency>
-        <!-- 公共项目资源 -->
         <dependency>
             <groupId>com.xm</groupId>
-            <artifactId>comment_web</artifactId>
+            <artifactId>comment_seata</artifactId>
             <version>${project.current.version}</version>
         </dependency>
 

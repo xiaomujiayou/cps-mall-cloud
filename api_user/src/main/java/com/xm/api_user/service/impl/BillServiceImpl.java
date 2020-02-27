@@ -6,7 +6,6 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.codingapi.txlcn.tc.annotation.LcnTransaction;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
 import com.xm.api_user.mapper.SuBillMapper;
@@ -27,6 +26,7 @@ import com.xm.comment_serialize.module.user.entity.SuUserEntity;
 import com.xm.comment_serialize.module.user.vo.BillVo;
 import com.xm.comment_utils.mybatis.PageBean;
 import com.xm.comment_utils.project.PromotionUtils;
+import io.seata.spring.annotation.GlobalTransactional;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -55,8 +55,9 @@ public class BillServiceImpl implements BillService {
     @Autowired
     private BillService billService;
 
-    @LcnTransaction
-    @Transactional
+//    @LcnTransaction
+    @GlobalTransactional(rollbackFor = Exception.class)
+//    @Transactional
     @Override
     public void createByOrder(SuOrderEntity order) {
         //订单相关账单存在则返回
@@ -181,8 +182,9 @@ public class BillServiceImpl implements BillService {
         return bill;
     }
 
-    @LcnTransaction
-    @Transactional
+//    @LcnTransaction
+    @GlobalTransactional(rollbackFor = Exception.class)
+//    @Transactional
     @Override
     public void payOutOrderBill(SuOrderEntity order) {
         List<SuBillEntity> suBillEntities = getOrderRelatedBill(order);
@@ -195,8 +197,9 @@ public class BillServiceImpl implements BillService {
         });
     }
 
-    @LcnTransaction
-    @Transactional
+//    @LcnTransaction
+//    @Transactional
+    @GlobalTransactional(rollbackFor = Exception.class)
     @Override
     public void invalidOrderBill(SuOrderEntity order) {
         List<SuBillEntity> suBillEntities = getOrderRelatedBill(order);
@@ -297,7 +300,7 @@ public class BillServiceImpl implements BillService {
         suBillEntity.setDes(slPropSpecEx.getSlPropEntity().getName() + "-" + slPropSpecEx.getName());
         suBillEntity.setUpdateTime(new Date());
         suBillEntity.setCreateTime(suBillEntity.getUpdateTime());
-        suBillMapper.insertSelective(suBillEntity);
+        suBillMapper.insertUseGeneratedKeys(suBillEntity);
         //订单支付超时
         rabbitTemplate.convertAndSend(BillMqConfig.EXCHANGE,BillMqConfig.KEY_PAY_OVERTIME,suBillEntity);
         SuBillToPayBo suBillToPayBo = new SuBillToPayBo();

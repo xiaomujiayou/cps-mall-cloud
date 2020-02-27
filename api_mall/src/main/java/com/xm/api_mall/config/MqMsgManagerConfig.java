@@ -1,6 +1,5 @@
 package com.xm.api_mall.config;
 
-import com.codingapi.txlcn.tc.aspect.DataSourceAspect;
 import com.xm.comment_mq.handler.MessageManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

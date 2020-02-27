@@ -88,14 +88,14 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <!-- 服务追踪组件 -->
-        <dependency>
-            <groupId>com.codingapi.txlcn</groupId>
-            <artifactId>txlcn-tc</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.codingapi.txlcn</groupId>
-            <artifactId>txlcn-txmsg-netty</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.codingapi.txlcn</groupId>-->
+<!--            <artifactId>txlcn-tc</artifactId>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>com.codingapi.txlcn</groupId>-->
+<!--            <artifactId>txlcn-txmsg-netty</artifactId>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
