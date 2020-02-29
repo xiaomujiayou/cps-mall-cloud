@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xm.api_lottery.mapper.SlUserPropSpecMapMapper" >
+  <resultMap id="BaseResultMap" type="com.xm.comment_serialize.module.lottery.entity.SlUserPropSpecMapEntity" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="prop_spec_id" property="propSpecId" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+</mapper>

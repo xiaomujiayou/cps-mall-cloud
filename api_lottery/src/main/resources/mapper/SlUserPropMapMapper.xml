@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xm.api_lottery.mapper.SlUserPropMapMapper" >
+  <resultMap id="BaseResultMap" type="com.xm.comment_serialize.module.lottery.entity.SlUserPropMapEntity" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="prop_id" property="propId" jdbcType="INTEGER" />
+    <result column="prop_unit_current" property="propUnitCurrent" jdbcType="INTEGER" />
+    <result column="prop_unit_total" property="propUnitTotal" jdbcType="INTEGER" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+</mapper>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xm.api_lottery.mapper.SlPropSpecMapper" >
+  <resultMap id="BaseResultMap" type="com.xm.comment_serialize.module.lottery.entity.SlPropSpecEntity" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="prop_id" property="propId" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="original_price" property="originalPrice" jdbcType="INTEGER" />
+    <result column="price" property="price" jdbcType="INTEGER" />
+    <result column="des" property="des" jdbcType="VARCHAR" />
+    <result column="unit" property="unit" jdbcType="INTEGER" />
+    <result column="on_sale" property="onSale" jdbcType="INTEGER" />
+    <result column="choose" property="choose" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+</mapper>

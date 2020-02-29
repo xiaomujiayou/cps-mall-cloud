@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.xm</groupId>
+        <artifactId>share</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <groupId>com.xm</groupId>
+    <artifactId>comment_api</artifactId>
+    <name>comment_api</name>
+    <description>第三方sdk封装</description>
+
+    <properties>
+        <skipTests>true</skipTests>
+    </properties>
+
+    <dependencies>
+        <!-- 蘑菇街sdk -->
+        <dependency>
+            <groupId>com.xm.mgj</groupId>
+            <artifactId>openapi-sdk</artifactId>
+        </dependency>
+        <!-- 拼多多sdk -->
+        <dependency>
+            <groupId>com.xm.pdd</groupId>
+            <artifactId>pop-sdk</artifactId>
+            <classifier>all</classifier>
+        </dependency>
+        <!-- 阿里云oss -->
+        <dependency>
+            <groupId>com.aliyun.oss</groupId>
+            <artifactId>aliyun-sdk-oss</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.xm</groupId>
+            <artifactId>comment_utils</artifactId>
+            <version>${project.current.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <classifier>exec</classifier>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
