@@ -11,9 +11,10 @@ import javax.sql.DataSource;
 
 /**
  * 数据源代理
+ * spring-cloud-alibaba-seata已自带
  * @author wangzhongxiang
  */
-@Configuration
+//@Configuration
 public class SeataDataSourceConfig {
 
     @Bean

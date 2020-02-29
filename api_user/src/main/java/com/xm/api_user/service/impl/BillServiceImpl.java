@@ -31,7 +31,10 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import tk.mybatis.mapper.entity.Example;
 import tk.mybatis.orderbyhelper.OrderByHelper;
 
@@ -55,9 +58,7 @@ public class BillServiceImpl implements BillService {
     @Autowired
     private BillService billService;
 
-//    @LcnTransaction
     @GlobalTransactional(rollbackFor = Exception.class)
-//    @Transactional
     @Override
     public void createByOrder(SuOrderEntity order) {
         //订单相关账单存在则返回
@@ -182,9 +183,7 @@ public class BillServiceImpl implements BillService {
         return bill;
     }
 
-//    @LcnTransaction
     @GlobalTransactional(rollbackFor = Exception.class)
-//    @Transactional
     @Override
     public void payOutOrderBill(SuOrderEntity order) {
         List<SuBillEntity> suBillEntities = getOrderRelatedBill(order);
@@ -197,8 +196,6 @@ public class BillServiceImpl implements BillService {
         });
     }
 
-//    @LcnTransaction
-//    @Transactional
     @GlobalTransactional(rollbackFor = Exception.class)
     @Override
     public void invalidOrderBill(SuOrderEntity order) {
@@ -301,6 +298,7 @@ public class BillServiceImpl implements BillService {
         suBillEntity.setUpdateTime(new Date());
         suBillEntity.setCreateTime(suBillEntity.getUpdateTime());
         suBillMapper.insertUseGeneratedKeys(suBillEntity);
+
         //订单支付超时
         rabbitTemplate.convertAndSend(BillMqConfig.EXCHANGE,BillMqConfig.KEY_PAY_OVERTIME,suBillEntity);
         SuBillToPayBo suBillToPayBo = new SuBillToPayBo();

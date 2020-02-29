@@ -1,5 +1,6 @@
 package com.xm.api_user;
 
+//import com.alibaba.cloud.seata.GlobalTransactionAutoConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -14,7 +15,7 @@ import tk.mybatis.spring.annotation.MapperScan;
 @EnableFeignClients(basePackages = {"com.xm.comment_feign.module.*.feign"})
 @EnableDiscoveryClient
 @MapperScan(basePackages = {"com.xm.*.mapper","com.xm.*.mapper.custom"})
-@SpringBootApplication(exclude = DataSourceAutoConfiguration.class)
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 public class ApiUserApplication {
 
     public static void main(String[] args) {

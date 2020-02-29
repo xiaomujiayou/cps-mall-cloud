@@ -72,9 +72,14 @@
 <!--            </dependency>-->
             <!--seata-->
             <dependency>
+                <groupId>io.seata</groupId>
+                <artifactId>seata-spring-boot-starter</artifactId>
+                <version>1.1.0</version>
+            </dependency>
+            <dependency>
                 <groupId>com.alibaba.cloud</groupId>
                 <artifactId>spring-cloud-alibaba-seata</artifactId>
-                <version>2.1.0.RELEASE</version>
+                <version>2.2.0.RELEASE</version>
             </dependency>
             <dependency>
                 <groupId>io.seata</groupId>
@@ -151,7 +156,7 @@
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid-spring-boot-starter</artifactId>
-                <version>1.1.10</version>
+                <version>1.1.21</version>
             </dependency>
 
             <!--rabbitmq系统http接口-->

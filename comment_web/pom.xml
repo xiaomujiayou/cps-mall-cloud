@@ -87,7 +87,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-        <!-- 服务追踪组件 -->
+        <!-- 分布式事务 -->
 <!--        <dependency>-->
 <!--            <groupId>com.codingapi.txlcn</groupId>-->
 <!--            <artifactId>txlcn-tc</artifactId>-->

@@ -3,6 +3,7 @@ eureka:
   client:
     service-url:
       defaultZone: http://127.0.0.1:8101/eureka/
+#      defaultZone: http://129.211.37.193:8101/eureka/
     registry-fetch-interval-seconds: 3      #eureka client刷新本地缓存时间,默认30s
   instance:
     lease-renewal-interval-in-seconds: 1    #每间隔1s，向服务端发送一次心跳，证明自己依然”存活“，默认30秒
@@ -82,8 +83,8 @@ spring:
       probability: 1
 
 #分布式事务
-tx-lcn:
-  client:
-    manager-address: 47.92.6.56:8070
+#tx-lcn:
+#  client:
+#    manager-address: 47.92.6.56:8070
 
 

@@ -82,9 +82,9 @@ spring:
       probability: 1
 
 #分布式事务
-tx-lcn:
-  client:
-    manager-address: txlcn-tm:8070
+#tx-lcn:
+#  client:
+#    manager-address: txlcn-tm:8070
 
 
 

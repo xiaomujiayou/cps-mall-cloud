@@ -14,7 +14,7 @@ import tk.mybatis.spring.annotation.MapperScan;
 @EnableFeignClients(basePackages = {"com.xm.comment_feign.module.*.feign"})
 @EnableDiscoveryClient
 @MapperScan(basePackages = {"com.xm.*.mapper","com.xm.*.mapper.custom"})
-@SpringBootApplication(exclude = DataSourceAutoConfiguration.class)
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 public class ApiMallApplication {
 
     public static void main(String[] args) {

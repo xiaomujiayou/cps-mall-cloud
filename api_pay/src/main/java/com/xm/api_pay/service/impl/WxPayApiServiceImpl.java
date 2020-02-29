@@ -32,10 +32,14 @@ import com.xm.comment_utils.exception.GlobleException;
 import com.xm.comment_utils.response.MsgEnum;
 import io.seata.core.context.RootContext;
 import io.seata.spring.annotation.GlobalTransactional;
+import io.seata.tm.api.transaction.TransactionHook;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -58,6 +62,7 @@ public class WxPayApiServiceImpl implements WxPayApiService {
     @Resource(name = "wxPayPropertiesEx")
     private WxPayPropertiesEx wxPayPropertiesEx;
 
+    @Transactional
     @Override
     public WxPayOrderResultVo collection(SuBillToPayBo suBillToPayBo) throws WxPayException {
         WxPayUnifiedOrderRequest request = createWxOrderRequest(suBillToPayBo);
@@ -121,7 +126,6 @@ public class WxPayApiServiceImpl implements WxPayApiService {
         wxPayUnifiedOrderRequest.setNotifyUrl(wxPayPropertiesEx.getNotifyUrl());
         wxPayUnifiedOrderRequest.setTradeType(WxPayConstants.TradeType.JSAPI);
         wxPayUnifiedOrderRequest.setOpenid(suBillToPayBo.getOpenId());
-        int a = 1/0;
         return wxPayUnifiedOrderRequest;
     }
 
@@ -155,7 +159,6 @@ public class WxPayApiServiceImpl implements WxPayApiService {
         SpWxOrderInEntity spWxOrderInEntity = new SpWxOrderInEntity();
         spWxOrderInEntity.setOutTradeNo(spWxOrderNotifyEntity.getOutTradeNo());
         spWxOrderInEntity = spWxOrderInMapper.selectOne(spWxOrderInEntity);
-    System.out.println(JSON.toJSONString(spWxOrderInEntity));
         SuBillToPayBo suBillToPayBo = JSON.parseObject(spWxOrderInEntity.getReqBo(),SuBillToPayBo.class);
         rabbitTemplate.convertAndSend(BillMqConfig.EXCHANGE,BillMqConfig.KEY_PAY_SUCESS,suBillToPayBo);
         rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE,"",new PayOrderSucessMessage(userId,suBillToPayBo,spWxOrderNotifyEntity));
