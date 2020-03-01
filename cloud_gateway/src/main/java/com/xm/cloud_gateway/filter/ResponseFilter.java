@@ -1,6 +1,8 @@
 package com.xm.cloud_gateway.filter;
 
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -12,7 +14,9 @@ import org.apache.http.protocol.ResponseContent;
 import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants;
 import org.springframework.stereotype.Component;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SEND_RESPONSE_FILTER_ORDER;
@@ -54,8 +58,10 @@ public class ResponseFilter extends ZuulFilter {
             should.set(o.first().equals("Content-Type") && o.second().contains("application/json"));
         });
         InputStream responseStream = context.getResponseDataStream();
-        String resBody = IoUtil.read(responseStream,"UTF-8");
+        //原始报文
+        byte[] resByteBody = IoUtil.readBytes(responseStream);
         if(should.get()){
+            String resBody = StrUtil.str(resByteBody,"UTF-8");
             //服务返回值不为空，则对结果进行包装
             Object jsonData = JSON.parse(resBody);
             context.getResponse().setCharacterEncoding("UTF-8");
@@ -67,15 +73,16 @@ public class ResponseFilter extends ZuulFilter {
             resBody = JSON.toJSONString(R.sucess(jsonData));
             context.setResponseBody(resBody);
         }else {
-            //服务返回值为void则对结果进行包装为sucess
-            if(StrUtil.isBlank(resBody)){
+            if(ArrayUtil.isEmpty(resByteBody)){
+                //服务返回值为void则对结果进行包装为sucess
                 context.addZuulResponseHeader("Content-Type","application/json");
                 context.getResponse().setCharacterEncoding("UTF-8");
                 context.setResponseBody(JSON.toJSONString(R.sucess()));
             }else {
-                context.addZuulResponseHeader("Content-Type",context.getResponse().getContentType());
-                context.getResponse().setCharacterEncoding(context.getResponse().getCharacterEncoding());
-                context.setResponseBody(resBody);
+                //返回原始报文
+//                context.addZuulResponseHeader("Content-Type",context.getResponse().getContentType());
+//                context.getResponse().setCharacterEncoding(context.getResponse().getCharacterEncoding());
+                context.setResponseDataStream(new ByteArrayInputStream(resByteBody));
             }
         }
         return null;
