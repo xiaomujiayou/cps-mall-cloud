@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.xm.api_mall.mapper.SmOptMapper;
 import com.xm.api_mall.service.ProductApiService;
 import com.xm.api_mall.service.ProductService;
+import com.xm.api_mall.service.ProductTestService;
 import com.xm.api_mall.service.ProfitService;
 import com.xm.comment_serialize.module.mall.constant.GoodsSortContant;
 import com.xm.comment_serialize.module.mall.form.GetProductSaleInfoForm;
@@ -23,6 +24,7 @@ import com.xm.comment_serialize.module.mall.vo.SmProductSimpleVo;
 import com.xm.comment_serialize.module.user.form.AddSearchForm;
 import com.xm.comment_utils.mybatis.PageBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -42,6 +44,10 @@ public class PddProductServiceImpl implements ProductService {
     private UserFeignClient userFeignClient;
     @Autowired
     private ProfitService profitService;
+
+    @Lazy
+    @Autowired
+    private ProductTestService productTestService;
 
     @Override
     public PageBean<SmProductEntityEx> optionList(Integer userId,String pid, ProductListForm productListForm) throws Exception {
@@ -199,11 +205,12 @@ public class PddProductServiceImpl implements ProductService {
 
     @Override
     public ShareLinkBo saleInfo(Integer userId,String pid, GetProductSaleInfoForm productSaleInfoForm) throws Exception {
-        Map<String,Object> customParams = new HashMap<>();
-        customParams.put("userId",userId);
-        customParams.put("appType",productSaleInfoForm.getAppType());
-        customParams.put("fromUser",productSaleInfoForm.getShareUserId());
-        return productApiService.getShareLink(JSON.toJSONString(customParams),pid,productSaleInfoForm.getGoodsId(),null);
+        return productTestService.saleInfo(userId,pid,productSaleInfoForm);
+//        Map<String,Object> customParams = new HashMap<>();
+//        customParams.put("userId",userId);
+//        customParams.put("appType",productSaleInfoForm.getAppType());
+//        customParams.put("fromUser",productSaleInfoForm.getShareUserId());
+//        return productApiService.getShareLink(JSON.toJSONString(customParams),pid,productSaleInfoForm.getGoodsId(),null);
     }
 
 }
