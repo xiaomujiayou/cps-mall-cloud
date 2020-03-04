@@ -22,4 +22,8 @@ public class GenNumUtil {
     public static String genBillNum(){
         return DateUtil.format(new Date(),"yyyyMMddHHmmss")+ RandomUtil.randomNumbers(5);
     }
+    
+    public static void main(String[] args){
+        System.out.println(genBillNum());
+    }
 }
