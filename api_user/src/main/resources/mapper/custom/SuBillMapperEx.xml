@@ -4,6 +4,7 @@
   <resultMap id="BaseResultMap" type="com.xm.comment_serialize.module.user.dto.OrderBillDto" >
     <result column="b_id" property="id" jdbcType="INTEGER" />
     <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="bill_sn" property="billSn" jdbcType="VARCHAR" />
     <result column="money" property="money" jdbcType="INTEGER" />
     <result column="b_type" property="type" jdbcType="INTEGER" />
     <result column="attach" property="attach" jdbcType="INTEGER" />

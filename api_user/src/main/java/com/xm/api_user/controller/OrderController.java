@@ -45,6 +45,7 @@ public class OrderController {
             vo.setPlatformType(o.getSuOrderEntity().getPlatformType());
             vo.setGoodsId(o.getSuOrderEntity().getProductId());
             vo.setBillId(o.getId());
+            vo.setBillSn(o.getBillSn());
             vo.setOrderState(o.getSuOrderEntity().getState());
             vo.setState(o.getState());
             vo.setOriginalPrice(o.getSuOrderEntity().getOriginalPrice());

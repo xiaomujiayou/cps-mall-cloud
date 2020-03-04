@@ -29,6 +29,7 @@ import com.xm.comment_serialize.module.pay.vo.WxPayOrderResultVo;
 import com.xm.comment_serialize.module.user.bo.SuBillToPayBo;
 import com.xm.comment_serialize.module.user.entity.SuBillEntity;
 import com.xm.comment_utils.exception.GlobleException;
+import com.xm.comment_utils.product.GenNumUtil;
 import com.xm.comment_utils.response.MsgEnum;
 import io.seata.core.context.RootContext;
 import io.seata.spring.annotation.GlobalTransactional;
@@ -120,7 +121,7 @@ public class WxPayApiServiceImpl implements WxPayApiService {
         attach.put("billId",suBillToPayBo.getId());
         attach.put("userId",suBillToPayBo.getUserId());
         wxPayUnifiedOrderRequest.setAttach(JSON.toJSONString(attach));
-        wxPayUnifiedOrderRequest.setOutTradeNo(DateUtil.format(new Date(),"yyyyMMddHHmmss")+RandomUtil.randomNumbers(3));
+        wxPayUnifiedOrderRequest.setOutTradeNo(GenNumUtil.genOrderNum());
         wxPayUnifiedOrderRequest.setTotalFee(suBillToPayBo.getMoney());
         wxPayUnifiedOrderRequest.setSpbillCreateIp(suBillToPayBo.getClientIp());
         wxPayUnifiedOrderRequest.setNotifyUrl(wxPayPropertiesEx.getNotifyUrl());

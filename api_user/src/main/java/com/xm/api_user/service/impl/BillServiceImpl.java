@@ -3,6 +3,7 @@ package com.xm.api_user.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -25,6 +26,7 @@ import com.xm.comment_serialize.module.user.entity.SuOrderEntity;
 import com.xm.comment_serialize.module.user.entity.SuUserEntity;
 import com.xm.comment_serialize.module.user.vo.BillVo;
 import com.xm.comment_utils.mybatis.PageBean;
+import com.xm.comment_utils.product.GenNumUtil;
 import com.xm.comment_utils.project.PromotionUtils;
 import io.seata.spring.annotation.GlobalTransactional;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -89,7 +91,6 @@ public class BillServiceImpl implements BillService {
                 ConfigEnmu.PRODUCT_BUY_RATE.getName(),
                 ConfigTypeConstant.SYS_CONFIG).getVal());
         SuBillEntity buyUserBill = createOrderBill(order.getUserId(),order,1,buyUserRate,null);
-//        suBillMapper.insertSelective(buyUserBill);
         billService.addBill(buyUserBill);
         //生成代理账单
         //获取代理层级
@@ -110,7 +111,6 @@ public class BillServiceImpl implements BillService {
             if(proxyUsers == null || proxyUsers.size() <= 0 || i > proxyUsers.size() - 1  || proxyUsers.get(i) == null)
                 break;
             SuBillEntity proxyBill = createOrderBill(proxyUsers.get(i).getId(),order,2,proxyRate.get(i),i==0?order.getUserId():proxyUsers.get(i-1).getId());
-//            suBillMapper.insertSelective(proxyBill);
             billService.addBill(proxyBill);
         }
     }
@@ -129,7 +129,6 @@ public class BillServiceImpl implements BillService {
                 ConfigEnmu.PRODUCT_SHARE_USER_RATE.getName(),
                 ConfigTypeConstant.SYS_CONFIG).getVal());
         SuBillEntity shareUserBill = createOrderBill(shareUserId,order,4,shareUserRate,order.getUserId());
-//        suBillMapper.insertSelective(shareUserBill);
         billService.addBill(shareUserBill);
         //生成购买者订单
         Integer buyUserRate = Integer.valueOf(mallFeignClient.getOneConfig(
@@ -137,7 +136,6 @@ public class BillServiceImpl implements BillService {
                 ConfigEnmu.PRODUCT_SHARE_BUY_RATE.getName(),
                 ConfigTypeConstant.SYS_CONFIG).getVal());
         SuBillEntity buyUserBill = createOrderBill(order.getUserId(),order,3,buyUserRate,null);
-//        suBillMapper.insertSelective(buyUserBill);
         billService.addBill(buyUserBill);
     }
 
@@ -178,8 +176,6 @@ public class BillServiceImpl implements BillService {
         bill.setIncome(1);
         bill.setState(BillTypeConstant.ORDER);
         bill.setFailReason(order.getFailReason());
-        bill.setUpdateTime(new Date());
-        bill.setCreateTime(new Date());
         return bill;
     }
 
@@ -189,9 +185,6 @@ public class BillServiceImpl implements BillService {
         List<SuBillEntity> suBillEntities = getOrderRelatedBill(order);
         suBillEntities.stream().forEach(o->{
             billService.updateBillState(o,BillStateConstant.READY,null);
-//            o.setState(BillStateConstant.READY);
-//            o.setUpdateTime(new Date());
-//            suBillMapper.updateByPrimaryKeySelective(o);
             rabbitTemplate.convertAndSend(BillMqConfig.EXCHANGE,BillMqConfig.KEY,o);
         });
     }
@@ -202,10 +195,6 @@ public class BillServiceImpl implements BillService {
         List<SuBillEntity> suBillEntities = getOrderRelatedBill(order);
         suBillEntities.stream().forEach(o->{
             billService.updateBillState(o,BillStateConstant.FAIL,order.getFailReason());
-//            o.setState(BillStateConstant.FAIL);
-//            o.setFailReason(order.getFailReason());
-//            o.setUpdateTime(new Date());
-//            suBillMapper.updateByPrimaryKeySelective(o);
         });
     }
     /**
@@ -274,7 +263,16 @@ public class BillServiceImpl implements BillService {
 
     @Override
     public void addBill(SuBillEntity suBillEntity) {
-        suBillMapper.insertSelective(suBillEntity);
+        suBillMapper.insertSelective(completeBillInfo(suBillEntity));
+    }
+    public void addBillWithKey(SuBillEntity suBillEntity) {
+        suBillMapper.insertUseGeneratedKeys(completeBillInfo(suBillEntity));
+    }
+    private SuBillEntity completeBillInfo(SuBillEntity suBillEntity){
+        suBillEntity.setBillSn(GenNumUtil.genBillNum());
+        suBillEntity.setCreateTime(new Date());
+        suBillEntity.setUpdateTime(suBillEntity.getCreateTime());
+        return suBillEntity;
     }
 
     @Override
@@ -295,9 +293,10 @@ public class BillServiceImpl implements BillService {
         suBillEntity.setState(6);
         suBillEntity.setIncome(2);
         suBillEntity.setDes(slPropSpecEx.getSlPropEntity().getName() + "-" + slPropSpecEx.getName());
-        suBillEntity.setUpdateTime(new Date());
-        suBillEntity.setCreateTime(suBillEntity.getUpdateTime());
-        suBillMapper.insertUseGeneratedKeys(suBillEntity);
+        addBillWithKey(suBillEntity);
+//        suBillEntity.setUpdateTime(new Date());
+//        suBillEntity.setCreateTime(suBillEntity.getUpdateTime());
+//        suBillMapper.insertUseGeneratedKeys(suBillEntity);
 
         //订单支付超时
         rabbitTemplate.convertAndSend(BillMqConfig.EXCHANGE,BillMqConfig.KEY_PAY_OVERTIME,suBillEntity);

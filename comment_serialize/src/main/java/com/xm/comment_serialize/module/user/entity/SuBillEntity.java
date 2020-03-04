@@ -18,6 +18,11 @@ public class SuBillEntity implements Serializable{
 	private Integer userId;
 
 	/**
+	 * 账单流水
+	 */
+	private String billSn;
+
+	/**
 	 * 账单来源用户，因为哪个用户而产生的订单(订单类型为2/3时)
 	 */
 	private Integer fromUserId;
