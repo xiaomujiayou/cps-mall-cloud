@@ -93,7 +93,8 @@ public class UserServiceImpl implements UserService {
         if(shareUserId != null)
             user.setParentId(shareUserId);
         user.setOpenId(openId);
-        user.setNickname("Su_"+ MD5.md5(openId,"").substring(0,5));
+        user.setUserSn(MD5.md5(openId,""));
+        user.setNickname("Su_"+ user.getUserSn().substring(0,5));
         user.setSex(0);
         user.setCreateTime(new Date());
         user.setLastLogin(new Date());

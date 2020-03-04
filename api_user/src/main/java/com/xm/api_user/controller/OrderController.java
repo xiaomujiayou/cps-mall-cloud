@@ -37,6 +37,7 @@ public class OrderController {
         PageBean<OrderBillDto> pageBean = orderService.getOrderBill(userId,getOrderForm.getType(),getOrderForm.getPlatformType(),getOrderForm.getState(),getOrderForm.getPageNum(),getOrderForm.getPageSize());
         List<OrderBillVo> vos = pageBean.getList().stream().map(o->{
             OrderBillVo vo = new OrderBillVo();
+            vo.setOrderNum(o.getSuOrderEntity().getOrderSn());
             vo.setUserName(o.getSuUserEntity().getNickname());
             vo.setHeadImg(o.getSuUserEntity().getHeadImg());
             vo.setProductImgUrl(o.getSuOrderEntity().getImgUrl());

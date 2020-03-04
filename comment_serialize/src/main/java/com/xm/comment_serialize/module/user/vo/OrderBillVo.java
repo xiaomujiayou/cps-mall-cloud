@@ -7,6 +7,7 @@ import java.util.Date;
 
 @Data
 public class OrderBillVo {
+    private String orderNum;
     private String userName;
     private String headImg;
     private String productImgUrl;

@@ -11,6 +11,7 @@ import com.xm.comment_serialize.module.mall.ex.SmProductEntityEx;
 import com.xm.comment_serialize.module.mall.form.GetProductSaleInfoForm;
 import com.xm.comment_serialize.module.user.constant.OrderStateConstant;
 import com.xm.comment_serialize.module.user.entity.SuOrderEntity;
+import com.xm.comment_utils.project.PromotionUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,7 +44,7 @@ public class ProductTestServiceImpl implements ProductTestService {
 
     private SuOrderEntity createSuOrderEntity(SmProductEntityEx item,String pid,Integer userId,GetProductSaleInfoForm productSaleInfoForm){
         SuOrderEntity orderEntity = new SuOrderEntity();
-        orderEntity.setOrderSn(UUID.randomUUID().toString().replaceAll("-",""));
+        orderEntity.setOrderSn(UUID.randomUUID().toString().replaceAll("-","").substring(0,18));
         orderEntity.setProductId(item.getGoodsId().toString());
         orderEntity.setProductName(item.getName());
         orderEntity.setImgUrl(item.getGoodsThumbnailUrl());
@@ -54,7 +55,7 @@ public class ProductTestServiceImpl implements ProductTestService {
         orderEntity.setQuantity(1);
         orderEntity.setAmount(item.getOriginalPrice() - item.getCouponPrice());
         orderEntity.setPromotionRate(item.getPromotionRate().intValue());
-        orderEntity.setPromotionAmount(item.getSharePrice());
+        orderEntity.setPromotionAmount(PromotionUtils.calcByRate(orderEntity.getAmount(),orderEntity.getPromotionRate()));
         orderEntity.setType(0);
         Map<String,Object> customParams = new HashMap<>();
         customParams.put("userId",userId);

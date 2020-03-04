@@ -34,7 +34,6 @@ public class LoginController {
      */
     @PostMapping("/login")
     public Object login(@Valid @RequestBody WechatLoginForm wechatLoginForm, BindingResult bindingResult){
-        long s = System.currentTimeMillis();
         GetUserInfoForm form = new GetUserInfoForm();
         form.setCode(wechatLoginForm.getCode());
         form.setShareUserId(wechatLoginForm.getShareUserId());
@@ -44,12 +43,6 @@ public class LoginController {
         }catch (Exception e){
             e.printStackTrace();
             return R.error(MsgEnum.UNKNOWN_ERROR);
-//            if(e.getMsgEnum() == null)
-//                return R.error(MsgEnum.UNKNOWN_ERROR);
-//            if(StrUtil.isNotBlank(e.getMsg())){
-//                return R.error(e.getMsgEnum(),e.getMsg());
-//            }
-//            return R.error(e.getMsgEnum());
         }
         WeChatToken token = new WeChatToken(msg.getOpenId());
         if(!SecurityUtils.getSubject().isAuthenticated()){
@@ -60,15 +53,12 @@ public class LoginController {
         SuUserEntity userEntity = (SuUserEntity)SecurityUtils.getSubject().getPrincipal();
         Map<String,Object> userInfo = new HashMap<>();
         userInfo.put("nickname",userEntity.getNickname());
+        userInfo.put("userSn",userEntity.getUserSn());
         userInfo.put("headImg",userEntity.getHeadImg());
         userInfo.put("id",userEntity.getId());
         userInfo.put("sex",userEntity.getSex());
         userInfo.put("state",userEntity.getState());
         result.put("userInfo",userInfo);
-        System.out.println(System.currentTimeMillis() - s);
         return R.sucess(result);
     }
-
-
-
 }

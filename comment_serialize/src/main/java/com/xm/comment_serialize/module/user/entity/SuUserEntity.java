@@ -12,6 +12,8 @@ public class SuUserEntity implements Serializable{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
+	private String userSn;
+
 	/**
 	 * 父用户id
 	 */

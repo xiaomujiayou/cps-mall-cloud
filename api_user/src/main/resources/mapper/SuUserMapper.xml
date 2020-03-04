@@ -3,6 +3,7 @@
 <mapper namespace="com.xm.api_user.mapper.SuUserMapper" >
   <resultMap id="BaseResultMap" type="com.xm.comment_serialize.module.user.entity.SuUserEntity" >
     <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="user_sn" property="userSn" jdbcType="VARCHAR" />
     <result column="parent_id" property="parentId" jdbcType="INTEGER" />
     <result column="nickname" property="nickname" jdbcType="VARCHAR" />
     <result column="head_img" property="headImg" jdbcType="VARCHAR" />
