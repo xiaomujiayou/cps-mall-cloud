@@ -52,7 +52,7 @@ public class ProductTestServiceImpl implements ProductTestService {
         orderEntity.setPId(pid);
         orderEntity.setOriginalPrice(item.getOriginalPrice());
         orderEntity.setQuantity(1);
-        orderEntity.setAmount(item.getBuyPrice());
+        orderEntity.setAmount(item.getOriginalPrice() - item.getCouponPrice());
         orderEntity.setPromotionRate(item.getPromotionRate().intValue());
         orderEntity.setPromotionAmount(item.getSharePrice());
         orderEntity.setType(0);
