@@ -167,7 +167,7 @@ public class BillServiceImpl implements BillService {
      */
     private SuBillEntity createOrderBill(Integer userId,SuOrderEntity order,Integer billType,Integer rate,Integer formUserId){
         SuBillEntity bill = new SuBillEntity();
-        bill.setUserId(order.getUserId());
+        bill.setUserId(userId);
         bill.setFromUserId(formUserId);
         bill.setMoney(PromotionUtils.calcByRate(order.getPromotionAmount(),rate));
         bill.setType(billType);
@@ -217,13 +217,16 @@ public class BillServiceImpl implements BillService {
         //自购订单包含分享自购
         if(type != null && type == 1){
             Example example = new Example(SuBillEntity.class);
-            Example.Criteria criteria =  example.createCriteria().andIn("type",Arrays.asList(1,3));
+            Example.Criteria criteria =  example.createCriteria()
+                    .andEqualTo("userId",userId)
+                    .andIn("type",Arrays.asList(1,3));
             if(state != null)
                 criteria.andEqualTo("state",state);
             suBillEntities = suBillMapper.selectByExample(example);
 
         }else {
             SuBillEntity example = new SuBillEntity();
+            example.setUserId(userId);
             example.setState(state);
             example.setType(type);
             suBillEntities = suBillMapper.select(example);

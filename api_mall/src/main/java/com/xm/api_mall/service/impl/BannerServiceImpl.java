@@ -1,5 +1,7 @@
 package com.xm.api_mall.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import com.xm.api_mall.mapper.SmBannerMapper;
 import com.xm.api_mall.service.BannerService;
 import com.xm.api_mall.service.ProductApiService;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 import tk.mybatis.orderbyhelper.OrderByHelper;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,14 +29,16 @@ public class BannerServiceImpl implements BannerService {
 
     @Override
     public List<SmBannerEntity> getBannerByType(BannerTypeEnum bannerTypeEnum) throws Exception {
-        OrderByHelper.orderBy("sort asc");
         SmBannerEntity criteria = new SmBannerEntity();
         criteria.setType(bannerTypeEnum.getType());
         criteria.setType(criteria.getType());
-        List<SmBannerEntity> list = smBannerMapper.select(criteria);
+        List<SmBannerEntity> list = null;
         if(bannerTypeEnum.equals(BannerTypeEnum.HOME)){
+            list = new ArrayList<>();
             //添加拼多多主题商品活动
             List<SmBannerEntity> pddThemes = pddProductApiService.getThemeList().stream().map(o->{
+                if(StrUtil.isBlank(o.getImageUrl()))
+                    return null;
                 SmBannerEntity smBannerEntity = new SmBannerEntity();
                 smBannerEntity.setId(o.getId());
                 smBannerEntity.setType(bannerTypeEnum.getType());
@@ -43,7 +48,10 @@ public class BannerServiceImpl implements BannerService {
                 smBannerEntity.setTarget(2);
                 return smBannerEntity;
             }).collect(Collectors.toList());
-            list.addAll(pddThemes);
+            list.addAll(CollUtil.removeNull(pddThemes));
+        }else {
+            OrderByHelper.orderBy("sort asc");
+            list = smBannerMapper.select(criteria);
         }
 
         return list;
