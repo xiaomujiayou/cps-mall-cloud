@@ -79,7 +79,6 @@
         su_user su
             ON su.id = so.user_id
     <where>
-        sb.type = 1
         <if test="userId != null">
             AND sb.user_id = #{userId}
         </if>
@@ -87,7 +86,7 @@
             AND sb.user_id = so.user_id
         </if>
         <if test="type != null and type == 2">
-            AND sb.user_id != so.user_id
+            AND sb.user_id != so.user_id AND sb.type = 4
         </if>
         <if test="platformType != null">
             AND so.platform_type = #{platformType}

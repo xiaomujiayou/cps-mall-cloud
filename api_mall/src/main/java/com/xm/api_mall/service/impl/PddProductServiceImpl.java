@@ -208,8 +208,8 @@ public class PddProductServiceImpl implements ProductService {
         return productTestService.saleInfo(userId,pid,productSaleInfoForm);
 //        Map<String,Object> customParams = new HashMap<>();
 //        customParams.put("userId",userId);
-//        customParams.put("appType",productSaleInfoForm.getAppType());
-//        customParams.put("fromUser",productSaleInfoForm.getShareUserId());
+//        customParams.put("fromApp",productSaleInfoForm.getAppType());
+//        customParams.put("shareUserId",productSaleInfoForm.getShareUserId());
 //        return productApiService.getShareLink(JSON.toJSONString(customParams),pid,productSaleInfoForm.getGoodsId(),null);
     }
 

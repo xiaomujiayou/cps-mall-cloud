@@ -11,6 +11,7 @@ import com.xm.comment_serialize.module.mall.ex.SmProductEntityEx;
 import com.xm.comment_serialize.module.mall.form.GetProductSaleInfoForm;
 import com.xm.comment_serialize.module.user.constant.OrderStateConstant;
 import com.xm.comment_serialize.module.user.entity.SuOrderEntity;
+import com.xm.comment_utils.product.GenNumUtil;
 import com.xm.comment_utils.project.PromotionUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,7 @@ public class ProductTestServiceImpl implements ProductTestService {
 
     private SuOrderEntity createSuOrderEntity(SmProductEntityEx item,String pid,Integer userId,GetProductSaleInfoForm productSaleInfoForm){
         SuOrderEntity orderEntity = new SuOrderEntity();
-        orderEntity.setOrderSn(UUID.randomUUID().toString().replaceAll("-","").substring(0,18));
+        orderEntity.setOrderSn(GenNumUtil.genOrderNum());
         orderEntity.setProductId(item.getGoodsId().toString());
         orderEntity.setProductName(item.getName());
         orderEntity.setImgUrl(item.getGoodsThumbnailUrl());
@@ -59,8 +60,8 @@ public class ProductTestServiceImpl implements ProductTestService {
         orderEntity.setType(0);
         Map<String,Object> customParams = new HashMap<>();
         customParams.put("userId",userId);
-        customParams.put("appType",productSaleInfoForm.getAppType());
-        customParams.put("fromUser",productSaleInfoForm.getShareUserId());
+        customParams.put("fromApp",productSaleInfoForm.getAppType());
+        customParams.put("shareUserId",productSaleInfoForm.getShareUserId());
         orderEntity.setCustomParameters(JSON.toJSONString(customParams));
         orderEntity.setOrderModifyAt(new Date());
         return orderEntity;

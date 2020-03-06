@@ -15,6 +15,7 @@
             su_bill sb
         <where>
             AND sb.user_id = #{userId}
+            AND sb.type in (2,4)
             <if test="state != null">
                 AND sb.state = #{state}
             </if>
