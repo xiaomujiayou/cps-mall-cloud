@@ -2,6 +2,8 @@ package com.xm.comment_mq.config;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.xm.comment_mq.handler.MessageHandler;
+import com.xm.comment_mq.handler.MessageManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -14,8 +16,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.web.context.ContextLoader;
+import org.springframework.web.context.WebApplicationContext;
 
 import javax.annotation.PostConstruct;
+import java.util.Map;
 
 /**
  * 配置jackson序列化
@@ -27,12 +32,6 @@ public class RabbitMqConfig {
     @Autowired
     private SimpleRabbitListenerContainerFactory simpleRabbitListenerContainerFactory;
 
-    private ObjectMapper objectMapper(){
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false);
-        return mapper;
-    }
-
     @PostConstruct
     public void initSimpleRabbitListenerContainerFactory(){
         //忽略jackson 序列化时对属性的强匹配
@@ -43,5 +42,13 @@ public class RabbitMqConfig {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         rabbitTemplate.setMessageConverter(new Jackson2JsonMessageConverter("com.xm"));
         return rabbitTemplate;
+    }
+
+    @Bean
+    public MessageManager initMqHandler(WebApplicationContext webApplicationContext){
+        Map<String,MessageHandler> handlerMaps = webApplicationContext.getBeansOfType(MessageHandler.class);
+        MessageManager messageManager = new MessageManager();
+        handlerMaps.values().stream().forEach(o -> messageManager.add(o));
+        return messageManager;
     }
 }

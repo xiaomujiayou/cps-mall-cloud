@@ -98,7 +98,9 @@ public class WxMaConfiguration {
 
     private final WxMaMessageHandler logHandler = (wxMessage, context, service, sessionManager) -> {
         System.out.println("收到消息：" + wxMessage.toString());
-        service.getMsgService().sendKefuMsg(WxMaKefuMessage.newTextBuilder().content("收到信息为：" + wxMessage.toJson())
+//        service.getMsgService().sendKefuMsg(WxMaKefuMessage.newTextBuilder().content("收到信息为：" + wxMessage.toJson())
+//            .toUser(wxMessage.getFromUser()).build());
+        service.getMsgService().sendKefuMsg(WxMaKefuMessage.newTextBuilder().content("问题已转交客服处理，感谢支持！")
             .toUser(wxMessage.getFromUser()).build());
         return null;
     };

@@ -11,6 +11,7 @@ import com.xm.comment_mq.message.AbsUserActionMessage;
 import com.xm.comment_mq.message.config.UserActionConfig;
 import com.xm.comment_mq.message.impl.UserBillCreateMessage;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.ExchangeTypes;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.Exchange;
@@ -24,6 +25,7 @@ import java.io.IOException;
 /**
  * 监听用户动态
  */
+@Slf4j
 @Component
 public class UserMessageReceiver extends AbsMessageReceiver {
 

@@ -2,6 +2,7 @@ package com.xm.api_user.service.impl;
 
 import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import com.github.pagehelper.PageHelper;
 import com.xm.api_user.mapper.*;
@@ -9,6 +10,11 @@ import com.xm.api_user.mapper.custom.SuOrderMapperEx;
 import com.xm.api_user.mapper.custom.SuRoleMapperEx;
 import com.xm.api_user.mapper.custom.SuUserMapperEx;
 import com.xm.api_user.service.UserService;
+import com.xm.comment_mq.message.config.UserActionConfig;
+import com.xm.comment_mq.message.impl.UserAddProxyMessage;
+import com.xm.comment_mq.message.impl.UserFristLoginMessage;
+import com.xm.comment_serialize.module.user.bo.UserProfitBo;
+import com.xm.comment_serialize.module.user.constant.BillTypeConstant;
 import com.xm.comment_utils.exception.GlobleException;
 import com.xm.comment_feign.module.mall.feign.MallFeignClient;
 import com.xm.comment_utils.response.MsgEnum;
@@ -29,6 +35,7 @@ import me.chanjar.weixin.common.error.WxErrorException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import tk.mybatis.orderbyhelper.OrderByHelper;
 
@@ -40,6 +47,9 @@ import java.util.Map;
 @Service("userService")
 public class UserServiceImpl implements UserService {
 
+    @Lazy
+    @Autowired
+    private UserService userService;
     @Autowired
     private SuUserMapper suUserMapper;
     @Autowired
@@ -72,7 +82,7 @@ public class UserServiceImpl implements UserService {
             record = suUserMapper.selectOne(record);
             if(record != null)
                 return record;
-            return addNewUser(wxMaJscode2SessionResult.getOpenid(),getUserInfoForm.getShareUserId());
+            return userService.addNewUser(wxMaJscode2SessionResult.getOpenid(),getUserInfoForm.getShareUserId());
         }else if(StringUtils.isNotBlank(getUserInfoForm.getOpenId())){
             SuUserEntity record = new SuUserEntity();
             record.setOpenId(getUserInfoForm.getOpenId());
@@ -216,16 +226,28 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserProfitVo getUserProft(Integer userId) {
-        UserProfitVo userProfitVo = new UserProfitVo();
+    public UserProfitBo getUserProftList(Integer userId) {
+        UserProfitBo userProfitBo = new UserProfitBo();
         Map<String, BigDecimal> orderInfo = suOrderMapperEx.getUserOrderAbout(userId);
-        userProfitVo.setTotalCoupon(orderInfo.get("totalCoupon").intValue());
-        userProfitVo.setTotalCommission(suOrderMapperEx.getUserTotalCommission(userId,3,null,null).intValue());
-        userProfitVo.setTodayProfit(suOrderMapperEx.getUserTotalCommission(userId,null, DateUtil.parse(DateUtil.today()),new Date()).intValue());
-        userProfitVo.setTotalConsumption(orderInfo.get("totalConsumption").intValue());
-        userProfitVo.setTotalShare(suOrderMapperEx.getUserShareOrderAbout(userId).intValue());
+        userProfitBo.setTotalCoupon(orderInfo.get("totalCoupon").intValue());
+        userProfitBo.setTotalConsumption(orderInfo.get("totalConsumption").intValue());
+//        userProfitBo.setTotalCommission(suOrderMapperEx.getUserTotalCommission(userId,3,null,null).intValue());
+        userProfitBo.setTodayProfit(suOrderMapperEx.getUserTotalCommission(userId,null, DateUtil.parse(DateUtil.today()),new Date()).intValue());
+        userProfitBo.setTotalProfit(suOrderMapperEx.getUserTotalCommission(userId,null,null,null).intValue());
+        userProfitBo.setWaitProfit(suOrderMapperEx.getUserTotalCommission(userId, CollUtil.newArrayList(1),null,null).intValue());
+        userProfitBo.setTotalShare(suOrderMapperEx.getUserShareOrderAbout(userId).intValue());
         ProxyInfoVo proxyInfoVo = getProxyInfo(userId);
-        userProfitVo.setTotalProxyUser(proxyInfoVo.getTotalDirectProxy()+proxyInfoVo.getTotalIndirectProxy());
-        return userProfitVo;
+        userProfitBo.setTotalProxyUser(proxyInfoVo.getTotalDirectProxy()+proxyInfoVo.getTotalIndirectProxy());
+        return userProfitBo;
+    }
+
+    @Override
+    public UserProfitBo getUserProftDesc(Integer userId) {
+        UserProfitBo userProfitBo = new UserProfitBo();
+        Map<String, BigDecimal> orderInfo = suOrderMapperEx.getUserOrderAbout(userId);
+        userProfitBo.setTotalCoupon(orderInfo.get("totalCoupon").intValue());
+        userProfitBo.setTotalConsumption(orderInfo.get("totalConsumption").intValue());
+        userProfitBo.setTotalCommission(suOrderMapperEx.getUserTotalCommission(userId,CollUtil.newArrayList(3),null,null).intValue());
+        return userProfitBo;
     }
 }

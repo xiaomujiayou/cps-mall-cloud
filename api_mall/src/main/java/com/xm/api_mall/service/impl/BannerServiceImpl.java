@@ -29,9 +29,7 @@ public class BannerServiceImpl implements BannerService {
 
     @Override
     public List<SmBannerEntity> getBannerByType(BannerTypeEnum bannerTypeEnum) throws Exception {
-        SmBannerEntity criteria = new SmBannerEntity();
-        criteria.setType(bannerTypeEnum.getType());
-        criteria.setType(criteria.getType());
+
         List<SmBannerEntity> list = null;
         if(bannerTypeEnum.equals(BannerTypeEnum.HOME)){
             list = new ArrayList<>();
@@ -51,6 +49,9 @@ public class BannerServiceImpl implements BannerService {
             list.addAll(CollUtil.removeNull(pddThemes));
         }else {
             OrderByHelper.orderBy("sort asc");
+            SmBannerEntity criteria = new SmBannerEntity();
+            criteria.setIsShow(1);
+            criteria.setType(bannerTypeEnum.getType());
             list = smBannerMapper.select(criteria);
         }
 

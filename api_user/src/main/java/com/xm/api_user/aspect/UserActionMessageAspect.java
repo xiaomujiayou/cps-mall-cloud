@@ -29,9 +29,8 @@ public class UserActionMessageAspect {
     @Autowired
     private SuUserMapper suUserMapper;
 
-    @Pointcut("execution(public * com.xm.api_user.service.impl.UserServiceImpl.addNewUser(..))")
+    @Pointcut("execution(public * com.xm.api_user.service.UserService.addNewUser(..))")
     public void addNewUserPointCut(){}
-
     /**
      * 生成
      * UserFristLoginMessage
@@ -69,7 +68,7 @@ public class UserActionMessageAspect {
      * @return
      * @throws Throwable
      */
-    @Around("addNewUserPointCut()")
+    @Around("onOrderCreatePointCut()")
     public Object onOrderCreatePointCut(ProceedingJoinPoint joinPoint) throws Throwable {
         Object obj = null;
         try {

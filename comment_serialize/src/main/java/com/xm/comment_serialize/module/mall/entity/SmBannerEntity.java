@@ -28,7 +28,7 @@ public class SmBannerEntity implements Serializable{
 	private Integer sort;
 
 	/**
-	 * 目标(1:普通url跳转,2:小程序跳转,3:唤醒其他小程序,4:唤醒app)
+	 * 目标(1:普通url跳转,2:小程序跳转,3:唤醒其他小程序,4:唤醒app,5:客服消息)
 	 */
 	private Integer target;
 
@@ -38,9 +38,14 @@ public class SmBannerEntity implements Serializable{
 	private String url;
 
 	/**
-	 * 类型(1:首页轮播图,2:首页滑动列表,3:tabbar底部导航)
+	 * 类型(1:首页轮播图,2:首页滑动列表,3:tabbar底部导航,4:个人中心功能菜单)
 	 */
 	private Integer type;
+
+	/**
+	 * 是否显示
+	 */
+	private Integer isShow;
 
 	private java.util.Date createTime;
 }

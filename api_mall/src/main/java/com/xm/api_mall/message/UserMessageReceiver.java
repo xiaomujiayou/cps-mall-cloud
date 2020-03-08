@@ -21,7 +21,7 @@ public class UserMessageReceiver extends AbsMessageReceiver {
 
     @RabbitListener(bindings = @QueueBinding(
             exchange = @Exchange(value = UserActionConfig.EXCHANGE, type = UserActionConfig.EXCHANGE_TYPE),
-            value = @Queue(UserActionConfig.QUEUE_USER)
+            value = @Queue(UserActionConfig.QUEUE_MALL)
     ))
     @Override
     public void onMessage(JSONObject jsonMessage, Channel channel, Message message) throws IOException {

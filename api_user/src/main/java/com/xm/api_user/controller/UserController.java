@@ -5,6 +5,7 @@ import cn.hutool.core.util.NumberUtil;
 import com.xm.api_user.mapper.SuUserMapper;
 import com.xm.api_user.service.UserService;
 import com.xm.comment.annotation.LoginUser;
+import com.xm.comment_serialize.module.user.bo.UserProfitBo;
 import com.xm.comment_utils.exception.GlobleException;
 import com.xm.comment_utils.response.Msg;
 import com.xm.comment_utils.response.MsgEnum;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import com.xm.comment_serialize.module.user.form.GetUserInfoForm;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -108,17 +110,33 @@ public class UserController{
      * @param userId
      * @return
      */
-    @GetMapping("/profit")
-    public Map<String,String> getUserProft(@LoginUser Integer userId) {
-        UserProfitVo userProfitVo = userService.getUserProft(userId);
-        Map<String,String> result = new HashMap<>();
-        result.put("totalCoupon",NumberUtil.roundStr(NumberUtil.div(Double.valueOf(userProfitVo.getTotalCoupon()).doubleValue() ,100d),2));
-        result.put("totalCommission",NumberUtil.roundStr(NumberUtil.div(Double.valueOf(userProfitVo.getTotalCommission()).doubleValue() ,100d),2));
-        result.put("todayProfit",NumberUtil.roundStr(NumberUtil.div(Double.valueOf(userProfitVo.getTodayProfit()).doubleValue() ,100d),2));
-        result.put("totalConsumption",NumberUtil.roundStr(NumberUtil.div(Double.valueOf(userProfitVo.getTotalConsumption()).doubleValue() ,100d),2));
-        result.put("totalShare",NumberUtil.roundStr(NumberUtil.div(Double.valueOf(userProfitVo.getTotalShare()).doubleValue() ,100d),2));
-        result.put("totalProxyUser",userProfitVo.getTotalProxyUser().toString());
+    @GetMapping("/profit/list")
+    public List<UserProfitVo> getUserProft(@LoginUser Integer userId) {
+        UserProfitBo userProfitBo = userService.getUserProftList(userId);
+        List<UserProfitVo> result = new ArrayList<>();
+        result.add(new UserProfitVo("今日收益",fen2yuan(userProfitBo.getTodayProfit()),""));
+        result.add(new UserProfitVo("历史收益",fen2yuan(userProfitBo.getTotalProfit()),""));
+        result.add(new UserProfitVo("等待发放",fen2yuan(userProfitBo.getWaitProfit()),""));
+        result.add(new UserProfitVo("锁定用户",userProfitBo.getTotalProxyUser().toString(),"/pages/profit/profit"));
+        result.add(new UserProfitVo("分享成交额",fen2yuan(userProfitBo.getTotalShare()),"/pages/order/order?type=1"));
+        result.add(new UserProfitVo("自购成交额",fen2yuan(userProfitBo.getTotalConsumption()),"/pages/order/order?type=0"));
         return result;
+    }
+    @GetMapping("/profit/desc")
+    public Map<String,Object> getUserProft1(@LoginUser Integer userId) {
+        UserProfitBo userProfitBo = userService.getUserProftDesc(userId);
+        Map<String,Object> map = new HashMap<>();
+        map.put("totalCoupon",fen2yuan(userProfitBo.getTotalCoupon()));
+        map.put("totalCommission",fen2yuan(userProfitBo.getTotalCommission()));
+        return map;
+    }
+
+    /**
+     * 分转元，且保留两位小数
+     * @return
+     */
+    private String fen2yuan(Integer money){
+        return NumberUtil.roundStr(NumberUtil.div(Double.valueOf(money).doubleValue() ,100d),2);
     }
 
 }

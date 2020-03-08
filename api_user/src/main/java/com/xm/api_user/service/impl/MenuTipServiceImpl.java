@@ -60,7 +60,7 @@ public class MenuTipServiceImpl implements MenuTipService {
 
     private MenuTipVo convertVo(SuMenuTipsEntity suMenuTipsEntity) {
         MenuTipVo menuTipVo = new MenuTipVo();
-        menuTipVo.setHot(suMenuTipsEntity.getHot()==1);
+        menuTipVo.setHot(suMenuTipsEntity.getHot() == null ? false : suMenuTipsEntity.getHot() == 1 ? true : false);
         menuTipVo.setMenuId(suMenuTipsEntity.getMenuId());
         menuTipVo.setNum(suMenuTipsEntity.getNum());
         return menuTipVo;
@@ -79,7 +79,7 @@ public class MenuTipServiceImpl implements MenuTipService {
                 .andIn("menuId",menuIds);
         List<SuMenuTipsEntity> menuTipsEntities = suMenuTipsMapper.selectByExample(example);
         menuIds.stream().forEach(o -> {
-            if(menuTipsEntities.stream().filter(j -> {return j.getMenuId().equals(o);}).findFirst().get() == null){
+            if(!menuTipsEntities.stream().filter(j -> {return j.getMenuId().equals(o);}).findFirst().isPresent()){
                 SuMenuTipsEntity suMenuTipsEntity = new SuMenuTipsEntity();
                 suMenuTipsEntity.setUserId(userId);
                 suMenuTipsEntity.setMenuId(o);

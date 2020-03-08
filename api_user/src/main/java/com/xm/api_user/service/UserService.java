@@ -1,5 +1,6 @@
 package com.xm.api_user.service;
 
+import com.xm.comment_serialize.module.user.bo.UserProfitBo;
 import com.xm.comment_serialize.module.user.dto.ProxyProfitDto;
 import com.xm.comment_serialize.module.user.entity.SuUserEntity;
 import com.xm.comment_serialize.module.user.ex.RolePermissionEx;
@@ -20,21 +21,29 @@ public interface UserService {
      * @return
      * @throws WxErrorException
      */
-    SuUserEntity getUserInfo(GetUserInfoForm getUserInfoForm) throws WxErrorException;
+    public SuUserEntity getUserInfo(GetUserInfoForm getUserInfoForm) throws WxErrorException;
+
+    /**
+     * 添加一个用户
+     * @param openId
+     * @param shareUserId
+     * @return
+     */
+    public SuUserEntity addNewUser(String openId,Integer shareUserId);
 
     /**
      * 更新一个用户资料
      * @param userId
      * @param updateUserInfoForm
      */
-    void updateUserInfo(Integer userId, UpdateUserInfoForm updateUserInfoForm);
+    public void updateUserInfo(Integer userId, UpdateUserInfoForm updateUserInfoForm);
 
     /**
      * 获取用户权限
      * @param userId
      * @return
      */
-    List<RolePermissionEx> getUserRole(Integer userId);
+    public List<RolePermissionEx> getUserRole(Integer userId);
 
     /**
      * 获取上级用户
@@ -42,7 +51,7 @@ public interface UserService {
      * @param userType  :UserTypeContstant
      * @return
      */
-    SuUserEntity getSuperUser(Integer userId,int userType);
+    public SuUserEntity getSuperUser(Integer userId,int userType);
 
     /**
      * 获取用户代理收益信息
@@ -52,19 +61,21 @@ public interface UserService {
      * @param pageSize
      * @return
      */
-    PageBean<ProxyProfitDto> getProxyProfit(Integer userId, Integer state, Integer orderColumn, Integer orderBy, Integer pageNum, Integer pageSize);
+    public PageBean<ProxyProfitDto> getProxyProfit(Integer userId, Integer state, Integer orderColumn, Integer orderBy, Integer pageNum, Integer pageSize);
 
     /**
      * 获取用户代理信息
      * @param userId
      * @return
      */
-    ProxyInfoVo getProxyInfo(Integer userId);
+    public ProxyInfoVo getProxyInfo(Integer userId);
 
     /**
      * 获取用户收益概略信息
      * @param userId
      * @return
      */
-    UserProfitVo getUserProft(Integer userId);
+    public UserProfitBo getUserProftList(Integer userId);
+
+    public UserProfitBo getUserProftDesc(Integer userId);
 }

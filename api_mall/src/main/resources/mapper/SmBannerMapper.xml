@@ -9,6 +9,7 @@
     <result column="target" property="target" jdbcType="INTEGER" />
     <result column="url" property="url" jdbcType="VARCHAR" />
     <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="is_show" property="isShow" jdbcType="INTEGER" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
   </resultMap>
 </mapper>

@@ -13,7 +13,7 @@ import lombok.Data;
 public enum UserActionEnum {
 
     //用户分享事件
-    USER_FRIST_LOGIN(10000,"首次登录","api-user", UserAddProxyMessage.class,true),
+    USER_FRIST_LOGIN(10000,"首次登录","api-user", UserFristLoginMessage.class,true),
     USER_ADD_PROXY(10001,"新增一个下级用户","api-user", UserAddProxyMessage.class,true),
     USER_SHARE_GOODS(10002,"分享商品被点击","api-mail", UserShareGoodsMessage.class,true),
     USER_SHARE_APP(10003,"分享程序被点击","", SuUserEntity.class,false),

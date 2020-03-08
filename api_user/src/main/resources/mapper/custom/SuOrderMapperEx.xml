@@ -15,10 +15,18 @@
             su_bill sb
         <where>
             AND sb.user_id = #{userId}
-            AND sb.type in (2,4)
-            <if test="state != null">
-                AND sb.state = #{state}
-            </if>
+            AND sb.income = 1
+            <choose>
+                <when test="states != null">
+                    AND sb.state in
+                    <foreach collection="states" item="item" index="index" open="(" close=")" separator=",">
+                        #{item}
+                    </foreach>
+                </when>
+                <otherwise>
+                    AND sb.state != 4
+                </otherwise>
+            </choose>
             <if test="startTime != null">
                 <![CDATA[ AND sb.create_time > #{startTime} ]]>
             </if>

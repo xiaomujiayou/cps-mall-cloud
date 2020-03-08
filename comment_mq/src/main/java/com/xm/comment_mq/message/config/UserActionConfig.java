@@ -13,5 +13,7 @@ public class UserActionConfig {
     public static final String QUEUE_LOTTERY = EXCHANGE + ".lottery.queue";
     //用户服务队列
     public static final String QUEUE_USER = EXCHANGE + ".user.queue";
+    //用户服务队列
+    public static final String QUEUE_MALL = EXCHANGE + ".mall.queue";
 
 }

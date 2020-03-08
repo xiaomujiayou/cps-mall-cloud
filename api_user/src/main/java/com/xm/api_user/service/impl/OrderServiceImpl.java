@@ -59,6 +59,7 @@ public class OrderServiceImpl implements OrderService {
         if(oldOrder == null){
             //收录订单并计算相关账单
             orderService.onOrderCreate(order);
+            return;
         }else if(repeated(oldOrder,order))          //是否重复收录
             return;
         //更新订单状态，并根据情况发放佣金
@@ -100,8 +101,6 @@ public class OrderServiceImpl implements OrderService {
      * ②:计算相关用户收益
      * @param order
      */
-//    @LcnTransaction
-//    @Transactional(rollbackFor = Exception.class)
     @GlobalTransactional(rollbackFor = Exception.class)
     @Override
     public void onOrderCreate(SuOrderEntity order) {

@@ -1,5 +1,6 @@
 package com.xm.comment_mq.handler;
 
+import com.alibaba.fastjson.JSON;
 import com.xm.comment_mq.message.AbsUserActionMessage;
 
 import java.util.*;
@@ -15,6 +16,7 @@ public class MessageManager {
         handler.getType().stream().forEach(o->{
             List<MessageHandler> handlerList = getHandlersByType(o);
             handlerList.add(handler);
+            handlers.put(o,handlerList);
         });
     }
 
@@ -23,8 +25,8 @@ public class MessageManager {
         if(list != null)
             return list;
         return Collections.synchronizedList(new ArrayList<>());
-
     }
+    
     public void handleMessage(AbsUserActionMessage message){
         List<MessageHandler> handlerList = handlers.get(message.getClass());
         if(handlerList == null)

@@ -32,7 +32,7 @@ public interface SuOrderMapperEx extends MyMapper<SuOrderEntity> {
      * @param userId
      * @return
      */
-    BigDecimal getUserTotalCommission(Integer userId, Integer state, Date startTime,Date endTime);
+    BigDecimal getUserTotalCommission(Integer userId, List<Integer> states, Date startTime,Date endTime);
 
     /**
      * 获取用户历史消费
