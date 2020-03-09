@@ -133,18 +133,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<RolePermissionEx> getUserRole(Integer userId) {
-//        SuUserRoleMapEntity userRoleMapEntity = new SuUserRoleMapEntity();
-//        userRoleMapEntity.setUserId(userId);
-//        List<Integer> roleIds = suUserRoleMapMapper.select(userRoleMapEntity).stream().map(SuUserRoleMapEntity::getRoleId).collect(Collectors.toList());
-//        Example roleExample = new Example(SuRoleEntity.class);
-//        roleExample.createCriteria().andIn("id",roleIds);
-//        List<SuRoleEntity> roles = suRoleMapper.selectByExample(roleExample);
-//        Example rolePermMapExample = new Example(SuRolePermissionMapEntity.class);
-//        rolePermMapExample.createCriteria().andIn("roleId",roles.stream().map(SuRoleEntity::getId).collect(Collectors.toList()));
-//        List<Integer> permissionIds = suRolePermissionMapMapper.selectByExample(rolePermMapExample).stream().map(SuRolePermissionMapEntity::getPermissionId).collect(Collectors.toList());
-//        Example permissionExample = new Example(SuPermissionEntity.class);
-//        permissionExample.createCriteria().andIn("id",permissionIds);
-//        suRolePermissionMapMapper.selectByExample(permissionExample);
         return suRoleMapperEx.getUserRoleEx(userId);
     }
 
@@ -231,7 +219,6 @@ public class UserServiceImpl implements UserService {
         Map<String, BigDecimal> orderInfo = suOrderMapperEx.getUserOrderAbout(userId);
         userProfitBo.setTotalCoupon(orderInfo.get("totalCoupon").intValue());
         userProfitBo.setTotalConsumption(orderInfo.get("totalConsumption").intValue());
-//        userProfitBo.setTotalCommission(suOrderMapperEx.getUserTotalCommission(userId,3,null,null).intValue());
         userProfitBo.setTodayProfit(suOrderMapperEx.getUserTotalCommission(userId,null, DateUtil.parse(DateUtil.today()),new Date()).intValue());
         userProfitBo.setTotalProfit(suOrderMapperEx.getUserTotalCommission(userId,null,null,null).intValue());
         userProfitBo.setWaitProfit(suOrderMapperEx.getUserTotalCommission(userId, CollUtil.newArrayList(1),null,null).intValue());

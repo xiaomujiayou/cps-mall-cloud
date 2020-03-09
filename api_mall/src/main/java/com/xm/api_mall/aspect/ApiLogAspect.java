@@ -16,6 +16,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Map;
 
+/**
+ * 开放平台api接口日志
+*/
 @Aspect
 @Component
 @Slf4j
@@ -25,12 +28,6 @@ public class ApiLogAspect {
 
     @Around("pointCut()")
     public Object valid(ProceedingJoinPoint joinPoint) throws Throwable{
-        MethodSignature methodSignature = (MethodSignature)joinPoint.getSignature();
-        Method targetMethod = methodSignature.getMethod();
-        Parameter[] parameters = targetMethod.getParameters();
-        boolean annotationFlag = false;
-        Integer index = null;
-
         Map<String,String> param = null;
         for (Object arg : joinPoint.getArgs()) {
             if(arg instanceof  PopBaseHttpRequest){

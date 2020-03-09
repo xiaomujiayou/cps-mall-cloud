@@ -117,8 +117,8 @@ public class UserController{
         result.add(new UserProfitVo("今日收益",fen2yuan(userProfitBo.getTodayProfit()),""));
         result.add(new UserProfitVo("历史收益",fen2yuan(userProfitBo.getTotalProfit()),""));
         result.add(new UserProfitVo("等待发放",fen2yuan(userProfitBo.getWaitProfit()),""));
-        result.add(new UserProfitVo("锁定用户",userProfitBo.getTotalProxyUser().toString(),"/pages/profit/profit"));
         result.add(new UserProfitVo("分享成交额",fen2yuan(userProfitBo.getTotalShare()),"/pages/order/order?type=1"));
+        result.add(new UserProfitVo("锁定用户",userProfitBo.getTotalProxyUser().toString(),"/pages/profit/profit"));
         result.add(new UserProfitVo("自购成交额",fen2yuan(userProfitBo.getTotalConsumption()),"/pages/order/order?type=0"));
         return result;
     }
