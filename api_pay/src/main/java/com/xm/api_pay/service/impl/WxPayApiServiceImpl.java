@@ -6,6 +6,8 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.github.binarywang.wxpay.bean.entpay.EntPayRequest;
+import com.github.binarywang.wxpay.bean.entpay.EntPayResult;
 import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
@@ -15,6 +17,7 @@ import com.github.binarywang.wxpay.service.WxPayService;
 import com.github.pagehelper.PageHelper;
 import com.sun.media.jfxmedia.logging.Logger;
 import com.xm.api_pay.config.WxPayPropertiesEx;
+import com.xm.api_pay.mapper.SpWxEntPayOrderInMapper;
 import com.xm.api_pay.mapper.SpWxOrderInMapper;
 import com.xm.api_pay.mapper.SpWxOrderNotifyMapper;
 import com.xm.api_pay.service.WxPayApiService;
@@ -23,8 +26,10 @@ import com.xm.comment_mq.message.config.PayMqConfig;
 import com.xm.comment_mq.message.config.UserActionConfig;
 import com.xm.comment_mq.message.impl.PayOrderCreateMessage;
 import com.xm.comment_mq.message.impl.PayOrderSucessMessage;
+import com.xm.comment_serialize.module.pay.entity.SpWxEntPayOrderInEntity;
 import com.xm.comment_serialize.module.pay.entity.SpWxOrderInEntity;
 import com.xm.comment_serialize.module.pay.entity.SpWxOrderNotifyEntity;
+import com.xm.comment_serialize.module.pay.message.EntPayMessage;
 import com.xm.comment_serialize.module.pay.vo.WxPayOrderResultVo;
 import com.xm.comment_serialize.module.user.bo.SuBillToPayBo;
 import com.xm.comment_serialize.module.user.entity.SuBillEntity;
@@ -47,6 +52,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service("wxPayApiService")
@@ -62,8 +68,10 @@ public class WxPayApiServiceImpl implements WxPayApiService {
     private WxPayService wxService;
     @Resource(name = "wxPayPropertiesEx")
     private WxPayPropertiesEx wxPayPropertiesEx;
+    @Autowired
+    private SpWxEntPayOrderInMapper spWxEntPayOrderInMapper;
 
-    @Transactional
+    @GlobalTransactional(rollbackFor = Exception.class)
     @Override
     public WxPayOrderResultVo collection(SuBillToPayBo suBillToPayBo) throws WxPayException {
         WxPayUnifiedOrderRequest request = createWxOrderRequest(suBillToPayBo);
@@ -130,9 +138,70 @@ public class WxPayApiServiceImpl implements WxPayApiService {
         return wxPayUnifiedOrderRequest;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
-    public void payment(List<SuBillEntity> suBillEntities) {
+    public void payment(EntPayMessage entPayMessage) throws WxPayException {
+        SpWxEntPayOrderInEntity record = new SpWxEntPayOrderInEntity();
+        record.setBillPayId(entPayMessage.getScBillPayEntity().getId());
+        if(spWxEntPayOrderInMapper.selectCount(record) > 0)
+            return;
+        EntPayRequest request = new EntPayRequest();
+        request.setMchAppid(wxPayPropertiesEx.getAppId());
+        request.setMchId(wxPayPropertiesEx.getMchId());
+        request.setPartnerTradeNo(StrUtil.isBlank(entPayMessage.getRetryTradeNo()) ? GenNumUtil.genWxEntPayOrderNum() : entPayMessage.getRetryTradeNo());
+        request.setOpenid(entPayMessage.getScBillPayEntity().getOpenId());
+        request.setCheckName("NO_CHECK");
+        request.setDescription(entPayMessage.getDesc());
+        request.setSpbillCreateIp(entPayMessage.getIp());
+        request.setAmount(entPayMessage.getScBillPayEntity().getTotalMoney());
+request.setAmount(100000);
+        EntPayResult result = null;
+        SpWxEntPayOrderInEntity spWxEntPayOrderInEntity = null;
+        try {
+            result = wxService.getEntPayService().entPay(request);
+            spWxEntPayOrderInEntity = entPay(entPayMessage,request,result,null);
+        } catch (WxPayException e) {
+            spWxEntPayOrderInEntity = entPay(entPayMessage,request,null,e);
+            log.error("微信企业付款失败 信息：{} error：{}",JSON.toJSONString(spWxEntPayOrderInEntity),e);
+//            throw e;
+//            if(e.getErrCode().equals("SYSTEMERROR")){
+//                if(StrUtil.isNotBlank(entPayMessage.getRetryTradeNo())){
+//                    log.info("微信企业付款重试失败");
+//                    return;
+//                }
+//                log.info("微信企业付款接口繁忙，即将重试");
+//                entPayMessage.setRetryTradeNo(request.getPartnerTradeNo());
+//                rabbitTemplate.convertAndSend(PayMqConfig.EXCHANGE,PayMqConfig.KEY_WX_ENT_PAY,entPayMessage);
+//            }else {
+//                throw e;
+//            }
+        } finally {
+            rabbitTemplate.convertAndSend(PayMqConfig.EXCHANGE_ENT,"",spWxEntPayOrderInEntity);
+        }
+    }
 
+    //保存企业付款记录
+    private SpWxEntPayOrderInEntity entPay(EntPayMessage entPayMessage,EntPayRequest request,EntPayResult result,WxPayException e){
+        SpWxEntPayOrderInEntity entity = new SpWxEntPayOrderInEntity();
+        BeanUtil.copyProperties(request,entity);
+        entity.setBillPayId(entPayMessage.getScBillPayEntity().getId());
+        entity.setBillIds(entPayMessage.getScBillPayEntity().getBillIds());
+        entity.setDes(request.getDescription());
+        entity.setCreateTime(new Date());
+        if(!(result == null)) {
+            BeanUtil.copyProperties(result, entity);
+            entity.setState(1);
+        }
+        if(e != null){
+            entity.setReturnCode(e.getReturnCode());
+            entity.setReturnMsg(e.getReturnMsg());
+            entity.setResultCode(e.getResultCode());
+            entity.setErrCode(e.getErrCode());
+            entity.setErrCodeDes(e.getErrCodeDes());
+            entity.setState(2);
+        }
+        spWxEntPayOrderInMapper.insertUseGeneratedKeys(entity);
+        return entity;
     }
 
     @Override
@@ -144,7 +213,6 @@ public class WxPayApiServiceImpl implements WxPayApiService {
             log.debug("微信支付回调：该支付信息已被处理 单号：[{}]",notifyResult.getOutTradeNo());
             return;
         }
-
         SpWxOrderNotifyEntity spWxOrderNotifyEntity = new SpWxOrderNotifyEntity();
         BeanUtil.copyProperties(notifyResult,spWxOrderNotifyEntity);
         spWxOrderNotifyEntity.setCreateTime(new Date());

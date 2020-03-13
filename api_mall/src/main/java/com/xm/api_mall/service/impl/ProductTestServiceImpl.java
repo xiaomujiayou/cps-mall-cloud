@@ -40,6 +40,12 @@ public class ProductTestServiceImpl implements ProductTestService {
         SmProductEntityEx smProductEntityEx = pddProductService.detail(productSaleInfoForm.getGoodsId(),pid,userId,productSaleInfoForm.getShareUserId());
         SuOrderEntity suOrderEntity = createSuOrderEntity(smProductEntityEx,pid,userId,productSaleInfoForm);
         rabbitTemplate.convertAndSend(OrderMqConfig.EXCHANGE,OrderMqConfig.KEY,suOrderEntity);
+        suOrderEntity.setState(OrderStateConstant.CONFIRM_RECEIPT);
+        suOrderEntity.setOrderModifyAt(new Date());
+        rabbitTemplate.convertAndSend(OrderMqConfig.EXCHANGE,OrderMqConfig.KEY,suOrderEntity);
+        suOrderEntity.setOrderModifyAt(new Date());
+        suOrderEntity.setState(OrderStateConstant.CHECK_SUCESS);
+        rabbitTemplate.convertAndSend(OrderMqConfig.EXCHANGE,OrderMqConfig.KEY,suOrderEntity);
         return shareLinkBo;
     }
 

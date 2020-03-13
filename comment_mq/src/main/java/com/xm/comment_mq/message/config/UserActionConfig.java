@@ -15,5 +15,7 @@ public class UserActionConfig {
     public static final String QUEUE_USER = EXCHANGE + ".user.queue";
     //用户服务队列
     public static final String QUEUE_MALL = EXCHANGE + ".mall.queue";
+    //定时任务队列
+    public static final String QUEUE_CRON = EXCHANGE + ".cron.queue";
 
 }

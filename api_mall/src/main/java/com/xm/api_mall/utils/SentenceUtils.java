@@ -73,8 +73,13 @@ public class SentenceUtils {
     
     public static void main(String[] args) throws IOException {
 
-        String str = "恒源祥男袜子秋季薄款运动棉袜透气短筒防臭吸汗低帮浅口隐形袜子";
-//        List<Term> phraseList = HanLP.segment(str);
-        System.out.println(getUpset(str));
+//        String str = "【镇宅辟邪】桃木中国结挂件客厅大号福字电视墙过年乔迁对联挂饰";
+        String str = "正牌微信支付服务商，已申请下来所有微信支付代理资质";
+
+        List<String> p = SentenceUtils.participles(str);
+        double a = (p.stream().filter(o -> o.length() >= 3).count())/Double.valueOf(p.size());
+        double b = (p.stream().filter(o -> o.length() == 2).count())/Double.valueOf(p.size());
+        System.out.println(p);
+        System.out.println(a*3 + b*1.5);
     }
 }

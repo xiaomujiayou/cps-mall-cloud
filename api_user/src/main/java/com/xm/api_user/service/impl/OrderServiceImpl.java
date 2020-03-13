@@ -49,9 +49,7 @@ public class OrderServiceImpl implements OrderService {
      * ②:更新旧订单
      * @param order
      */
-//    @LcnTransaction
     @GlobalTransactional(rollbackFor = Exception.class)
-//    @Transactional(rollbackFor = Exception.class)
     @Override
     public void receiveOrderMsg(SuOrderEntity order) {
         //判断是否为新收录订单（系统未曾收录的）
@@ -63,6 +61,7 @@ public class OrderServiceImpl implements OrderService {
         }else if(repeated(oldOrder,order))          //是否重复收录
             return;
         //更新订单状态，并根据情况发放佣金
+        order.setId(oldOrder.getId());
         orderService.updateOrderState(order,oldOrder);
     }
 
@@ -149,7 +148,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public PageBean<OrderBillDto> getOrderBill(Integer userId,Integer type, Integer platformType, Integer state, Integer pageNum, Integer pageSize) {
         PageHelper.startPage(pageNum,pageSize);
-        OrderByHelper.orderBy("sb.create_time desc");
+        OrderByHelper.orderBy("so.create_time desc");
         List<OrderBillDto> list = suBillMapperEx.getOrderBill(userId ,type,platformType,state);
         return new PageBean<>(list);
     }

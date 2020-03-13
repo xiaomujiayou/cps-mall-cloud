@@ -18,10 +18,6 @@ import java.util.TimeZone;
 @EnableDiscoveryClient
 @SpringBootApplication
 public class CronServiceApplication {
-    @PostConstruct
-    void started() {
-        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
-    }
     public static void main(String[] args) {
         SpringApplication.run(CronServiceApplication.class, args);
     }

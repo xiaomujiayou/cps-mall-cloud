@@ -2,8 +2,14 @@ spring:
   application:
     name: cron-service
   profiles:
-    active: dev,plugin,cloud-dev,assembly-dev,api-dev
+    active: dev,plugin,cloud-dev,assembly-dev,api-dev,seata-dev
 
 pdd:
   client-id: 022c61074e3d46dd946a45f3024a75d8
   client-secret: 702bee4684121e512392cb0405b9292fbc624234
+
+profit:
+  min-money: 30
+  ip: 127.0.0.1
+  page-size: 5
+  pay-desc: 截至到 {time} 有效佣金

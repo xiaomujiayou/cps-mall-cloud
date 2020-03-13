@@ -6,4 +6,4 @@ ADD target/*.jar target.jar
 
 EXPOSE 8109
 
-ENTRYPOINT ["java", "-jar", "/target.jar","--spring.profiles.active=prod,plugin,cloud-prod,assembly-prod,api-prod","-Duser.timezone=GMT+08"]
+ENTRYPOINT ["java", "-jar", "/target.jar","--spring.profiles.active=prod,plugin,cloud-prod,assembly-prod,api-prod,seata-prod","-Duser.timezone=GMT+08"]

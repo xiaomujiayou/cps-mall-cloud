@@ -17,6 +17,7 @@ public class OrderBillVo {
     private Integer billId;
     private String billSn;
     private Integer orderState;
+    private String orderSn;
     private Integer state;
     private Integer originalPrice;
     private Integer quantity;

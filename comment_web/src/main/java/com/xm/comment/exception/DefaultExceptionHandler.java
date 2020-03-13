@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.nio.charset.Charset;
 
 /**
@@ -27,13 +28,15 @@ public class DefaultExceptionHandler {
 
     @ResponseBody
     @ExceptionHandler(value = Exception.class)
-    public Msg handle(HttpServletRequest request, Exception e) throws Exception {
+    public Msg handle(HttpServletRequest request, HttpServletResponse response, Exception e) throws Exception {
         e.printStackTrace();
         String from = request.getHeader("from");
         if(StrUtil.isBlank(from) || !from.equals("zuul"))
             //服务间传递的异常，继续传递
             throw e;
         //处理zuul和最外层服务间的异常
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
         if(e instanceof GlobleException) {
             //自定义异常，或内层服务的包装异常
             GlobleException ge = (GlobleException)e;

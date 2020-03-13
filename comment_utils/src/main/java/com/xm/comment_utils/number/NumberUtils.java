@@ -1,5 +1,7 @@
 package com.xm.comment_utils.number;
 
+import cn.hutool.core.util.NumberUtil;
+
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -52,5 +54,13 @@ public class NumberUtils {
         Random random = new Random();
         int s = random.nextInt(max) % (max - min + 1) + min;
         return s;
+    }
+
+    /**
+     * 分转元，且保留两位小数
+     * @return
+     */
+    public static String fen2yuan(Integer money){
+        return NumberUtil.roundStr(NumberUtil.div(Double.valueOf(money).doubleValue() ,100d),2);
     }
 }

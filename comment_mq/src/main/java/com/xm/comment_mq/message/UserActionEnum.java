@@ -31,12 +31,14 @@ public enum UserActionEnum {
     USER_BILL_STATE_CHANGE(10302,"用户账单状态已改变","api-user", UserBillStateChangeMessage.class,true),
     USER_BILL_COMMISSION_SUCESS(10303,"用户账单结算成功(钱到位)","", UserBillCommissionSucessMessage.class,false),
     USER_BILL_COMMISSION_FAIL(10304,"用户账单结算失败(钱到位)","", UserBillCommissionFailSucessMessage.class,false),
+    USER_PAYMENT_SUCESS(10305,"用户佣金发放成功","",UserPaymentSucessMessage.class,true),
 
     //用户使用事件
     USER_OPEN_APP(10201,"用户打开程序","", UserOpenAppMessage.class,false),
     USER_SHOW_GOODS(10202,"用户浏览一个商品","", UserShowGoodsMessage.class,true),
     USER_SEARCH_GOODS(10203,"用户搜索一个商品","", UserSearchGoodsMessage.class,true),
     USER_SMART_SEARCH_GOODS(10203,"用户智能搜索一个商品","", UserSmartSearchGoodsMessage.class,true),
+
 
     //支付相关事件
     PAY_ORDER_CRREATE(10401,"支付订单创建","api-pay",PayOrderCreateMessage.class,true),

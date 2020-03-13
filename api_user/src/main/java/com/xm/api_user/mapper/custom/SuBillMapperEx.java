@@ -12,7 +12,7 @@ import java.util.List;
 public interface SuBillMapperEx extends MyMapper<SuBillEntity> {
 
     /**
-     * 获取
+     * 获取订单相关
      * @param userId
      * @param type
      * @param platformType
@@ -20,5 +20,12 @@ public interface SuBillMapperEx extends MyMapper<SuBillEntity> {
      * @return
      */
     List<OrderBillDto> getOrderBill(Integer userId,Integer type,Integer platformType,Integer state);
+
+    /**
+     * 获取账单相关
+     * @param userId
+     * @return
+     */
+    List<OrderBillDto> getBillInfo(Integer userId,List<String> billIds);
 
 }

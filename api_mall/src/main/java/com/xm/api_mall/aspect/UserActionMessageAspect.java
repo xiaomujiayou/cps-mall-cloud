@@ -80,8 +80,10 @@ public class UserActionMessageAspect {
     @Around("parseUrlPointCut()")
     public Object parseUrlPointCut(ProceedingJoinPoint joinPoint) throws Throwable{
         TextToGoodsUtils.GoodsSpec goodsSpecMsg = (TextToGoodsUtils.GoodsSpec)joinPoint.proceed();
+        if(goodsSpecMsg.getParseType() != 1)
+            return goodsSpecMsg;
         SmProductEntityEx smProductEntity = new SmProductEntityEx();
-        BeanUtil.copyProperties(goodsSpecMsg,smProductEntity);
+        BeanUtil.copyProperties(goodsSpecMsg.getGoodsInfo(),smProductEntity);
         Integer userId = (Integer) joinPoint.getArgs()[0];
         String url = (String) joinPoint.getArgs()[2];
         rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE,"",new UserSmartSearchGoodsMessage(userId,smProductEntity,url,smProductEntity.getName()));

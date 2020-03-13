@@ -18,4 +18,6 @@ public interface ProductTestService {
      * @throws Exception
      */
     public ShareLinkBo saleInfo(Integer userId, String pid, GetProductSaleInfoForm productSaleInfoForm) throws Exception;
+
+
 }

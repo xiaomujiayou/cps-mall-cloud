@@ -4,6 +4,7 @@ import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
 import com.github.binarywang.wxpay.bean.result.WxPayUnifiedOrderResult;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.xm.comment_serialize.module.pay.entity.SpWxOrderNotifyEntity;
+import com.xm.comment_serialize.module.pay.message.EntPayMessage;
 import com.xm.comment_serialize.module.pay.vo.WxPayOrderResultVo;
 import com.xm.comment_serialize.module.user.bo.SuBillToPayBo;
 import com.xm.comment_serialize.module.user.entity.SuBillEntity;
@@ -24,9 +25,9 @@ public interface WxPayApiService {
 
     /**
      * 付款
-     * @param suBillEntities
+     * @param entPayMessage
      */
-    public void payment(List<SuBillEntity> suBillEntities);
+    public void payment(EntPayMessage entPayMessage) throws WxPayException;
 
     /**
      * 微信支付成功回调

@@ -71,22 +71,20 @@
         su.state u_state,
         su.create_time u_create_time
     FROM
-        su_bill sb
-    LEFT JOIN
         su_order so
-            ON sb.attach = so.id
     LEFT JOIN
         su_user su
             ON su.id = so.user_id
+    LEFT JOIN
+        su_bill sb
+            ON sb.attach = so.id
+            AND sb.`user_id` = so.`user_id`
     <where>
-        <if test="userId != null">
-            AND sb.user_id = #{userId}
-        </if>
         <if test="type != null and type == 1">
-            AND sb.user_id = so.user_id
+            AND so.user_id = #{userId}
         </if>
         <if test="type != null and type == 2">
-            AND sb.user_id != so.user_id AND sb.type = 4
+            AND so.share_user_id = #{userId}
         </if>
         <if test="platformType != null">
             AND so.platform_type = #{platformType}
@@ -96,6 +94,35 @@
         </if>
     </where>
   </select>
-
-
+    <select id="getBillInfo" resultMap="BaseResultMap">
+        SELECT
+            *,
+            sb.id b_id,
+            sb.type b_type,
+            sb.state b_state,
+            sb.promotion_rate b_promotion_rate,
+            sb.create_time b_create_time,
+            so.id o_id,
+            so.state o_state,
+            so.type o_type,
+            so.promotion_rate o_promotion_rate,
+            so.create_time o_create_time,
+            su.id u_id,
+            su.state u_state,
+            su.create_time u_create_time
+        FROM
+            su_bill sb
+        LEFT JOIN
+            su_order so
+                ON sb.attach = so.id
+        LEFT JOIN
+            su_user su
+                ON sb.from_user_id = su.id
+        <where>
+            sb.id IN
+            <foreach collection="billIds" item="id" index="index" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </where>
+    </select>
 </mapper>

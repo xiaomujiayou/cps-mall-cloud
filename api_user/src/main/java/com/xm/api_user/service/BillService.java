@@ -2,11 +2,15 @@ package com.xm.api_user.service;
 
 import com.xm.api_user.mapper.custom.SuBillMapperEx;
 import com.xm.comment_serialize.module.lottery.ex.SlPropSpecEx;
+import com.xm.comment_serialize.module.pay.entity.SpWxEntPayOrderInEntity;
 import com.xm.comment_serialize.module.user.bo.SuBillToPayBo;
+import com.xm.comment_serialize.module.user.dto.OrderBillDto;
 import com.xm.comment_serialize.module.user.entity.SuBillEntity;
 import com.xm.comment_serialize.module.user.entity.SuOrderEntity;
 import com.xm.comment_serialize.module.user.vo.BillVo;
 import com.xm.comment_utils.mybatis.PageBean;
+
+import java.util.List;
 
 public interface BillService {
 
@@ -30,6 +34,13 @@ public interface BillService {
     public void invalidOrderBill(SuOrderEntity order);
 
     public PageBean<BillVo> getList(Integer userId, Integer state, Integer type, Integer pageNum, Integer pageSize);
+
+    /**
+     * 获取账单详情
+     * @param userId
+     * @return
+     */
+    public List<OrderBillDto> getBillInfo(Integer userId, List<String> billIds);
 
     /**
      * 创建账单
@@ -62,4 +73,12 @@ public interface BillService {
      * @param suBillEntity
      */
     public void paySucess(SuBillEntity suBillEntity);
+
+    /**
+     * 企业付款成功
+     * @param spWxEntPayOrderInEntity
+     */
+    public void onEntPayResult(SpWxEntPayOrderInEntity spWxEntPayOrderInEntity);
+
+
 }

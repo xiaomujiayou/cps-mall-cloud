@@ -19,6 +19,11 @@
     </properties>
 
     <dependencies>
+        <!-- 阿里poi -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>easyexcel</artifactId>
+        </dependency>
 
         <!-- 拼多多sdk -->
         <dependency>
@@ -32,6 +37,17 @@
             <groupId>com.xm</groupId>
             <artifactId>comment_web</artifactId>
             <version>${project.current.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.xm</groupId>
+            <artifactId>comment_seata</artifactId>
+            <version>${project.current.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <dependency>

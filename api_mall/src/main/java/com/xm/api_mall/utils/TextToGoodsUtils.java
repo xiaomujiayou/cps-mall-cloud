@@ -18,6 +18,7 @@ public class TextToGoodsUtils {
      */
     public static GoodsSpec parse(String text){
         GoodsSpec goodsSpec = new GoodsSpec();
+        //链接识别
         String goodsId = RegeUtils.matchFrist(text,PDD_URL_PATTERN);
         if(goodsId!=null){
             goodsSpec.setGoodsId(goodsId);
@@ -25,8 +26,19 @@ public class TextToGoodsUtils {
             goodsSpec.setParseType(1);
             return goodsSpec;
         }
+        //标题识别
+        if(isGoodsName(text)){
+            goodsSpec.setParseType(3);
+            return goodsSpec;
+        }
         goodsSpec.setParseType(0);
         return goodsSpec;
+    }
+
+    private static boolean isGoodsName(String text){
+        if(text.length() > 15 && text.length() < 40)
+            return true;
+        return false;
     }
 
     @Data

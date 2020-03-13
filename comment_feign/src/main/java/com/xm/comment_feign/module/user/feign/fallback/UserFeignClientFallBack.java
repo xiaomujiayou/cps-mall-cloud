@@ -3,6 +3,7 @@ package com.xm.comment_feign.module.user.feign.fallback;
 import com.xm.comment_feign.module.user.feign.UserFeignClient;
 import com.xm.comment_serialize.module.lottery.ex.SlPropSpecEx;
 import com.xm.comment_serialize.module.user.bo.SuBillToPayBo;
+import com.xm.comment_serialize.module.user.dto.OrderBillDto;
 import com.xm.comment_serialize.module.user.vo.MenuTipVo;
 import com.xm.comment_utils.exception.GlobleException;
 import com.xm.comment_utils.response.MsgEnum;
@@ -60,6 +61,11 @@ public class UserFeignClientFallBack implements UserFeignClient {
 
     @Override
     public SuBillToPayBo createByProp(SlPropSpecEx slPropSpecEx) {
+        throw new GlobleException(MsgEnum.SERVICE_AVAILABLE);
+    }
+
+    @Override
+    public List<OrderBillDto> getBillInfo(Integer userId, List<String> billIds) {
         throw new GlobleException(MsgEnum.SERVICE_AVAILABLE);
     }
 

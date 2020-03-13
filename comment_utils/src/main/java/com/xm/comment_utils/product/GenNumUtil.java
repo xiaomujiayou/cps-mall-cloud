@@ -8,6 +8,14 @@ import java.util.Date;
 public class GenNumUtil {
 
     /**
+     * 生成wx企业付款订单号
+     * @return
+     */
+    public static String genWxEntPayOrderNum(){
+        return DateUtil.format(new Date(),"yyyyMMddHHmmss")+ RandomUtil.randomNumbers(6);
+    }
+
+    /**
      * 生成订单号
      * @return
      */

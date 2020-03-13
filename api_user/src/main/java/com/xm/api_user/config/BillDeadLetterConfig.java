@@ -26,9 +26,13 @@ public class BillDeadLetterConfig {
         args.put(RabbitMqConstant.DEAD_QUEUE_ARG_KEY_NAME,BillMqConfig.KEY_PAY_OVERTIME_DEAD);
         return new Queue(BillMqConfig.QUEUE_PAY_OVERTIME,true,false,false,args);
     }
+    @Bean
+    public DirectExchange billExchange(){
+        return new DirectExchange(BillMqConfig.EXCHANGE);
+    }
     // 声明死信队列绑定关系
     @Bean
-    public Binding billLetterBinding(Queue waittingPayBillQueue){
-        return BindingBuilder.bind(waittingPayBillQueue).to(new DirectExchange(BillMqConfig.EXCHANGE)).with(BillMqConfig.KEY_PAY_OVERTIME);
+    public Binding billLetterBinding(Queue waittingPayBillQueue,DirectExchange billExchange){
+        return BindingBuilder.bind(waittingPayBillQueue).to(billExchange).with(BillMqConfig.KEY_PAY_OVERTIME);
     }
 }

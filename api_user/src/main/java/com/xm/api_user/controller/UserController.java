@@ -7,6 +7,7 @@ import com.xm.api_user.service.UserService;
 import com.xm.comment.annotation.LoginUser;
 import com.xm.comment_serialize.module.user.bo.UserProfitBo;
 import com.xm.comment_utils.exception.GlobleException;
+import com.xm.comment_utils.number.NumberUtils;
 import com.xm.comment_utils.response.Msg;
 import com.xm.comment_utils.response.MsgEnum;
 import com.xm.comment_utils.response.R;
@@ -114,29 +115,23 @@ public class UserController{
     public List<UserProfitVo> getUserProft(@LoginUser Integer userId) {
         UserProfitBo userProfitBo = userService.getUserProftList(userId);
         List<UserProfitVo> result = new ArrayList<>();
-        result.add(new UserProfitVo("今日收益",fen2yuan(userProfitBo.getTodayProfit()),""));
-        result.add(new UserProfitVo("历史收益",fen2yuan(userProfitBo.getTotalProfit()),""));
-        result.add(new UserProfitVo("等待发放",fen2yuan(userProfitBo.getWaitProfit()),""));
-        result.add(new UserProfitVo("分享成交额",fen2yuan(userProfitBo.getTotalShare()),"/pages/order/order?type=1"));
+        result.add(new UserProfitVo("今日收益",NumberUtils.fen2yuan(userProfitBo.getTodayProfit()),""));
+        result.add(new UserProfitVo("历史收益",NumberUtils.fen2yuan(userProfitBo.getTotalProfit()),""));
+        result.add(new UserProfitVo("等待发放",NumberUtils.fen2yuan(userProfitBo.getWaitProfit()),""));
+        result.add(new UserProfitVo("分享成交额",NumberUtils.fen2yuan(userProfitBo.getTotalShare()),"/pages/order/order?type=1"));
         result.add(new UserProfitVo("锁定用户",userProfitBo.getTotalProxyUser().toString(),"/pages/profit/profit"));
-        result.add(new UserProfitVo("自购成交额",fen2yuan(userProfitBo.getTotalConsumption()),"/pages/order/order?type=0"));
+        result.add(new UserProfitVo("自购成交额",NumberUtils.fen2yuan(userProfitBo.getTotalConsumption()),"/pages/order/order?type=0"));
         return result;
     }
     @GetMapping("/profit/desc")
     public Map<String,Object> getUserProft1(@LoginUser Integer userId) {
         UserProfitBo userProfitBo = userService.getUserProftDesc(userId);
         Map<String,Object> map = new HashMap<>();
-        map.put("totalCoupon",fen2yuan(userProfitBo.getTotalCoupon()));
-        map.put("totalCommission",fen2yuan(userProfitBo.getTotalCommission()));
+        map.put("totalCoupon", NumberUtils.fen2yuan(userProfitBo.getTotalCoupon()));
+        map.put("totalCommission",NumberUtils.fen2yuan(userProfitBo.getTotalCommission()));
         return map;
     }
 
-    /**
-     * 分转元，且保留两位小数
-     * @return
-     */
-    private String fen2yuan(Integer money){
-        return NumberUtil.roundStr(NumberUtil.div(Double.valueOf(money).doubleValue() ,100d),2);
-    }
+
 
 }

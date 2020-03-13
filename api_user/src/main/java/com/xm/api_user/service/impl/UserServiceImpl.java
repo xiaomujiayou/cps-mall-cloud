@@ -14,6 +14,7 @@ import com.xm.comment_mq.message.config.UserActionConfig;
 import com.xm.comment_mq.message.impl.UserAddProxyMessage;
 import com.xm.comment_mq.message.impl.UserFristLoginMessage;
 import com.xm.comment_serialize.module.user.bo.UserProfitBo;
+import com.xm.comment_serialize.module.user.constant.BillStateConstant;
 import com.xm.comment_serialize.module.user.constant.BillTypeConstant;
 import com.xm.comment_utils.exception.GlobleException;
 import com.xm.comment_feign.module.mall.feign.MallFeignClient;
@@ -221,7 +222,7 @@ public class UserServiceImpl implements UserService {
         userProfitBo.setTotalConsumption(orderInfo.get("totalConsumption").intValue());
         userProfitBo.setTodayProfit(suOrderMapperEx.getUserTotalCommission(userId,null, DateUtil.parse(DateUtil.today()),new Date()).intValue());
         userProfitBo.setTotalProfit(suOrderMapperEx.getUserTotalCommission(userId,null,null,null).intValue());
-        userProfitBo.setWaitProfit(suOrderMapperEx.getUserTotalCommission(userId, CollUtil.newArrayList(1),null,null).intValue());
+        userProfitBo.setWaitProfit(suOrderMapperEx.getUserTotalCommission(userId, CollUtil.newArrayList(BillStateConstant.WAIT,BillStateConstant.READY),null,null).intValue());
         userProfitBo.setTotalShare(suOrderMapperEx.getUserShareOrderAbout(userId).intValue());
         ProxyInfoVo proxyInfoVo = getProxyInfo(userId);
         userProfitBo.setTotalProxyUser(proxyInfoVo.getTotalDirectProxy()+proxyInfoVo.getTotalIndirectProxy());

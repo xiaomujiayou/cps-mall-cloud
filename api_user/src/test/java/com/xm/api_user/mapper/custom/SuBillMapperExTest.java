@@ -1,5 +1,6 @@
 package com.xm.api_user.mapper.custom;
 
+import cn.hutool.core.collection.CollUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.xm.api_user.ApiUserApplicationTests;
@@ -13,8 +14,12 @@ public class SuBillMapperExTest extends ApiUserApplicationTests {
     @Autowired
     private SuBillMapperEx suBillMapperEx;
 
+//    @Test
+//    public void getOrderBill(){
+//        System.out.println(JSON.toJSONString(suBillMapperEx.getOrderBill(1,2,1,1), SerializerFeature.PrettyFormat));
+//    }
     @Test
     public void getOrderBill(){
-        System.out.println(JSON.toJSONString(suBillMapperEx.getOrderBill(1,2,1,1), SerializerFeature.PrettyFormat));
+        System.out.println(JSON.toJSONString(suBillMapperEx.getBillInfo(1, CollUtil.newArrayList("")), SerializerFeature.PrettyFormat));
     }
 }

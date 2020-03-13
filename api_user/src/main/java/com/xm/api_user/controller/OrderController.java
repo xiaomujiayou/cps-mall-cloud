@@ -47,12 +47,13 @@ public class OrderController {
             vo.setBillId(o.getId());
             vo.setBillSn(o.getBillSn());
             vo.setOrderState(o.getSuOrderEntity().getState());
+            vo.setOrderSn(o.getSuOrderEntity().getOrderSn());
             vo.setState(o.getState());
             vo.setOriginalPrice(o.getSuOrderEntity().getOriginalPrice());
             vo.setQuantity(o.getSuOrderEntity().getQuantity());
             vo.setAmount(o.getSuOrderEntity().getAmount());
             vo.setMoney(o.getMoney());
-            vo.setCreateTime(o.getCreateTime());
+            vo.setCreateTime(o.getSuOrderEntity().getCreateTime());
             return vo;
         }).collect(Collectors.toList());
         PageBean<OrderBillVo> result = new PageBean<>(vos);

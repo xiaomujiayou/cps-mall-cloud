@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.xm.api_mall.component.PlatformContext;
 import com.xm.api_mall.exception.ApiCallException;
+import com.xm.api_mall.utils.SentenceUtils;
 import com.xm.api_mall.utils.TextToGoodsUtils;
 import com.xm.comment.annotation.LoginUser;
 import com.xm.comment.annotation.Pid;
@@ -175,5 +176,4 @@ public class ProductController {
         }
         return goodsSpec;
     }
-    
 }

@@ -29,10 +29,17 @@ public abstract class AbsMessageReceiver {
     private MessageManager messageManager;
 
     public void onMessage(JSONObject jsonMessage, Channel channel, Message message) throws IOException {
-        UserActionEnum userActionEnum = jsonMessage.getObject("userActionEnum",UserActionEnum.class);
-        log.debug("user action:{} data:{}",userActionEnum.getName(), JSON.toJSONString(jsonMessage));
-        AbsUserActionMessage absUserActionMessage = (AbsUserActionMessage) jsonMessage.toJavaObject(userActionEnum.getMessageType());
-        messageManager.handleMessage(absUserActionMessage);
-        channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
+        Long msgId = message.getMessageProperties().getDeliveryTag();
+        try{
+            UserActionEnum userActionEnum = jsonMessage.getObject("userActionEnum",UserActionEnum.class);
+            log.debug("user action:{} data:{}",userActionEnum.getName(), JSON.toJSONString(jsonMessage));
+            AbsUserActionMessage absUserActionMessage = (AbsUserActionMessage) jsonMessage.toJavaObject(userActionEnum.getMessageType());
+            messageManager.handleMessage(absUserActionMessage);
+        }catch (Exception e){
+            channel.basicReject(msgId,false);
+            log.error("user action error：{} msg：{} 处理失败 error：{}",msgId,jsonMessage,e);
+        } finally {
+            channel.basicAck(msgId,false);
+        }
     }
 }

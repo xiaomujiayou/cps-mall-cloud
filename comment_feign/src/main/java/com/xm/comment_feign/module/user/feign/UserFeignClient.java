@@ -3,6 +3,7 @@ package com.xm.comment_feign.module.user.feign;
 import com.xm.comment_feign.module.user.feign.fallback.UserFeignClientFallBack;
 import com.xm.comment_serialize.module.lottery.ex.SlPropSpecEx;
 import com.xm.comment_serialize.module.user.bo.SuBillToPayBo;
+import com.xm.comment_serialize.module.user.dto.OrderBillDto;
 import com.xm.comment_serialize.module.user.entity.SuConfigEntity;
 import com.xm.comment_serialize.module.user.entity.SuUserEntity;
 import com.xm.comment_serialize.module.user.ex.RolePermissionEx;
@@ -43,6 +44,9 @@ public interface UserFeignClient {
 
     @PostMapping(value = "/bill/create/prop" ,consumes = "application/json")
     public SuBillToPayBo createByProp(@RequestBody SlPropSpecEx slPropSpecEx);
+
+    @GetMapping("/bill/info")
+    public List<OrderBillDto> getBillInfo(@RequestParam Integer userId,@RequestParam List<String> billIds);
 
     @PostMapping(value = "/menu/tips/num",consumes = "application/json")
     public void addNum(@RequestParam Integer userId,@RequestBody List<Integer> menuIds);
