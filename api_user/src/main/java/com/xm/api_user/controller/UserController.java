@@ -115,12 +115,13 @@ public class UserController{
     public List<UserProfitVo> getUserProft(@LoginUser Integer userId) {
         UserProfitBo userProfitBo = userService.getUserProftList(userId);
         List<UserProfitVo> result = new ArrayList<>();
-        result.add(new UserProfitVo("今日收益",NumberUtils.fen2yuan(userProfitBo.getTodayProfit()),""));
-        result.add(new UserProfitVo("历史收益",NumberUtils.fen2yuan(userProfitBo.getTotalProfit()),""));
-        result.add(new UserProfitVo("等待发放",NumberUtils.fen2yuan(userProfitBo.getWaitProfit()),""));
-        result.add(new UserProfitVo("分享成交额",NumberUtils.fen2yuan(userProfitBo.getTotalShare()),"/pages/order/order?type=1"));
+        result.add(new UserProfitVo("今日收益",NumberUtils.fen2yuan(userProfitBo.getTodayProfit()),"/pages/my-bill/index"));
+        result.add(new UserProfitVo("历史收益",NumberUtils.fen2yuan(userProfitBo.getTotalProfit()),"/pages/my-bill/index"));
+        result.add(new UserProfitVo("等待确认",NumberUtils.fen2yuan(userProfitBo.getWaitProfit()),"/pages/my-bill/index?type=0&state=1"));
+        result.add(new UserProfitVo("准备发放",NumberUtils.fen2yuan(userProfitBo.getReadyProfit()),"/pages/my-bill/index?type=0&state=2"));
         result.add(new UserProfitVo("锁定用户",userProfitBo.getTotalProxyUser().toString(),"/pages/profit/profit"));
         result.add(new UserProfitVo("自购成交额",NumberUtils.fen2yuan(userProfitBo.getTotalConsumption()),"/pages/order/order?type=0"));
+        result.add(new UserProfitVo("分享成交额",NumberUtils.fen2yuan(userProfitBo.getTotalShare()),"/pages/order/order?type=1"));
         return result;
     }
     @GetMapping("/profit/desc")

@@ -160,11 +160,12 @@ public class BillPayServiceImpl implements BillPayService {
             ScBillPayVo scBillPayVo = new ScBillPayVo();
             BeanUtil.copyProperties(o,scBillPayVo);
 //            scBillPayVo.setName("发放佣金");
-//            if(o.getState() == 3)
+            if(o.getState() == 3)
+                return null;
 //                scBillPayVo.setFailReason("系统出错，请稍后。。");
             return scBillPayVo;
         }).collect(Collectors.toList());
-
+        scBillPayVos = CollUtil.removeNull(scBillPayVos);
         PageBean<ScBillPayVo> payVoPageBean = new PageBean<>(scBillPayVos);
         payVoPageBean.setPageNum(scBillPayEntityPageBean.getPageNum());
         payVoPageBean.setPageSize(scBillPayEntityPageBean.getPageSize());

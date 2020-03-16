@@ -154,7 +154,6 @@ public class WxPayApiServiceImpl implements WxPayApiService {
         request.setDescription(entPayMessage.getDesc());
         request.setSpbillCreateIp(entPayMessage.getIp());
         request.setAmount(entPayMessage.getScBillPayEntity().getTotalMoney());
-request.setAmount(100000);
         EntPayResult result = null;
         SpWxEntPayOrderInEntity spWxEntPayOrderInEntity = null;
         try {
@@ -163,18 +162,6 @@ request.setAmount(100000);
         } catch (WxPayException e) {
             spWxEntPayOrderInEntity = entPay(entPayMessage,request,null,e);
             log.error("微信企业付款失败 信息：{} error：{}",JSON.toJSONString(spWxEntPayOrderInEntity),e);
-//            throw e;
-//            if(e.getErrCode().equals("SYSTEMERROR")){
-//                if(StrUtil.isNotBlank(entPayMessage.getRetryTradeNo())){
-//                    log.info("微信企业付款重试失败");
-//                    return;
-//                }
-//                log.info("微信企业付款接口繁忙，即将重试");
-//                entPayMessage.setRetryTradeNo(request.getPartnerTradeNo());
-//                rabbitTemplate.convertAndSend(PayMqConfig.EXCHANGE,PayMqConfig.KEY_WX_ENT_PAY,entPayMessage);
-//            }else {
-//                throw e;
-//            }
         } finally {
             rabbitTemplate.convertAndSend(PayMqConfig.EXCHANGE_ENT,"",spWxEntPayOrderInEntity);
         }

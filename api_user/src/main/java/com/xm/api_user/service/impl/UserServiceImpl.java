@@ -222,7 +222,8 @@ public class UserServiceImpl implements UserService {
         userProfitBo.setTotalConsumption(orderInfo.get("totalConsumption").intValue());
         userProfitBo.setTodayProfit(suOrderMapperEx.getUserTotalCommission(userId,null, DateUtil.parse(DateUtil.today()),new Date()).intValue());
         userProfitBo.setTotalProfit(suOrderMapperEx.getUserTotalCommission(userId,null,null,null).intValue());
-        userProfitBo.setWaitProfit(suOrderMapperEx.getUserTotalCommission(userId, CollUtil.newArrayList(BillStateConstant.WAIT,BillStateConstant.READY),null,null).intValue());
+        userProfitBo.setWaitProfit(suOrderMapperEx.getUserTotalCommission(userId, CollUtil.newArrayList(BillStateConstant.WAIT),null,null).intValue());
+        userProfitBo.setReadyProfit(suOrderMapperEx.getUserTotalCommission(userId, CollUtil.newArrayList(BillStateConstant.READY),null,null).intValue());
         userProfitBo.setTotalShare(suOrderMapperEx.getUserShareOrderAbout(userId).intValue());
         ProxyInfoVo proxyInfoVo = getProxyInfo(userId);
         userProfitBo.setTotalProxyUser(proxyInfoVo.getTotalDirectProxy()+proxyInfoVo.getTotalIndirectProxy());

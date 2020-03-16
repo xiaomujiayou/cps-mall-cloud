@@ -144,20 +144,20 @@ public class PddProductServiceImpl implements ProductService {
 
     @Override
     public PageBean<SmProductEntityEx> recommendList(Integer userId,String pid, ProductListForm productListForm) throws Exception {
-//        return convertSmProductEntityEx(userId,productApiService.getRecommendGoodsList(pid,productListForm.getChannelType(),productListForm.getPageNum(),productListForm.getPageSize()));
-        ProductCriteriaBo productCriteriaBo = new ProductCriteriaBo();
-        if(productListForm.getActivityTags() != null && !productListForm.getActivityTags().isEmpty())
-            productCriteriaBo.setActivityTags(productListForm.getActivityTags());
-        productCriteriaBo.setPid(pid);
-        productCriteriaBo.setUserId(userId);
-        productCriteriaBo.setPageNum(productListForm.getPageNum());
-        productCriteriaBo.setPageSize(productListForm.getPageSize());
-        productCriteriaBo.setHasCoupon(true);
-        productCriteriaBo.setOrderBy(GoodsSortContant.PROMOTION_PRICE_DESC);
-        productCriteriaBo.setMinPrice(200);
-        productCriteriaBo.setMaxPrice(10000);
-        productCriteriaBo.setOptionId(1);
-        return convertSmProductEntityEx(userId,productApiService.getProductByCriteria(productCriteriaBo));
+        return convertSmProductEntityEx(userId,productApiService.getRecommendGoodsList(pid,productListForm.getChannelType(),productListForm.getPageNum(),productListForm.getPageSize()));
+//        ProductCriteriaBo productCriteriaBo = new ProductCriteriaBo();
+//        if(productListForm.getActivityTags() != null && !productListForm.getActivityTags().isEmpty())
+//            productCriteriaBo.setActivityTags(productListForm.getActivityTags());
+//        productCriteriaBo.setPid(pid);
+//        productCriteriaBo.setUserId(userId);
+//        productCriteriaBo.setPageNum(productListForm.getPageNum());
+//        productCriteriaBo.setPageSize(productListForm.getPageSize());
+//        productCriteriaBo.setHasCoupon(true);
+//        productCriteriaBo.setOrderBy(GoodsSortContant.PROMOTION_PRICE_DESC);
+//        productCriteriaBo.setMinPrice(200);
+//        productCriteriaBo.setMaxPrice(10000);
+//        productCriteriaBo.setOptionId(1);
+//        return convertSmProductEntityEx(userId,productApiService.getProductByCriteria(productCriteriaBo));
     }
 
     private PageBean<SmProductEntityEx> convertSmProductEntityEx(Integer userId,PageBean<SmProductEntity> pageBean){
@@ -205,12 +205,13 @@ public class PddProductServiceImpl implements ProductService {
 
     @Override
     public ShareLinkBo saleInfo(Integer userId,String pid, GetProductSaleInfoForm productSaleInfoForm) throws Exception {
-        return productTestService.saleInfo(userId,pid,productSaleInfoForm);
-//        Map<String,Object> customParams = new HashMap<>();
-//        customParams.put("userId",userId);
-//        customParams.put("fromApp",productSaleInfoForm.getAppType());
-//        customParams.put("shareUserId",productSaleInfoForm.getShareUserId());
-//        return productApiService.getShareLink(JSON.toJSONString(customParams),pid,productSaleInfoForm.getGoodsId(),null);
+//        return productTestService.saleInfo(userId,pid,productSaleInfoForm);
+
+        Map<String,Object> customParams = new HashMap<>();
+        customParams.put("userId",userId);
+        customParams.put("fromApp",productSaleInfoForm.getAppType());
+        customParams.put("shareUserId",productSaleInfoForm.getShareUserId());
+        return productApiService.getShareLink(JSON.toJSONString(customParams),pid,productSaleInfoForm.getGoodsId(),null);
     }
 
 }

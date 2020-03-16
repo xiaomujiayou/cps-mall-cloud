@@ -14,6 +14,8 @@ public class UserProfitBo {
     private Integer totalProfit;
     //待发放收益
     private Integer waitProfit;
+    //准备发放
+    private Integer readyProfit;
     //总消费
     private Integer totalConsumption;
     //分享订单总额(已下单付款)

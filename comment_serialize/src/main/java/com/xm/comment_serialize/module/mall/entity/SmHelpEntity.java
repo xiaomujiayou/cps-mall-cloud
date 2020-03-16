@@ -32,5 +32,20 @@ public class SmHelpEntity implements Serializable{
 	 */
 	private Integer state;
 
+	/**
+	 * 面板宽度
+	 */
+	private Integer width;
+
+	/**
+	 * 面板高度
+	 */
+	private Integer height;
+
+	/**
+	 * 是否为圆角(0:否,1:是)
+	 */
+	private Integer round;
+
 	private java.util.Date createTime;
 }

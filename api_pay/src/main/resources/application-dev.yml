@@ -13,14 +13,8 @@ logging:
   logPath: D:\java\data\log\share\api-pay
   logLevel: debug
 
-wx:
-  pay:
-    appId: wxd14f92d77787943c
-    mchId: 1579575331
-    mchKey: dhfsdfhjksdjfknkdnfjskdnfklsnfls
-    keyPath: classpath:cert/1579575331_20200312_apiclient_cert.p12
-    notifyUrl: http://xiaomujiayou.w3.luyouxia.net/api-pay/pay/wx/order/notify
-
+#wx:
+#  pay:
 #    appId: wxd14f92d77787943c
 #    mchId: 1572782521
 #    mchKey: 71f2381fb0a1d9f79e3085f9543a9188

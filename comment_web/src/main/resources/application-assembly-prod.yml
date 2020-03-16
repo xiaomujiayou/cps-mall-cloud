@@ -32,16 +32,16 @@ spring:
       stat-view-servlet:
         enabled: true
         reset-enable: true                          # 是否能够重置数据
-        login-username: admin
-        login-password: admin
+        login-username: druidadmin
+        login-password: '!kxy521yu'
         url-pattern: /druid/*                       #访问路径为/druid时，跳转到StatViewServlet
 
   rabbitmq:
     host: rabbitmq
     port: 5672
     virtual-host: /share
-    username: guest
-    password: guest
+    username: xiaomujiayou
+    password: '!kxy521yu'
     connection-timeout: 15000     #连接超时时间
     type: simple
     #    publisher-confirms: true
@@ -58,12 +58,10 @@ spring:
           max-attempts: 3         # 消息最多消费次数3次
           initial-interval: 10000 # 消息多次消费的间隔10秒
 
-
-
   redis:
     host: redis
     port: 6379
-    password: kxy521yu
+    password: '!kxy521yu'
     database: 0
     timeout: 25000
     jedis:
@@ -81,10 +79,6 @@ spring:
     sampler:
       probability: 1
 
-#分布式事务
-#tx-lcn:
-#  client:
-#    manager-address: txlcn-tm:8070
 
 
 

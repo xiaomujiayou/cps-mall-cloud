@@ -4,4 +4,10 @@ spring:
   profiles:
     active: dev,plugin,cloud-dev,assembly-dev,seata-dev
 
-
+wx:
+  pay:
+    appId: wxd14f92d77787943c
+    mchId: 1579575331
+    mchKey: dhfsdfhjksdjfknkdnfjskdnfklsnfls
+    keyPath: classpath:cert/1579575331_20200312_apiclient_cert.p12
+    notifyUrl: http://xiaomujiayou.w3.luyouxia.net/api-pay/pay/wx/order/notify
