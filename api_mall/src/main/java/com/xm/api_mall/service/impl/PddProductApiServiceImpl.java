@@ -67,7 +67,7 @@ public class PddProductApiServiceImpl implements ProductApiService {
             Map<String,Object> range = new HashMap<>();
             range.put("range_id",0);
             range.put("range_from",criteria.getMinPrice());
-            range.put("range_to",criteria.getMaxPrice().equals(0)?null:criteria.getMaxPrice());
+            range.put("range_to",criteria.getMaxPrice().equals(0)?10000000:criteria.getMaxPrice());
             rangeList.add(range);
         }
 
