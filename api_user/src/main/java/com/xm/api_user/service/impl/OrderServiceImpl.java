@@ -130,16 +130,14 @@ public class OrderServiceImpl implements OrderService {
      * @param newOrder
      * @param oldOrder
      */
-//    @LcnTransaction
-//    @Transactional(rollbackFor = Exception.class)
     @GlobalTransactional(rollbackFor = Exception.class)
     @Override
     public void updateOrderState(SuOrderEntity newOrder,SuOrderEntity oldOrder) {
-        if(checkState(newOrder,oldOrder, OrderStateConstant.CHECK_SUCESS, OrderStateConstant.ALREADY_SETTLED)){
+        if(checkState(newOrder,oldOrder, OrderStateConstant.CHECK_SUCESS)){
             //达到发放状态，发放佣金
             billService.payOutOrderBill(newOrder);
         }
-        if(checkState(newOrder,oldOrder, OrderStateConstant.CHECK_FAIL, OrderStateConstant.PUNISH)){
+        if(checkState(newOrder,oldOrder, OrderStateConstant.CHECK_FAIL)){
             //达到失败状态，更新状态
             billService.invalidOrderBill(newOrder);
         }

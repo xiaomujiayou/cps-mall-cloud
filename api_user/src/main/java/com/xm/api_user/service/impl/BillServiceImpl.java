@@ -339,17 +339,22 @@ public class BillServiceImpl implements BillService {
         suBillMapper.updateByPrimaryKeySelective(suBillEntity1);
     }
 
-    @Transactional
+    @GlobalTransactional(rollbackFor = Exception.class)
     @Override
     public void onEntPayResult(SpWxEntPayOrderInEntity spWxEntPayOrderInEntity) {
         //付款失败则暂不处理，等待人工放款
         if(spWxEntPayOrderInEntity.getState() != 1)
             return;
-        Example example = new Example(SuBillEntity.class);
-        example.createCriteria().andIn("id",CollUtil.newArrayList(spWxEntPayOrderInEntity.getBillIds().split(",")));
-        SuBillEntity record = new SuBillEntity();
-        record.setState(BillStateConstant.ALREADY);
-        suBillMapper.updateByExampleSelective(record,example);
+        CollUtil.newArrayList(spWxEntPayOrderInEntity.getBillIds().split(",")).stream().mapToInt(Integer::valueOf).forEach(o->{
+            billService.updateBillState(suBillMapper.selectByPrimaryKey(o),BillStateConstant.ALREADY,null);
+        });
+
+
+//        Example example = new Example(SuBillEntity.class);
+//        example.createCriteria().andIn("id",CollUtil.newArrayList(spWxEntPayOrderInEntity.getBillIds().split(",")));
+//        SuBillEntity record = new SuBillEntity();
+//        record.setState(BillStateConstant.ALREADY);
+//        suBillMapper.updateByExampleSelective(record,example);
     }
 
     private BillVo covertBillVo(SuBillEntity suBillEntity,SuOrderEntity suOrderEntity,SuUserEntity suUserEntity){

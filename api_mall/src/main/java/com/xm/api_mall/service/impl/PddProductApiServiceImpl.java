@@ -7,8 +7,11 @@ import com.alibaba.fastjson.JSON;
 import com.pdd.pop.sdk.http.PopHttpClient;
 import com.pdd.pop.sdk.http.api.request.*;
 import com.pdd.pop.sdk.http.api.response.*;
+import com.xm.api_mall.mapper.SmOptMapper;
 import com.xm.api_mall.service.ConfigService;
+import com.xm.api_mall.service.OptionService;
 import com.xm.api_mall.service.ProductApiService;
+import com.xm.comment_serialize.module.mall.entity.SmOptEntity;
 import com.xm.comment_utils.exception.GlobleException;
 import com.xm.comment_utils.response.MsgEnum;
 import com.xm.comment.utils.GoodsPriceUtil;
@@ -26,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import tk.mybatis.mapper.entity.Example;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -37,9 +41,10 @@ public class PddProductApiServiceImpl implements ProductApiService {
 
     @Autowired
     private PopHttpClient popHttpClient;
-
     @Autowired
     private ConfigService configService;
+    @Autowired
+    private OptionService optionService;
 
 
     @Override
@@ -230,6 +235,7 @@ public class PddProductApiServiceImpl implements ProductApiService {
     }
 
     private PageBean<SmProductEntity> packageToPageBean(List<SmProductEntity> list,Integer total,Integer pageNum,Integer pageSize){
+        list = CollUtil.removeNull(list);
         PageBean<SmProductEntity> pageBean = new PageBean<>(list);
         pageBean.setTotal(total);
         pageBean.setPageNum(pageNum);
@@ -253,6 +259,10 @@ public class PddProductApiServiceImpl implements ProductApiService {
         smProductEntity.setPromotionRate(pddGoodsListItem.getPromotionRate().intValue());
         smProductEntity.setHasCoupon(pddGoodsListItem.getHasCoupon()?1:0);
         smProductEntity.setCashPrice(GoodsPriceUtil.type(PlatformTypeConstant.PDD).calcProfit(smProductEntity).intValue());
+        smProductEntity.setOptId(pddGoodsListItem.getOptId().toString());
+        if(smProductEntity.getName().contains("口罩") || smProductEntity.getName().contains("医") || smProductEntity.getName().contains("药") || !optionService.checkOpt(smProductEntity.getOptId())){
+            return null;
+        }
         smProductEntity.setCreateTime(new Date());
         return smProductEntity;
     }

@@ -22,4 +22,10 @@ public interface OptionService {
 
     List<SmOptEntity> getAllParentOption(Integer userId,Integer childOptId);
 
+    /**
+     * 校验类目是否合法
+     * @param optId
+     * @return
+     */
+    public boolean checkOpt(String optId);
 }

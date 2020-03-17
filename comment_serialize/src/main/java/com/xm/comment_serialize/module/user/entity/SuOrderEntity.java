@@ -88,7 +88,7 @@ public class SuOrderEntity implements Serializable{
 	private Integer type;
 
 	/**
-	 * 来源类型(1:自购,2:其他用户分享)
+	 * 来源类型(1:普通自购,2:分享自购)
 	 */
 	private Integer formType;
 

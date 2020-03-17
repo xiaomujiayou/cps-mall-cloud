@@ -57,5 +57,10 @@ public class SmOptEntity implements Serializable{
 	 */
 	private Integer sort;
 
+	/**
+	 * 是否可用(0:不可用,1:可用)
+	 */
+	private Integer disable;
+
 	private java.util.Date createTime;
 }

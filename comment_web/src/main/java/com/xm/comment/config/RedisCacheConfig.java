@@ -14,6 +14,7 @@ import org.springframework.data.redis.cache.RedisCacheWriter;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.integration.redis.util.RedisLockRegistry;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -23,22 +24,15 @@ import java.util.Map;
 @Configuration
 public class RedisCacheConfig extends CachingConfigurerSupport {
 
-//    @Bean
-//    public KeyGenerator simpleKeyGenerator() {
-//        return (o, method, objects) -> {
-//            StringBuilder stringBuilder = new StringBuilder();
-//            stringBuilder.append(o.getClass().getSimpleName());
-//            stringBuilder.append(".");
-//            stringBuilder.append(method.getName());
-//            stringBuilder.append("[");
-//            for (Object obj : objects) {
-//                stringBuilder.append(obj.toString());
-//            }
-//            stringBuilder.append("]");
-//
-//            return stringBuilder.toString();
-//        };
-//    }
+    /**
+     * 分布式锁
+     * @param redisConnectionFactory
+     * @return
+     */
+    @Bean
+    public RedisLockRegistry redisLockRegistry(RedisConnectionFactory redisConnectionFactory) {
+        return new RedisLockRegistry(redisConnectionFactory, "spring-cloud");
+    }
 
     @Bean
     @ConditionalOnMissingBean
@@ -54,6 +48,9 @@ public class RedisCacheConfig extends CachingConfigurerSupport {
         Map<String, RedisCacheConfiguration> redisCacheConfigurationMap = new HashMap<>();
         //蘑菇街商品详情缓存30分钟
         redisCacheConfigurationMap.put("share.goods.detail.mgj", this.getRedisCacheConfigurationWithTtl(30 * 60));
+
+        //拼多多商品类目校验
+        redisCacheConfigurationMap.put("opt.check.pdd", this.getRedisCacheConfigurationWithTtl(30 * 60));
         return redisCacheConfigurationMap;
     }
 

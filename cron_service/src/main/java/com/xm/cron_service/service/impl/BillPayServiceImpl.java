@@ -55,7 +55,7 @@ public class BillPayServiceImpl implements BillPayService {
     @Autowired
     private ProfitProperty profitProperty;
 
-    @Transactional(rollbackFor = Exception.class)
+    @GlobalTransactional(rollbackFor = Exception.class)
     @Override
     public void onEntPayResult(SpWxEntPayOrderInEntity spWxEntPayOrderInEntity) {
         ScBillPayEntity scBillPayEntity = scBillPayMapper.selectByPrimaryKey(spWxEntPayOrderInEntity.getBillPayId());
@@ -102,7 +102,7 @@ public class BillPayServiceImpl implements BillPayService {
         scWaitPayBillMapper.updateByExampleSelective(record,example);
     }
 
-    @Transactional
+    @GlobalTransactional
     @Override
     public List<ScBillPayEntity> genPayBill(String billPayName,Integer minMoney, Integer pageNum, Integer pageSize, Date timeline) {
         List<ScBillPayEntity> scBillPayEntities = scBillPayMapperEx.genPayBill(minMoney,PageUtil.getStart(pageNum,pageSize),pageSize,timeline);

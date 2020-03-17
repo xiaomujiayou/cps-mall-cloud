@@ -1,5 +1,6 @@
 package com.xm.api_mall.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.xm.api_mall.mapper.SmOptMapper;
@@ -24,6 +25,7 @@ import com.xm.comment_serialize.module.mall.vo.SmProductSimpleVo;
 import com.xm.comment_serialize.module.user.form.AddSearchForm;
 import com.xm.comment_utils.mybatis.PageBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -44,10 +46,11 @@ public class PddProductServiceImpl implements ProductService {
     private UserFeignClient userFeignClient;
     @Autowired
     private ProfitService profitService;
-
     @Lazy
     @Autowired
     private ProductTestService productTestService;
+    @Value("${spring.profiles.active}")
+    private String active;
 
     @Override
     public PageBean<SmProductEntityEx> optionList(Integer userId,String pid, ProductListForm productListForm) throws Exception {
@@ -205,13 +208,18 @@ public class PddProductServiceImpl implements ProductService {
 
     @Override
     public ShareLinkBo saleInfo(Integer userId,String pid, GetProductSaleInfoForm productSaleInfoForm) throws Exception {
-//        return productTestService.saleInfo(userId,pid,productSaleInfoForm);
 
-        Map<String,Object> customParams = new HashMap<>();
-        customParams.put("userId",userId);
-        customParams.put("fromApp",productSaleInfoForm.getAppType());
-        customParams.put("shareUserId",productSaleInfoForm.getShareUserId());
-        return productApiService.getShareLink(JSON.toJSONString(customParams),pid,productSaleInfoForm.getGoodsId(),null);
+        if(CollUtil.newArrayList(active.split(",")).contains("dev")){
+            return productTestService.saleInfo(userId,pid,productSaleInfoForm);
+        }
+        if(CollUtil.newArrayList(active.split(",")).contains("prod")){
+            Map<String,Object> customParams = new HashMap<>();
+            customParams.put("userId",userId);
+            customParams.put("fromApp",productSaleInfoForm.getAppType());
+            customParams.put("shareUserId",productSaleInfoForm.getShareUserId());
+            return productApiService.getShareLink(JSON.toJSONString(customParams),pid,productSaleInfoForm.getGoodsId(),null);
+        }
+        throw new GlobleException(MsgEnum.TYPE_NOTFOUND_ERROR, "当前环境异常：" + active);
     }
 
 }

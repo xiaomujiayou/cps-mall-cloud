@@ -21,6 +21,8 @@
     <result column="promotion_rate" property="promotionRate" jdbcType="INTEGER" />
     <result column="service_tags" property="serviceTags" jdbcType="VARCHAR" />
     <result column="activity_type" property="activityType" jdbcType="VARCHAR" />
+    <result column="opt_id" property="optId" jdbcType="VARCHAR" />
+    <result column="opt_ids" property="optIds" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
   </resultMap>
 </mapper>

@@ -40,11 +40,15 @@ public class ProductTestServiceImpl implements ProductTestService {
         SmProductEntityEx smProductEntityEx = pddProductService.detail(productSaleInfoForm.getGoodsId(),pid,userId,productSaleInfoForm.getShareUserId());
         SuOrderEntity suOrderEntity = createSuOrderEntity(smProductEntityEx,pid,userId,productSaleInfoForm);
         rabbitTemplate.convertAndSend(OrderMqConfig.EXCHANGE,OrderMqConfig.KEY,suOrderEntity);
+        Thread.sleep(1000);
         suOrderEntity.setState(OrderStateConstant.CONFIRM_RECEIPT);
         suOrderEntity.setOrderModifyAt(new Date());
         rabbitTemplate.convertAndSend(OrderMqConfig.EXCHANGE,OrderMqConfig.KEY,suOrderEntity);
+        Thread.sleep(1000);
         suOrderEntity.setOrderModifyAt(new Date());
-        suOrderEntity.setState(OrderStateConstant.CHECK_SUCESS);
+//        suOrderEntity.setState(OrderStateConstant.CHECK_SUCESS);
+        suOrderEntity.setState(OrderStateConstant.CHECK_FAIL);
+        suOrderEntity.setFailReason("用户取消订单");
         rabbitTemplate.convertAndSend(OrderMqConfig.EXCHANGE,OrderMqConfig.KEY,suOrderEntity);
         return shareLinkBo;
     }

@@ -103,6 +103,16 @@ public class SmProductEntity implements Serializable{
 	private String activityType;
 
 	/**
+	 * 类目id
+	 */
+	private String optId;
+
+	/**
+	 * 所有类目id
+	 */
+	private String optIds;
+
+	/**
 	 * 创建时间
 	 */
 	private java.util.Date createTime;

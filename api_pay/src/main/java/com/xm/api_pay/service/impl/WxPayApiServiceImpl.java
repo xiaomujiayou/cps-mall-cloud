@@ -1,6 +1,7 @@
 package com.xm.api_pay.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
@@ -42,6 +43,7 @@ import io.seata.tm.api.transaction.TransactionHook;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
@@ -70,6 +72,8 @@ public class WxPayApiServiceImpl implements WxPayApiService {
     private WxPayPropertiesEx wxPayPropertiesEx;
     @Autowired
     private SpWxEntPayOrderInMapper spWxEntPayOrderInMapper;
+    @Value("${spring.profiles.active}")
+    private String active;
 
     @GlobalTransactional(rollbackFor = Exception.class)
     @Override
@@ -138,7 +142,7 @@ public class WxPayApiServiceImpl implements WxPayApiService {
         return wxPayUnifiedOrderRequest;
     }
 
-    @Transactional(rollbackFor = Exception.class)
+    @GlobalTransactional(rollbackFor = Exception.class)
     @Override
     public void payment(EntPayMessage entPayMessage) throws WxPayException {
         SpWxEntPayOrderInEntity record = new SpWxEntPayOrderInEntity();
@@ -157,7 +161,12 @@ public class WxPayApiServiceImpl implements WxPayApiService {
         EntPayResult result = null;
         SpWxEntPayOrderInEntity spWxEntPayOrderInEntity = null;
         try {
-            result = wxService.getEntPayService().entPay(request);
+            if(CollUtil.newArrayList(active.split(",")).contains("dev")){
+                result = new EntPayResult();
+            }
+            if(CollUtil.newArrayList(active.split(",")).contains("prod")){
+                result = wxService.getEntPayService().entPay(request);
+            }
             spWxEntPayOrderInEntity = entPay(entPayMessage,request,result,null);
         } catch (WxPayException e) {
             spWxEntPayOrderInEntity = entPay(entPayMessage,request,null,e);

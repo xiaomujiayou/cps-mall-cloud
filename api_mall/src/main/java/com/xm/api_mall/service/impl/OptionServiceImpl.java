@@ -13,6 +13,7 @@ import com.xm.comment_serialize.module.user.constant.UserTypeConstant;
 import com.xm.comment_serialize.module.user.entity.SuUserEntity;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Example;
 import tk.mybatis.orderbyhelper.OrderByHelper;
@@ -67,7 +68,9 @@ public class OptionServiceImpl implements OptionService {
         List<SmOptEntity> smOptEntities = null;
         Example example = new Example(SmOptEntity.class);
         if(parentId == null || parentId == 0){
-            example.createCriteria().andEqualTo("level",1);
+            example.createCriteria()
+                    .andEqualTo("level",1)
+                    .andEqualTo("disable",1);
             smOptEntities = smOptMapper.selectByExample(example);
 
             String sortStr = null;
@@ -105,5 +108,19 @@ public class OptionServiceImpl implements OptionService {
             smOptEntity = smOptMapper.selectByPrimaryKey(smOptEntity.getParentId());
         }
         return smOptEntities;
+    }
+
+    /**
+     * 校验类目是否合法
+     * @param optId
+     * @return
+     */
+    @Cacheable("opt.check.pdd")
+    public boolean checkOpt(String optId){
+        Example example = new Example(SmOptEntity.class);
+        example.createCriteria()
+                .andEqualTo("pddOptId",optId)
+                .andEqualTo("disable",1);
+        return smOptMapper.selectCountByExample(example) >= 1;
     }
 }

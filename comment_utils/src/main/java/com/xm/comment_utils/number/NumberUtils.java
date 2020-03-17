@@ -61,6 +61,8 @@ public class NumberUtils {
      * @return
      */
     public static String fen2yuan(Integer money){
+        if(money == null)
+            return "0.00";
         return NumberUtil.roundStr(NumberUtil.div(Double.valueOf(money).doubleValue() ,100d),2);
     }
 }

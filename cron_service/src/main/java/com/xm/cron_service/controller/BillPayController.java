@@ -87,8 +87,11 @@ public class BillPayController {
             excel.setOrderSn("******");
             excel.setProductName("******");
         }
-        if(orderBillDto.getSuUserEntity() != null)
+        if(orderBillDto.getSuUserEntity() != null) {
             excel.setUserName(orderBillDto.getSuUserEntity().getNickname());
+        }else {
+            excel.setUserName("无");
+        }
         excel.setCreateTime(orderBillDto.getCreateTime());
         return excel;
     }
