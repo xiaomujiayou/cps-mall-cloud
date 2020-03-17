@@ -8,6 +8,8 @@
 out
 gen
 .txlcn
+.rebel.xml.bak
+.rebel-remote.xml.bak
 api_lottery/target/
 api_mall/target/
 api_mini/target/
