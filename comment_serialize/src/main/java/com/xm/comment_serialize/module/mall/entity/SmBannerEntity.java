@@ -13,9 +13,11 @@ public class SmBannerEntity implements Serializable{
 	private Integer id;
 
 	/**
-	 * 图片路径
+	 * app类型
 	 */
-	private String img;
+	private Integer appType;
+
+	private Integer platformType;
 
 	/**
 	 * 标题
@@ -23,9 +25,14 @@ public class SmBannerEntity implements Serializable{
 	private String name;
 
 	/**
-	 * 排序(从大到小)
+	 * 包含的信息
 	 */
-	private Integer sort;
+	private String url;
+
+	/**
+	 * 图片路径
+	 */
+	private String img;
 
 	/**
 	 * 目标(1:普通url跳转,2:小程序跳转,3:唤醒其他小程序,4:唤醒app,5:客服消息)
@@ -33,19 +40,19 @@ public class SmBannerEntity implements Serializable{
 	private Integer target;
 
 	/**
-	 * 包含的信息
-	 */
-	private String url;
-
-	/**
-	 * 类型(1:首页轮播图,2:首页滑动列表,3:tabbar底部导航,4:个人中心功能菜单)
+	 * 类型(1:首页轮播图,2:首页滑动列表)
 	 */
 	private Integer type;
 
 	/**
-	 * 是否显示
+	 * 是否可用(0:不可用,1：可用)
 	 */
-	private Integer isShow;
+	private Integer disable;
+
+	/**
+	 * 排序(从大到小)
+	 */
+	private Integer sort;
 
 	private java.util.Date createTime;
 }

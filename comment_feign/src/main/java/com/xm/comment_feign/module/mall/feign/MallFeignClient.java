@@ -3,7 +3,6 @@ package com.xm.comment_feign.module.mall.feign;
 import com.xm.comment_feign.module.mall.feign.fallback.MallFeignClientFallBack;
 import com.xm.comment_serialize.module.mall.bo.ProductIndexBo;
 import com.xm.comment_serialize.module.mall.entity.SmConfigEntity;
-import com.xm.comment_serialize.module.mall.entity.SmPidEntity;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
 import com.xm.comment_serialize.module.mall.ex.SmProductEntityEx;
 import com.xm.comment_serialize.module.mall.form.CalcProfitForm;
@@ -27,12 +26,6 @@ public interface MallFeignClient {
 
     @GetMapping(value = "/product/detail")
     public SmProductEntity getProductDetail(@RequestParam Integer platformType,@RequestParam String goodsId, @RequestParam BindingResult bindingResult, @RequestParam Integer userId);
-
-    @GetMapping("/pid/generate")
-    public SmPidEntity generatePid();
-
-    @GetMapping("/pid")
-    public SmPidEntity getPid(@RequestParam Integer id);
 
     @GetMapping("/order/pdd/increment")
     public PageBean<SuOrderEntity> getIncrement(@RequestParam Date startUpdateTime,@RequestParam Date endUpdateTime,@RequestParam Integer pageNum,@RequestParam Integer pageSize);

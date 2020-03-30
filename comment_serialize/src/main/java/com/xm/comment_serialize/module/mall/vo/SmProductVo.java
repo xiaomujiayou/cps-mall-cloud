@@ -13,6 +13,7 @@ public class SmProductVo {
     private String des;
     private Integer originalPrice;
     private Integer couponPrice;
+    private Integer couponStartFee;
     private Integer sharePrice;
     private Integer buyPrice;
     private String mallId;
@@ -24,4 +25,6 @@ public class SmProductVo {
     private String serviceTags;
     private String activityType;
     private java.util.Date createTime;
+    //淘宝购买链接，用于生成淘口令
+    private String tbBuyUrl;
 }

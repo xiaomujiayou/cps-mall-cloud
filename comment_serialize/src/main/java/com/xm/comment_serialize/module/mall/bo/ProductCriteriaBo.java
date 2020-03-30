@@ -14,7 +14,7 @@ public class ProductCriteriaBo {
     private Integer pageSize;
 
     private String pid;
-    private Integer optionId;
+    private String optionId;
     private String keyword;
     private Integer orderBy;
     private Integer minPrice;
@@ -23,8 +23,17 @@ public class ProductCriteriaBo {
     private List<Integer> activityTags;
     private Boolean hasCoupon;
 
-    public Integer getOrderBy(Integer platformType) {
-        Map<Integer,Integer> pdd = new HashMap<>();
+    //是否包邮
+    private Boolean parcels;
+    //是否为天猫
+    private Boolean isTmall;
+    //发货地
+    private String location;
+    //ip 计算邮费
+    private String ip;
+
+    public Object getOrderBy(Integer platformType) {
+        Map<Integer,Object> pdd = new HashMap<>();
         pdd.put(0,0);
         pdd.put(1,1);
         pdd.put(2,2);
@@ -54,14 +63,17 @@ public class ProductCriteriaBo {
 //        pdd.put(13,13);
 //        pdd.put(14,14);
 
+        Map<Integer,Object> tb = new HashMap<>();
+
+
 
         switch (platformType){
             case PlatformTypeConstant.PDD:
                 return pdd.get(orderBy);
             case PlatformTypeConstant.MGJ:
                 return mgj.get(orderBy);
-//            case PlatformTypeConstant.MGJ:
-//                return mgj.get(orderBy);
+            case PlatformTypeConstant.TB:
+                return tb.get(orderBy);
 //            case PlatformTypeConstant.MGJ:
 //                return mgj.get(orderBy);
 

@@ -1,25 +1,29 @@
 package com.xm.api_mall.controller;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.StrUtil;
-import com.xm.api_mall.component.PlatformContext;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.xm.api_mall.aspect.DispatchServiceAspect;
 import com.xm.api_mall.exception.ApiCallException;
-import com.xm.api_mall.utils.SentenceUtils;
+import com.xm.api_mall.service.api.GoodsListService;
+import com.xm.api_mall.service.api.GoodsService;
+import com.xm.api_mall.service.api.OptGoodsListService;
 import com.xm.api_mall.utils.TextToGoodsUtils;
+import com.xm.comment.annotation.AppType;
 import com.xm.comment.annotation.LoginUser;
 import com.xm.comment.annotation.Pid;
-import com.xm.comment_feign.module.user.feign.UserFeignClient;
+import com.xm.comment.annotation.PlatformType;
+import com.xm.comment_serialize.form.BaseForm;
 import com.xm.comment_serialize.module.mall.bo.ShareLinkBo;
-import com.xm.comment_utils.exception.GlobleException;
-import com.xm.comment_utils.response.MsgEnum;
+import com.xm.comment_serialize.module.mall.constant.PlatformTypeConstant;
+import com.xm.comment_serialize.module.mall.form.*;
 import com.xm.comment_serialize.module.mall.bo.ProductIndexBo;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
 import com.xm.comment_serialize.module.mall.ex.SmProductEntityEx;
-import com.xm.comment_serialize.module.mall.form.GetProductSaleInfoForm;
-import com.xm.comment_serialize.module.mall.form.ProductDetailForm;
-import com.xm.comment_serialize.module.mall.form.ProductListForm;
 import com.xm.comment_serialize.module.mall.vo.SmProductVo;
+import com.xm.comment_utils.exception.GlobleException;
 import com.xm.comment_utils.mybatis.PageBean;
+import com.xm.comment_utils.response.MsgEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -27,6 +31,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.lang.model.element.NestingKind;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,25 +47,25 @@ import java.util.stream.Collectors;
 public class ProductController {
 
     @Autowired
-    private PlatformContext productContext;
+    private GoodsService goodsService;
+
     @Autowired
-    private UserFeignClient userFeignClient;
+    private DispatchServiceAspect dispatchServiceAspect;
 
     @Resource(name = "myExecutor")
     private ThreadPoolTaskExecutor executor;
+
     /**
      * 商品列表
      * @return
      */
     @PostMapping("/list")
-    public Object getProductList(@RequestBody @Valid ProductListForm productListForm, BindingResult bindingResult, @LoginUser(necessary = false) Integer userId,@Pid(necessary = false) String pid) throws Exception {
-        PageBean<SmProductEntityEx> pageBean = (PageBean<SmProductEntityEx>) productContext
-                .platformType(productListForm.getPlatformType())
-                .listType(productListForm.getListType())
-                .invoke(
-                        userId,
-                        pid,
-                        productListForm);
+    public Object getProductList(@LoginUser @Pid @PlatformType @AppType BaseForm baseForm,@RequestBody JSONObject params) throws Exception {
+        params.putAll((JSONObject)JSON.toJSON(baseForm));
+        PageBean<SmProductEntityEx> pageBean = (PageBean<SmProductEntityEx>)dispatchServiceAspect.getList(
+                params,
+                GoodsListService.class,
+                OptGoodsListService.class);
         List<SmProductVo> list = pageBean.getList().stream().map(o->{
             SmProductVo smProductVo = new SmProductVo();
             BeanUtil.copyProperties(o,smProductVo);
@@ -79,19 +84,12 @@ public class ProductController {
      * @return
      */
     @GetMapping("/detail")
-    public SmProductVo getProductDetail(@Valid ProductDetailForm productDetailForm, BindingResult bindingResult, @LoginUser(necessary = false) Integer userId,@Pid(necessary = false) String pid) throws Exception {
-        return getDetailVo(userId,pid,productDetailForm.getPlatformType(),productDetailForm.getGoodsId(),productDetailForm.getShareUserId());
+    public SmProductVo getProductDetail(@Valid @PlatformType @LoginUser(necessary = false) @Pid(necessary = false) GoodsDetailForm goodsDetailForm, BindingResult bindingResult) throws Exception {
+        return getDetailVo(goodsDetailForm);
     }
 
-    private SmProductVo getDetailVo(Integer userId,String pid,Integer platformType,String goodsId,Integer shareUserId) throws Exception {
-        SmProductEntityEx smProductEntityEx = productContext
-                .platformType(platformType)
-                .getService()
-                .detail(
-                        goodsId,
-                        pid,
-                        userId,
-                        shareUserId);
+    private SmProductVo getDetailVo(GoodsDetailForm goodsDetailForm) throws Exception {
+        SmProductEntityEx smProductEntityEx = goodsService.detail(goodsDetailForm);
         SmProductVo smProductVo = new SmProductVo();
         BeanUtil.copyProperties(smProductEntityEx,smProductVo);
         return smProductVo;
@@ -103,10 +101,12 @@ public class ProductController {
      */
     @GetMapping("/details")
     public List<SmProductEntity> getProductDetails(Integer platformType,@RequestParam("goodsIds") List<String> goodsIds) throws Exception {
-        return productContext
-                .platformType(platformType)
-                .getService()
-                .details(goodsIds);
+        if(goodsIds == null || goodsIds.isEmpty())
+            throw new GlobleException(MsgEnum.PARAM_VALID_ERROR);
+        GoodsDetailsForm goodsDetailsForm = new GoodsDetailsForm();
+        goodsDetailsForm.setPlatformType(platformType);
+        goodsDetailsForm.setGoodsIds(goodsIds);
+        return goodsService.details(goodsDetailsForm);
     }
 
     /**
@@ -121,10 +121,13 @@ public class ProductController {
             Future<List<SmProductEntity>> listFuture = executor.submit(new Callable<List<SmProductEntity>>() {
                 @Override
                 public List<SmProductEntity> call() throws Exception {
-                    return productContext
-                            .platformType(integerListEntry.getKey())
-                            .getService()
-                            .details(integerListEntry.getValue().stream().map(ProductIndexBo::getGoodsId).collect(Collectors.toList()));
+                    GoodsDetailsForm goodsDetailsForm = new GoodsDetailsForm();
+                    goodsDetailsForm.setPlatformType(integerListEntry.getKey());
+                    goodsDetailsForm.setGoodsIds(integerListEntry.getValue()
+                            .stream()
+                            .map(ProductIndexBo::getGoodsId)
+                            .collect(Collectors.toList()));
+                    return goodsService.details(goodsDetailsForm);
                 }
             });
             futures.add(listFuture);
@@ -145,32 +148,40 @@ public class ProductController {
     }
 
     @GetMapping("/sale")
-    public ShareLinkBo getProductSaleInfo(@LoginUser Integer userId, @Pid(necessary = false) String pid, @Valid GetProductSaleInfoForm productSaleInfoForm) throws Exception {
-        if(userId.equals(productSaleInfoForm.getShareUserId()))
-            productSaleInfoForm.setShareUserId(null);
-        return productContext
-                .platformType(productSaleInfoForm.getPlatformType())
-                .getService()
-                .saleInfo(
-                        userId,
-                        pid,
-                        productSaleInfoForm);
+    public ShareLinkBo getProductSaleInfo( @Valid @LoginUser @PlatformType @Pid SaleInfoForm saleInfoForm) throws Exception {
+        if(saleInfoForm.getUserId().equals(saleInfoForm.getShareUserId()))
+            saleInfoForm.setShareUserId(null);
+        return goodsService.saleInfo(saleInfoForm);
     }
 
     @GetMapping("/url/parse")
-    public TextToGoodsUtils.GoodsSpec parseUrl(@LoginUser(necessary = false) Integer userId,@Pid(necessary = false) String pid,String url) throws Exception {
-        if(StrUtil.isBlank(url))
-            throw new GlobleException(MsgEnum.PARAM_VALID_ERROR);
-        TextToGoodsUtils.GoodsSpec goodsSpec = TextToGoodsUtils.parse(url);
-        switch (goodsSpec.getParseType()){
-            case 1:{
+    public TextToGoodsUtils.GoodsSpec parseUrl( @Valid @LoginUser(necessary = false) @Pid(necessary = false) UrlParseForm urlParseForm,BindingResult bindingResult) throws Exception {
+        TextToGoodsUtils.GoodsSpec goodsSpec = TextToGoodsUtils.parse(urlParseForm.getUrl());
+        if(goodsSpec.getParseType() == 1){
+            //解析为具体商品
+            if(goodsSpec.getPlatformType() == PlatformTypeConstant.PDD){
                 try {
-                    goodsSpec.setGoodsInfo(getDetailVo(userId,pid,goodsSpec.getPlatformType(),goodsSpec.getGoodsId(),null));
+                    GoodsDetailForm goodsDetailForm = new GoodsDetailForm();
+                    BeanUtil.copyProperties(urlParseForm,goodsDetailForm);
+                    goodsDetailForm.setGoodsId(goodsSpec.getGoodsId());
+                    goodsDetailForm.setPlatformType(goodsSpec.getPlatformType());
+                    goodsSpec.setGoodsInfo(getDetailVo(goodsDetailForm));
                 }catch (ApiCallException e){
                     goodsSpec.setParseType(2);
-                    goodsSpec.setSimpleInfo(productContext
-                            .platformType(goodsSpec.getPlatformType())
-                            .getService().basicDetail(Long.valueOf(goodsSpec.getGoodsId())));
+                    BaseGoodsDetailForm baseGoodsDetailForm = new BaseGoodsDetailForm();
+                    BeanUtil.copyProperties(urlParseForm,baseGoodsDetailForm);
+                    baseGoodsDetailForm.setGoodsId(goodsSpec.getGoodsId());
+                    goodsSpec.setSimpleInfo(goodsService.basicDetail(baseGoodsDetailForm));
+                }
+            }else if(goodsSpec.getPlatformType() == PlatformTypeConstant.MGJ){
+                try {
+                    GoodsDetailForm goodsDetailForm = new GoodsDetailForm();
+                    BeanUtil.copyProperties(urlParseForm,goodsDetailForm);
+                    goodsDetailForm.setGoodsId(goodsSpec.getGoodsId());
+                    goodsDetailForm.setPlatformType(goodsSpec.getPlatformType());
+                    goodsSpec.setGoodsInfo(getDetailVo(goodsDetailForm));
+                }catch (Exception e){
+                    goodsSpec.setParseType(4);
                 }
             }
         }

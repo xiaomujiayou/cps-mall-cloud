@@ -13,7 +13,7 @@ public class WxCodeParamBean {
     //渠道id，可以不填，默认为0
     private String gid;
     //默认为true，表示需要生成小程序码
-    private String genWxcode;
+    private Boolean genWxcode;
 
     private String feedBack;
 }

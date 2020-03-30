@@ -31,6 +31,7 @@ public enum  MsgEnum {
 
     /* 服务系列*/
     SERVICE_AVAILABLE(10401,"服务不可用"),
+    SERVICE_UNKNOW(10401,"未知服务"),
 
     /* 用户系列 */
     USER_NOFOUND_ERROR(100501,"用户不存在"),
@@ -39,6 +40,8 @@ public enum  MsgEnum {
 
     /* 支付相关 */
     WX_PAY_ORDER_CREATE_FAIL(100601,"微信支付统一订单生成失败"),
+
+    ORDER_INVALID_ERROR(100701,"无效订单");
     ;
     private Integer code;
     private String msg;

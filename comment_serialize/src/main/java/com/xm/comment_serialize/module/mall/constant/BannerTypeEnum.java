@@ -5,8 +5,6 @@ import lombok.Data;
 public enum  BannerTypeEnum {
     HOME("首页轮播图",1),
     HOME_SLIDE_MUEN("首页首页滑动菜单",2),
-    BOTTOM_NAVIGNTION("底部导航",3),
-    SETTING_CONFIG("我的-设置菜单",4)
     ;
 
     private String name;

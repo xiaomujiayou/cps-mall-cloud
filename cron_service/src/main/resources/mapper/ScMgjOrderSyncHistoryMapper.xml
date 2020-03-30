@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xm.cron_service.mapper.ScMgjOrderSyncHistoryMapper" >
+  <resultMap id="BaseResultMap" type="com.xm.comment_serialize.module.cron.entity.ScMgjOrderSyncHistoryEntity" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="start_update_time" property="startUpdateTime" jdbcType="TIMESTAMP" />
+    <result column="end_update_time" property="endUpdateTime" jdbcType="TIMESTAMP" />
+    <result column="return_count" property="returnCount" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+</mapper>

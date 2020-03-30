@@ -53,6 +53,11 @@ public class SmProductEntity implements Serializable{
 	private Integer couponPrice;
 
 	/**
+	 * 优惠券使用门槛(分)
+	 */
+	private Integer couponStartFee;
+
+	/**
 	 * 返现价格(分)
 	 */
 	private Integer cashPrice;
@@ -88,7 +93,7 @@ public class SmProductEntity implements Serializable{
 	private String couponId;
 
 	/**
-	 * 佣金比例(千分比)
+	 * 佣金比例(万分比)
 	 */
 	private Integer promotionRate;
 
@@ -111,6 +116,11 @@ public class SmProductEntity implements Serializable{
 	 * 所有类目id
 	 */
 	private String optIds;
+
+	/**
+	 * 淘宝购买链接
+	 */
+	private String tbBuyUrl;
 
 	/**
 	 * 创建时间

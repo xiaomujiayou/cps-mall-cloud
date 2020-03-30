@@ -9,6 +9,8 @@ import com.xm.api_user.mapper.*;
 import com.xm.api_user.mapper.custom.SuOrderMapperEx;
 import com.xm.api_user.mapper.custom.SuRoleMapperEx;
 import com.xm.api_user.mapper.custom.SuUserMapperEx;
+import com.xm.api_user.service.PidService;
+import com.xm.api_user.service.SummaryService;
 import com.xm.api_user.service.UserService;
 import com.xm.comment_mq.message.config.UserActionConfig;
 import com.xm.comment_mq.message.impl.UserAddProxyMessage;
@@ -21,7 +23,6 @@ import com.xm.comment_feign.module.mall.feign.MallFeignClient;
 import com.xm.comment_utils.response.MsgEnum;
 import com.xm.comment_serialize.module.mall.constant.ConfigEnmu;
 import com.xm.comment_serialize.module.mall.constant.ConfigTypeConstant;
-import com.xm.comment_serialize.module.mall.entity.SmPidEntity;
 import com.xm.comment_serialize.module.user.constant.UserTypeConstant;
 import com.xm.comment_serialize.module.user.dto.ProxyProfitDto;
 import com.xm.comment_serialize.module.user.entity.*;
@@ -68,11 +69,15 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private MallFeignClient mallFeignClient;
     @Autowired
+    private PidService pidService;
+    @Autowired
     private SuOrderMapper suOrderMapper;
     @Autowired
     private SuOrderMapperEx suOrderMapperEx;
     @Autowired
     private RabbitTemplate rabbitTemplate;
+    @Autowired
+    private SummaryService summaryService;
 
     @Override
     public SuUserEntity getUserInfo(GetUserInfoForm getUserInfoForm) throws WxErrorException {
@@ -99,7 +104,7 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     public SuUserEntity addNewUser(String openId,Integer shareUserId){
-        SmPidEntity smPidEntity = mallFeignClient.generatePid();
+        SuPidEntity suPidEntity = pidService.generatePid();
         SuUserEntity user = new SuUserEntity();
         if(shareUserId != null)
             user.setParentId(shareUserId);
@@ -109,12 +114,13 @@ public class UserServiceImpl implements UserService {
         user.setSex(0);
         user.setCreateTime(new Date());
         user.setLastLogin(new Date());
-        user.setPid(smPidEntity.getId());
-        suUserMapper.insertSelective(user);
-        SuUserEntity record = new SuUserEntity();
-        record.setOpenId(openId);
-        record = suUserMapper.selectOne(record);
-        return record;
+        user.setPid(suPidEntity.getId());
+        suUserMapper.insertUseGeneratedKeys(user);
+        //创建用户汇总信息
+        SuSummaryEntity suSummaryEntity = summaryService.createNewSummary(user.getId());
+        user.setSummaryId(suSummaryEntity.getId());
+        suUserMapper.updateByPrimaryKeySelective(user);
+        return user;
     }
 
 

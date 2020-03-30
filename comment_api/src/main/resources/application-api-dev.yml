@@ -16,3 +16,15 @@ mgj:
   redirect-uri: http://xiaomujiayou.w3.luyouxia.net/api-mall/api/mgj/token
   uid: 1et2402
   we-app-Id: wxca3957e5474b3670
+
+wph:
+  app-key: 7a28a37b
+  app-secret: 27C64736068C19749BDA267AD428F087
+  url: https://gw.vipapis.com/
+
+tb:
+  app-key: 28225711
+  app-secret: edb1d724a0f70a68b82f143e8fe6fa45
+  url: http://gw.api.taobao.com/router/rest
+  adzone-id: 110173550272
+

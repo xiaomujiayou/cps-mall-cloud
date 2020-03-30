@@ -4,6 +4,7 @@ import cn.hutool.core.codec.Base64;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.xm.comment.annotation.LoginUser;
+import com.xm.comment_serialize.form.BaseForm;
 import com.xm.comment_utils.exception.GlobleException;
 import com.xm.comment_utils.response.MsgEnum;
 import com.xm.comment_utils.response.R;
@@ -51,22 +52,19 @@ public class LoginUserAspect {
         boolean isObjInfo = false;
         Integer index = null;
         LoginUser annotation = null;
-        for (Parameter parameter:parameters){
-            annotation = parameter.getAnnotation(LoginUser.class);
-            if(annotation != null) {
+        for (int i = 0; i < parameters.length; i++) {
+            annotation = parameters[i].getAnnotation(LoginUser.class);
+            if(annotation != null && !(joinPoint.getArgs()[i] instanceof BaseForm)) {
                 annotationFlag = true;
-                index = ArrayUtils.indexOf(parameters,parameter);
-                if(!parameter.getType().equals(Integer.class))
+                index = i;
+                if(!parameters[i].getType().equals(Integer.class))
                     isObjInfo = true;
                 break;
             }
         }
+
         if(!annotationFlag || (joinPoint.getArgs()[index] != null )) {
-            if(joinPoint.getArgs()[index] instanceof SuUserEntity && ((SuUserEntity)joinPoint.getArgs()[index]).getId() != null) {
-                return joinPoint.proceed();
-            }else if(joinPoint.getArgs()[index] instanceof Integer){
-                return joinPoint.proceed();
-            }
+            return joinPoint.proceed();
         }
 
         HttpServletRequest request =((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();

@@ -23,4 +23,7 @@ public class ShareLinkBo {
     //长链接
     private String longUrl;
 
+    //淘口令
+    private String tbOrder;
+
 }

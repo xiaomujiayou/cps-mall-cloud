@@ -5,6 +5,7 @@ import com.xm.comment_serialize.module.lottery.ex.SlPropSpecEx;
 import com.xm.comment_serialize.module.user.bo.SuBillToPayBo;
 import com.xm.comment_serialize.module.user.dto.OrderBillDto;
 import com.xm.comment_serialize.module.user.entity.SuConfigEntity;
+import com.xm.comment_serialize.module.user.entity.SuPidEntity;
 import com.xm.comment_serialize.module.user.entity.SuUserEntity;
 import com.xm.comment_serialize.module.user.ex.RolePermissionEx;
 import com.xm.comment_serialize.module.user.form.AddSearchForm;
@@ -32,6 +33,12 @@ public interface UserFeignClient {
 
     @GetMapping("/config/one")
     public SuConfigEntity getOneConfig(@RequestParam Integer userId, @RequestParam String key);
+
+    @GetMapping("/pid/generate")
+    public SuPidEntity generatePid();
+
+    @GetMapping("/pid")
+    public SuPidEntity getPid(@RequestParam Integer id);
 
     @GetMapping("/user/superUser")
     public SuUserEntity superUser(@RequestParam Integer userId,@RequestParam int userType);

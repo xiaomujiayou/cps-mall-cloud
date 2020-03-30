@@ -11,6 +11,7 @@
     <result column="des" property="des" jdbcType="VARCHAR" />
     <result column="original_price" property="originalPrice" jdbcType="INTEGER" />
     <result column="coupon_price" property="couponPrice" jdbcType="INTEGER" />
+    <result column="coupon_start_fee" property="couponStartFee" jdbcType="INTEGER" />
     <result column="cash_price" property="cashPrice" jdbcType="INTEGER" />
     <result column="mall_id" property="mallId" jdbcType="VARCHAR" />
     <result column="mall_name" property="mallName" jdbcType="VARCHAR" />
@@ -23,6 +24,7 @@
     <result column="activity_type" property="activityType" jdbcType="VARCHAR" />
     <result column="opt_id" property="optId" jdbcType="VARCHAR" />
     <result column="opt_ids" property="optIds" jdbcType="VARCHAR" />
+    <result column="tb_buy_url" property="tbBuyUrl" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
   </resultMap>
 </mapper>

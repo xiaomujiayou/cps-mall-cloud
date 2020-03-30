@@ -22,20 +22,9 @@ public class SummaryServiceImpl implements SummaryService {
 
     @Override
     public SuSummaryEntity getUserSummary(Integer userId) {
-        Lock lock = redisLockRegistry.obtain("lock");
-        lock.lock();
-        try {
-            SuSummaryEntity record = new SuSummaryEntity();
-            record.setUserId(userId);
-            List<SuSummaryEntity> target = suSummaryMapper.select(record);
-            if(target == null || target.size() <= 0) {
-                SuSummaryEntity suSummaryEntity = createNewSummary(userId);
-                return suSummaryEntity;
-            }
-            return target.get(0);
-        }finally {
-            lock.unlock();
-        }
+        SuSummaryEntity record = new SuSummaryEntity();
+        record.setUserId(userId);
+        return suSummaryMapper.selectOne(record);
     }
 
     @Override
@@ -44,7 +33,8 @@ public class SummaryServiceImpl implements SummaryService {
         suSummaryMapper.updateByPrimaryKeySelective(suSummaryEntity);
     }
 
-    private SuSummaryEntity createNewSummary(Integer userId) {
+    @Override
+    public SuSummaryEntity createNewSummary(Integer userId) {
         SuSummaryEntity suSummaryEntity = new SuSummaryEntity();
         suSummaryEntity.setUserId(userId);
         suSummaryEntity.setUpdateTime(new Date());
@@ -52,6 +42,4 @@ public class SummaryServiceImpl implements SummaryService {
         suSummaryMapper.insertUseGeneratedKeys(suSummaryEntity);
         return suSummaryEntity;
     }
-
-
 }

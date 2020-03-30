@@ -18,6 +18,20 @@
     </properties>
 
     <dependencies>
+        <!--淘宝sdk-->
+        <dependency>
+            <groupId>com.xm.tb</groupId>
+            <artifactId>taobao-sdk</artifactId>
+        </dependency>
+        <!-- 唯品会sdk -->
+        <dependency>
+            <groupId>com.xm.wph</groupId>
+            <artifactId>osp-sdk</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.xm.wph</groupId>
+            <artifactId>vop-sdk</artifactId>
+        </dependency>
         <!-- 蘑菇街sdk -->
         <dependency>
             <groupId>com.xm.mgj</groupId>

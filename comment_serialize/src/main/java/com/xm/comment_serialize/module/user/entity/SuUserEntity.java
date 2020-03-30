@@ -77,6 +77,11 @@ public class SuUserEntity implements Serializable{
 	private Integer pid;
 
 	/**
+	 * 汇总信息id
+	 */
+	private Integer summaryId;
+
+	/**
 	 * 最后登录时间
 	 */
 	private java.util.Date lastLogin;

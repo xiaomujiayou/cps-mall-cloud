@@ -99,6 +99,27 @@
             </dependency>
 
 
+
+            <!--淘宝sdk-->
+            <!-- ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓-->
+            <dependency>
+                <groupId>com.xm.tb</groupId>
+                <artifactId>taobao-sdk</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+            <!--唯品会sdk-->
+            <!-- ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓-->
+            <dependency>
+                <groupId>com.xm.wph</groupId>
+                <artifactId>osp-sdk</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.xm.wph</groupId>
+                <artifactId>vop-sdk</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+
             <!--蘑菇街sdk-->
             <!-- ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓-->
             <dependency>

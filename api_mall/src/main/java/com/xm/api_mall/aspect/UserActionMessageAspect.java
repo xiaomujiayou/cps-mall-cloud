@@ -7,7 +7,10 @@ import com.xm.comment_mq.message.impl.UserSearchGoodsMessage;
 import com.xm.comment_mq.message.impl.UserShareGoodsMessage;
 import com.xm.comment_mq.message.impl.UserSmartSearchGoodsMessage;
 import com.xm.comment_serialize.module.mall.ex.SmProductEntityEx;
+import com.xm.comment_serialize.module.mall.form.GoodsDetailForm;
+import com.xm.comment_serialize.module.mall.form.KeywordGoodsListForm;
 import com.xm.comment_serialize.module.mall.form.ProductListForm;
+import com.xm.comment_serialize.module.mall.form.UrlParseForm;
 import com.xm.comment_utils.mybatis.PageBean;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -29,7 +32,7 @@ public class UserActionMessageAspect {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-    @Pointcut("execution(public * com.xm.api_mall.service.ProductService.detail(..))")
+    @Pointcut("execution(public * com.xm.api_mall.service.api.impl.def.GoodsServiceImpl.detail(..))")
     public void goodsDetailMessagePointCut(){}
 
     /**
@@ -42,15 +45,14 @@ public class UserActionMessageAspect {
     @Around("goodsDetailMessagePointCut()")
     public Object goodsDetailMessagePointCut(ProceedingJoinPoint joinPoint) throws Throwable{
         SmProductEntityEx smProductEntityEx = (SmProductEntityEx)joinPoint.proceed();
-        Integer userId = (Integer) joinPoint.getArgs()[2];
-        Integer shareUserId = (Integer) joinPoint.getArgs()[3];
-        if(shareUserId != null && userId != null && !shareUserId.equals(userId))
-            rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE,"",new UserShareGoodsMessage(shareUserId,userId,smProductEntityEx));
+        GoodsDetailForm goodsDetailForm = (GoodsDetailForm) joinPoint.getArgs()[0];
+        if(goodsDetailForm.getShareUserId() != null && goodsDetailForm.getUserId() != null && !goodsDetailForm.getShareUserId().equals(goodsDetailForm.getUserId()))
+            rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE,"",new UserShareGoodsMessage(goodsDetailForm.getShareUserId(),goodsDetailForm.getUserId(),smProductEntityEx));
         return smProductEntityEx;
     }
 
 
-    @Pointcut("execution(public * com.xm.api_mall.service.ProductService.keywordList(..))")
+    @Pointcut("execution(public * com.xm.api_mall.service.api.impl.def.GoodsListServiceImpl.keyword(..))")
     public void keywordListPointCut(){}
     /**
      * 生成
@@ -62,9 +64,12 @@ public class UserActionMessageAspect {
     @Around("keywordListPointCut()")
     public Object keywordListPointCut(ProceedingJoinPoint joinPoint) throws Throwable{
         PageBean<SmProductEntityEx> smProductEntityExPageBean = (PageBean<SmProductEntityEx>)joinPoint.proceed();
-        Integer userId = (Integer) joinPoint.getArgs()[0];
-        ProductListForm productListForm = (ProductListForm) joinPoint.getArgs()[2];
-        rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE,"",new UserSearchGoodsMessage(userId,productListForm.getPlatformType(),productListForm.getKeywords(),productListForm.getPageNum()));
+        KeywordGoodsListForm keywordGoodsListForm = (KeywordGoodsListForm) joinPoint.getArgs()[0];
+        rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE,"",new UserSearchGoodsMessage(
+                keywordGoodsListForm.getUserId(),
+                keywordGoodsListForm.getPlatformType(),
+                keywordGoodsListForm.getKeywords(),
+                keywordGoodsListForm.getPageNum()));
         return smProductEntityExPageBean;
     }
 
@@ -84,9 +89,8 @@ public class UserActionMessageAspect {
             return goodsSpecMsg;
         SmProductEntityEx smProductEntity = new SmProductEntityEx();
         BeanUtil.copyProperties(goodsSpecMsg.getGoodsInfo(),smProductEntity);
-        Integer userId = (Integer) joinPoint.getArgs()[0];
-        String url = (String) joinPoint.getArgs()[2];
-        rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE,"",new UserSmartSearchGoodsMessage(userId,smProductEntity,url,smProductEntity.getName()));
+        UrlParseForm urlParseForm = (UrlParseForm) joinPoint.getArgs()[0];
+        rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE,"",new UserSmartSearchGoodsMessage(urlParseForm.getUserId(),smProductEntity,urlParseForm.getUrl(),smProductEntity.getName()));
         return goodsSpecMsg;
     }
 }

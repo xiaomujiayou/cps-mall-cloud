@@ -38,6 +38,11 @@ public class SuProductEntity implements Serializable{
 	private Integer shareUserId;
 
 	/**
+	 * 优惠券id(淘宝用)
+	 */
+	private String couponId;
+
+	/**
 	 * 是否删除(0:已删除,1:未删除)
 	 */
 	private Integer del;

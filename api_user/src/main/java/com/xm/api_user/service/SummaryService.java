@@ -18,4 +18,11 @@ public interface SummaryService {
      * @param suSummaryEntity
      */
     public void updateSummary(SuSummaryEntity suSummaryEntity);
+
+    /**
+     * 创建用户汇总信息
+     * @param userId
+     * @return
+     */
+    public SuSummaryEntity createNewSummary(Integer userId);
 }

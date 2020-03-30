@@ -8,6 +8,7 @@
     <result column="user_id" property="userId" jdbcType="INTEGER" />
     <result column="type" property="type" jdbcType="INTEGER" />
     <result column="share_user_id" property="shareUserId" jdbcType="INTEGER" />
+    <result column="coupon_id" property="couponId" jdbcType="VARCHAR" />
     <result column="del" property="del" jdbcType="INTEGER" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
   </resultMap>

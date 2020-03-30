@@ -28,8 +28,8 @@ import java.util.List;
  * 同步拼多多订单
  */
 @Slf4j
-@Component
-@EnableScheduling
+//@Component
+//@EnableScheduling
 public class PddOrderSyncTask{
 
     @Autowired

@@ -5,6 +5,9 @@ import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
 
 public class GoodsPriceUtil {
 
+    //佣金比率单位
+    private final int RATE = 10000;
+
     private Integer platfromType;
 
     private GoodsPriceUtil(){}
@@ -26,7 +29,7 @@ public class GoodsPriceUtil {
      * @return
      */
     public Double calcProfit(Double originalPrice,Double couponPrice ,Double profitRate){
-        return NumberUtil.div(NumberUtil.mul((Double)NumberUtil.sub(originalPrice,couponPrice),profitRate),1000);
+        return NumberUtil.div(NumberUtil.mul((Double)NumberUtil.sub(originalPrice,couponPrice),profitRate),RATE);
     }
     /**
      * 根据费率计算商品总佣金
@@ -37,7 +40,7 @@ public class GoodsPriceUtil {
      * @return
      */
     public Double calcProfit(SmProductEntity smProductEntity){
-        return NumberUtil.div(NumberUtil.mul(NumberUtil.sub(smProductEntity.getOriginalPrice(),smProductEntity.getCouponPrice()),smProductEntity.getPromotionRate()),1000).doubleValue();
+        return NumberUtil.div(NumberUtil.mul(NumberUtil.sub(smProductEntity.getOriginalPrice(),smProductEntity.getCouponPrice()),smProductEntity.getPromotionRate()),RATE).doubleValue();
     }
 
     /**
@@ -49,7 +52,7 @@ public class GoodsPriceUtil {
      * @return
      */
     public Double calcUserShareProfit(Double originalPrice,Double couponPrice ,Double profitRate,Double userShareRate){
-        return NumberUtil.div(NumberUtil.mul(calcProfit(originalPrice,couponPrice,profitRate),userShareRate),1000);
+        return NumberUtil.div(NumberUtil.mul(calcProfit(originalPrice,couponPrice,profitRate),userShareRate),RATE);
     }
     /**
      * 计算用户分享佣金
@@ -58,7 +61,7 @@ public class GoodsPriceUtil {
      * @return
      */
     public Double calcUserShareProfit(Double profit,Double userShareRate){
-        return NumberUtil.div(NumberUtil.mul(profit,userShareRate),1000);
+        return NumberUtil.div(NumberUtil.mul(profit,userShareRate),RATE);
     }
 
     /**
@@ -68,7 +71,7 @@ public class GoodsPriceUtil {
      * @return
      */
     public Double calcUserShareProfit(SmProductEntity smProductEntity,Double userShareRate){
-        return NumberUtil.div(NumberUtil.mul(calcProfit(smProductEntity),userShareRate),1000);
+        return NumberUtil.div(NumberUtil.mul(calcProfit(smProductEntity),userShareRate),RATE);
     }
 
     /**
@@ -80,7 +83,7 @@ public class GoodsPriceUtil {
      * @return
      */
     public Double calcUserShareBuyProfit(Double originalPrice,Double couponPrice ,Double profitRate,Double userShareBuyRate){
-        return NumberUtil.div(NumberUtil.mul(calcProfit(originalPrice,couponPrice,profitRate),userShareBuyRate),1000);
+        return NumberUtil.div(NumberUtil.mul(calcProfit(originalPrice,couponPrice,profitRate),userShareBuyRate),RATE);
     }
     /**
      * 计算用户分享购买佣金
@@ -89,7 +92,7 @@ public class GoodsPriceUtil {
      * @return
      */
     public Double calcUserShareBuyProfit(Double profit,Double userShareBuyRate){
-        return NumberUtil.div(NumberUtil.mul(profit,userShareBuyRate),1000);
+        return NumberUtil.div(NumberUtil.mul(profit,userShareBuyRate),RATE);
     }
 
     /**
@@ -99,7 +102,7 @@ public class GoodsPriceUtil {
      * @return
      */
     public Double calcUserShareBuyProfit(SmProductEntity smProductEntity,Double userShareBuyRate){
-        return NumberUtil.div(NumberUtil.mul(calcProfit(smProductEntity),userShareBuyRate),1000);
+        return NumberUtil.div(NumberUtil.mul(calcProfit(smProductEntity),userShareBuyRate),RATE);
     }
 
     /**
@@ -109,7 +112,7 @@ public class GoodsPriceUtil {
      * @return
      */
     public Double calcUserBuyProfit(Double profit,Double userBuyRate){
-        return NumberUtil.div(NumberUtil.mul(profit,userBuyRate),1000);
+        return NumberUtil.div(NumberUtil.mul(profit,userBuyRate),RATE);
     }
 
     /**
@@ -121,7 +124,7 @@ public class GoodsPriceUtil {
      * @return
      */
     public Double calcUserBuyProfit(Double originalPrice,Double couponPrice ,Double profitRate,Double userBuyRate){
-        return NumberUtil.div(NumberUtil.mul(calcProfit(originalPrice,couponPrice,profitRate),userBuyRate),1000);
+        return NumberUtil.div(NumberUtil.mul(calcProfit(originalPrice,couponPrice,profitRate),userBuyRate),RATE);
     }
 
     /**
@@ -131,7 +134,7 @@ public class GoodsPriceUtil {
      * @return
      */
     public Double calcUserBuyProfit(SmProductEntity smProductEntity,Double userBuyRate){
-        return NumberUtil.div(NumberUtil.mul(calcProfit(smProductEntity),userBuyRate),1000);
+        return NumberUtil.div(NumberUtil.mul(calcProfit(smProductEntity),userBuyRate),RATE);
     }
 
 }

@@ -6,12 +6,13 @@ import com.alibaba.fastjson.JSON;
 import com.xm.comment.annotation.Pid;
 import com.xm.comment_feign.module.mall.feign.MallFeignClient;
 import com.xm.comment_feign.module.user.feign.UserFeignClient;
+import com.xm.comment_serialize.form.BaseForm;
+import com.xm.comment_serialize.module.gateway.constant.RequestHeaderConstant;
+import com.xm.comment_serialize.module.user.entity.SuPidEntity;
 import com.xm.comment_utils.response.MsgEnum;
 import com.xm.comment_utils.response.R;
 import com.xm.comment_serialize.module.mall.constant.PlatformTypeConstant;
-import com.xm.comment_serialize.module.mall.entity.SmPidEntity;
 import com.xm.comment_serialize.module.user.entity.SuUserEntity;
-import org.apache.commons.lang3.ArrayUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -50,11 +51,12 @@ public class PidAspect {
         boolean annotationFlag = false;
         Integer index = null;
         Pid annotation = null;
-        for (Parameter parameter:parameters){
-            annotation = parameter.getAnnotation(Pid.class);
-            if(annotation != null) {
+
+        for (int i = 0; i < parameters.length; i++) {
+            annotation = parameters[i].getAnnotation(Pid.class);
+            if(annotation != null && !(joinPoint.getArgs()[i] instanceof BaseForm)) {
                 annotationFlag = true;
-                index = ArrayUtils.indexOf(parameters,parameter);
+                index = i;
                 break;
             }
         }
@@ -63,30 +65,30 @@ public class PidAspect {
         }
 
         HttpServletRequest request =((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        String platformType = request.getHeader("platform-type");
-        String userInfo = request.getHeader("user-info");
+        String platformType = request.getHeader(RequestHeaderConstant.PLATFORM_TYPE);
+        String userInfo = request.getHeader(RequestHeaderConstant.USER_INFO);
         if(annotation.necessary() && StrUtil.hasBlank(userInfo,platformType))
             return R.error(MsgEnum.SYSTEM_INVALID_USER_ERROR);
 
         SuUserEntity suUserEntity = JSON.parseObject(Base64.decodeStr(userInfo),SuUserEntity.class);
-        SmPidEntity smPidEntity = mallFeignClient.getPid(suUserEntity.getPid());
+        SuPidEntity suPidEntity = userFeignClient.getPid(suUserEntity.getPid());
 
         String pid = null;
         switch (Integer.valueOf(platformType)){
             case PlatformTypeConstant.PDD:{
-                pid = smPidEntity.getPdd();
+                pid = suPidEntity.getPdd();
                 break;
             }
             case PlatformTypeConstant.JD:{
-                pid = smPidEntity.getJd();
+                pid = suPidEntity.getJd();
                 break;
             }
             case PlatformTypeConstant.MGJ:{
-                pid = smPidEntity.getMgj();
+                pid = suPidEntity.getMgj();
                 break;
             }
             case PlatformTypeConstant.TB:{
-                pid = smPidEntity.getTb();
+                pid = suPidEntity.getTb();
                 break;
             }
         }

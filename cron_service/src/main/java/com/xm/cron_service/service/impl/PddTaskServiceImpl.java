@@ -48,6 +48,11 @@ public class PddTaskServiceImpl implements TaskService {
     }
 
     @Override
+    public SuOrderEntity getOrderByNum(String orderNum) {
+        return null;
+    }
+
+    @Override
     public Date getTime() throws Exception {
         PddTimeGetRequest request = new PddTimeGetRequest();
         PddTimeGetResponse response = popHttpClient.syncInvoke(request);

@@ -9,6 +9,7 @@ import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
 import com.xm.cloud_gateway.config.ShiroConfig;
 import com.xm.comment.constants.TokenConstants;
+import com.xm.comment_serialize.module.gateway.constant.RequestHeaderConstant;
 import com.xm.comment_serialize.module.user.entity.SuUserEntity;
 import com.xm.comment_serialize.module.user.vo.UserInfoVo;
 import lombok.extern.slf4j.Slf4j;
@@ -42,12 +43,6 @@ public class UserInfoFilter extends ZuulFilter {
     @Autowired
     private ShiroConfig shiroConfig;
 
-    //拦截白名单
-//    private static String[] whiteList = new String[]{"/user/register","/user/login"};
-
-//    @Autowired
-//    private StringRedisTemplate redisTemplate;
-
     @Override
     public String filterType() {
         return PRE_TYPE;
@@ -60,15 +55,6 @@ public class UserInfoFilter extends ZuulFilter {
 
     @Override
     public boolean shouldFilter() {
-//        RequestContext requestContext = RequestContext.getCurrentContext();
-//        HttpServletRequest request = requestContext.getRequest();
-//        String url = request.getRequestURI();
-//        for (String s : whiteList) {
-//            if(url.contains(s)){
-//                log.debug("命中白名单链接："+url);
-//                return false;
-//            }
-//        }
         return true;
     }
 
@@ -92,8 +78,8 @@ public class UserInfoFilter extends ZuulFilter {
                 SuUserEntity suUserEntity = principal.oneByType(SuUserEntity.class);
                 System.out.println(request.getRequestURI()+":"+principal);
                 if(user != null){
-                    requestContext.addZuulRequestHeader("user-info", Base64.encode(JSON.toJSONString(suUserEntity)));
-                    requestContext.addZuulRequestHeader("user-id", suUserEntity.getId().toString());
+                    requestContext.addZuulRequestHeader(RequestHeaderConstant.USER_INFO, Base64.encode(JSON.toJSONString(suUserEntity)));
+                    requestContext.addZuulRequestHeader(RequestHeaderConstant.USER_ID, suUserEntity.getId().toString());
                 }
             }
 

@@ -1,18 +1,27 @@
 package com.xm.api_user.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
 import com.xm.api_user.mapper.SuOrderMapper;
+import com.xm.api_user.mapper.SuPidMapper;
+import com.xm.api_user.mapper.SuUserMapper;
 import com.xm.api_user.mapper.custom.SuBillMapperEx;
 import com.xm.api_user.service.BillService;
 import com.xm.api_user.service.OrderService;
 import com.xm.api_user.service.ShareService;
+import com.xm.comment_serialize.module.mall.constant.PlatformTypeConstant;
+import com.xm.comment_serialize.module.user.bo.OrderCustomParameters;
 import com.xm.comment_serialize.module.user.constant.OrderStateConstant;
 import com.xm.comment_serialize.module.user.dto.OrderBillDto;
 import com.xm.comment_serialize.module.user.entity.SuOrderEntity;
+import com.xm.comment_serialize.module.user.entity.SuPidEntity;
+import com.xm.comment_serialize.module.user.entity.SuUserEntity;
+import com.xm.comment_utils.exception.GlobleException;
 import com.xm.comment_utils.mybatis.PageBean;
+import com.xm.comment_utils.response.MsgEnum;
 import io.seata.spring.annotation.GlobalTransactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -42,6 +51,10 @@ public class OrderServiceImpl implements OrderService {
     private SuBillMapperEx suBillMapperEx;
     @Autowired
     private ShareService shareService;
+    @Autowired
+    private SuPidMapper suPidMapper;
+    @Autowired
+    private SuUserMapper suUserMapper;
 
     /**
      * 处理订单消息
@@ -104,12 +117,24 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void onOrderCreate(SuOrderEntity order) {
         //保存订单
-        JSONObject params = JSON.parseObject(order.getCustomParameters());
-        Integer userId = params.getInteger("userId");
-        Integer shareUserId = params.getInteger("shareUserId");
-        Integer fromApp = params.getInteger("fromApp");
-        order.setUserId(userId);
-        order.setShareUserId(shareUserId);
+        OrderCustomParameters params = JSON.parseObject(order.getCustomParameters(), OrderCustomParameters.class);
+        if(order.getPlatformType() == PlatformTypeConstant.MGJ){
+            //蘑菇街小程序接口没有回调参数，因此只能通过pid 反向查询用户id
+            if(StrUtil.isBlank(params.getPid()))
+                throw new GlobleException(MsgEnum.ORDER_INVALID_ERROR,"蘑菇街订单:[" + order.getOrderSn() + "] pid 不存在");
+            SuPidEntity record = new SuPidEntity();
+            record.setMgj(params.getPid());
+            PageHelper.startPage(1,1);
+            record = suPidMapper.selectOne(record);
+            SuUserEntity suUserEntity = new SuUserEntity();
+            suUserEntity.setPid(record.getId());
+            PageHelper.startPage(1,1);
+            suUserEntity = suUserMapper.selectOne(suUserEntity);
+            order.setUserId(suUserEntity.getId());
+        }else {
+            order.setUserId(params.getUserId());
+            order.setShareUserId(params.getShareUserId());
+        }
         if(order.getShareUserId() != null && !order.getShareUserId().equals("")){
             order.setFormType(2);
             //添加分享记录
@@ -117,7 +142,7 @@ public class OrderServiceImpl implements OrderService {
         }else {
             order.setFormType(1);
         }
-        order.setFromApp(fromApp);
+        order.setFromApp(params.getFromApp());
         order.setCreateTime(new Date());
         suOrderMapper.insertUseGeneratedKeys(order);
         //创建订单收益账单

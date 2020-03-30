@@ -5,7 +5,6 @@ import com.xm.comment_utils.exception.GlobleException;
 import com.xm.comment_utils.response.MsgEnum;
 import com.xm.comment_serialize.module.mall.bo.ProductIndexBo;
 import com.xm.comment_serialize.module.mall.entity.SmConfigEntity;
-import com.xm.comment_serialize.module.mall.entity.SmPidEntity;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
 import com.xm.comment_serialize.module.mall.ex.SmProductEntityEx;
 import com.xm.comment_serialize.module.mall.form.CalcProfitForm;
@@ -28,16 +27,6 @@ public class MallFeignClientFallBack implements MallFeignClient {
 
     @Override
     public SmProductEntity getProductDetail(Integer platformType, String goodsId, BindingResult bindingResult, Integer userId) {
-        throw new GlobleException(MsgEnum.SERVICE_AVAILABLE);
-    }
-
-    @Override
-    public SmPidEntity generatePid() {
-        throw new GlobleException(MsgEnum.SERVICE_AVAILABLE);
-    }
-
-    @Override
-    public SmPidEntity getPid(Integer id) {
         throw new GlobleException(MsgEnum.SERVICE_AVAILABLE);
     }
 
