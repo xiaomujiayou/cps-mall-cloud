@@ -20,7 +20,6 @@ public class ShareController {
     @Autowired
     private MallFeignClient mallFeignClient;
 
-
     @GetMapping
     public PageBean<ShareVo> get(@LoginUser Integer userId, GetUserShareForm getUserShareForm){
         return shareService.getList(
@@ -29,7 +28,6 @@ public class ShareController {
                 getUserShareForm.getOrder(),
                 getUserShareForm.getPageNum(),
                 getUserShareForm.getPageSize());
-
     }
 
     @DeleteMapping("/{id}")

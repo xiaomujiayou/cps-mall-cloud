@@ -1,6 +1,7 @@
 package com.xm.comment_serialize.module.user.entity;
 
 import lombok.Data;
+import tk.mybatis.mapper.annotation.Version;
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -75,11 +76,6 @@ public class SuUserEntity implements Serializable{
 	 * 推广位id
 	 */
 	private Integer pid;
-
-	/**
-	 * 汇总信息id
-	 */
-	private Integer summaryId;
 
 	/**
 	 * 最后登录时间

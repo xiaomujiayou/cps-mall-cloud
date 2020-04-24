@@ -1,5 +1,6 @@
 package com.xm.api_user.service;
 
+import com.xm.comment_serialize.module.mall.ex.SmProductEntityEx;
 import com.xm.comment_serialize.module.user.entity.SuOrderEntity;
 import com.xm.comment_serialize.module.user.vo.ShareVo;
 import com.xm.comment_utils.mybatis.PageBean;
@@ -15,16 +16,14 @@ public interface ShareService {
      * @param goodsId
      * @param platformType
      */
-    public void shareOne(Integer userId,String goodsId,Integer platformType);
+//    public void shareOne(Integer userId,String goodsId,Integer platformType, SmProductEntityEx smProductEntityEx);
 
 
     /**
      * 分享的商品被浏览
      * @param userId
-     * @param goodsId
-     * @param platformType
      */
-    public void show(Integer userId,String goodsId,Integer platformType);
+    public void show(Integer userId, SmProductEntityEx smProductEntityEx);
 
     /**
      * 分享的商品被购买

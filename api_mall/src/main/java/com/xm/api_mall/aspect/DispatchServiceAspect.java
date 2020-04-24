@@ -111,7 +111,12 @@ public class DispatchServiceAspect {
             BaseForm baseForm = (BaseForm)joinPoint.getArgs()[i];
             Object service = getService(baseForm,targetMethod.getDeclaringClass());
             Method method = ReflectUtil.getMethodByName(service.getClass(),targetMethod.getName());
-            Object result = method.invoke(service,joinPoint.getArgs());
+            Object result = null;
+            try {
+                result = method.invoke(service,joinPoint.getArgs());
+            }catch (InvocationTargetException e){
+                throw e.getTargetException();
+            }
             if(result == null){
                 //调用默认服务接口
                 baseForm.setPlatformType(DEFAULT_PLATFORM);
@@ -144,6 +149,8 @@ public class DispatchServiceAspect {
             baseForm = params.toJavaObject(ThemeGoodsListForm.class);
         }else if("similar".equals(methodName)){
             baseForm = params.toJavaObject(SimilarGoodsListForm.class);
+        }else if("mall".equals(methodName)){
+            baseForm = params.toJavaObject(MallGoodsListForm.class);
         }else {
             baseForm = params.toJavaObject(GoodsListForm.class);
         }

@@ -12,9 +12,9 @@ public class MgjTest {
     public static void main(String[] args) throws ApiException {
         MogujieClient client = new MogujieClient("102139","FF7E20C91590054EACEFC1D645C8C5AE","https://openapi.mogujie.com/invoke");
         client.setIgnoreSSLCheck(true);
-        String token = "1AEF7EF2E317335A3092C40674DC9D8F";
-        PromInfoQueryBean promInfoQueryBean = new PromInfoQueryBean();
-        promInfoQueryBean.setKeyword("女装");
+        String token = "0FAA95BA7CD1552003F5C512A926D636";
+//        PromInfoQueryBean promInfoQueryBean = new PromInfoQueryBean();
+//        promInfoQueryBean.setKeyword("女装");
 //        MgjRequest<XiaoDianCpsdataPromItemGetResponse> mgjRequest = new XiaoDianCpsdataPromItemGetRequest(promInfoQueryBean);
 //        System.out.println(JSON.toJSONString(JSON.parse(client.execute(mgjRequest,token).getResult().getData()), SerializerFeature.PrettyFormat));
 //        MgjRequest<XiaoDianCpsdataItemGetResponse> mgjRequest = new XiaoDianCpsdataItemGetRequest("https://shop.mogujie.com/detail/1jwt9z0");
@@ -30,8 +30,8 @@ public class MgjTest {
 
 
         OrderInfoQueryBean orderInfoQueryBean = new OrderInfoQueryBean();
-        orderInfoQueryBean.setStart(20200115);
-        orderInfoQueryBean.setEnd(20200116);
+        orderInfoQueryBean.setStart(20200410);
+        orderInfoQueryBean.setEnd(20200410);
         orderInfoQueryBean.setPage(1);
         orderInfoQueryBean.setPagesize(100);
         MgjRequest<XiaoDianCpsdataOrderListGetResponse> mgjRequest = new XiaoDianCpsdataOrderListGetRequest(orderInfoQueryBean);

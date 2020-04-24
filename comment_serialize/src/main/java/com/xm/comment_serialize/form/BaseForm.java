@@ -8,4 +8,5 @@ public class BaseForm {
     private Integer platformType;
     private Integer userId;
     private String pid;
+    private String ip;
 }

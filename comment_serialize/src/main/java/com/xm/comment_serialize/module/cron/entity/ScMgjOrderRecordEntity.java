@@ -1,6 +1,7 @@
 package com.xm.comment_serialize.module.cron.entity;
 
 import lombok.Data;
+import tk.mybatis.mapper.annotation.Version;
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -15,7 +16,12 @@ public class ScMgjOrderRecordEntity implements Serializable{
 	/**
 	 * 订单编号
 	 */
-	private String orderNum;
+	private String orderSn;
+
+	/**
+	 * 子订单编号
+	 */
+	private String orderSubSn;
 
 	/**
 	 * 订单状态

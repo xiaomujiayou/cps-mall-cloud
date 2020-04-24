@@ -123,4 +123,9 @@ public class GoodsListServiceImpl implements GoodsListService {
         productEntityExPageBean.setList(productEntityExPageBean.getList().stream().filter(o-> !smProductEntity.getGoodsId().equals(o.getGoodsId())).collect(Collectors.toList()));
         return productEntityExPageBean;
     }
+
+    @Override
+    public PageBean<SmProductEntityEx> mall(MallGoodsListForm mallGoodsListForm) throws Exception {
+        return null;
+    }
 }

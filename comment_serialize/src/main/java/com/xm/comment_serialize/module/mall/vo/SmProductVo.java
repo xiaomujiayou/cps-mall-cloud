@@ -1,6 +1,13 @@
 package com.xm.comment_serialize.module.mall.vo;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
 import lombok.Data;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 public class SmProductVo {
@@ -27,4 +34,21 @@ public class SmProductVo {
     private java.util.Date createTime;
     //淘宝购买链接，用于生成淘口令
     private String tbBuyUrl;
+    private String discount;
+    private String commentsRate;
+    private String brandLogoUrl;
+    private String brandName;
+    //是否支持急速返现
+    private Boolean creditPay;
+
+    public String getServiceTags() {
+        if(creditPay == null || !creditPay)
+            return serviceTags;
+        if(serviceTags == null || StrUtil.isBlank(serviceTags))
+            return "急速返现";
+        List<String> list = CollUtil.newArrayList(serviceTags.split(","));
+        list.add("急速返现");
+        return list.stream().collect(Collectors.joining(","));
+
+    }
 }

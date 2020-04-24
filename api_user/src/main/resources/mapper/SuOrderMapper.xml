@@ -5,6 +5,7 @@
     <result column="id" property="id" jdbcType="INTEGER" />
     <result column="user_id" property="userId" jdbcType="INTEGER" />
     <result column="order_sn" property="orderSn" jdbcType="VARCHAR" />
+    <result column="order_sub_sn" property="orderSubSn" jdbcType="VARCHAR" />
     <result column="product_id" property="productId" jdbcType="VARCHAR" />
     <result column="product_name" property="productName" jdbcType="VARCHAR" />
     <result column="img_url" property="imgUrl" jdbcType="VARCHAR" />
@@ -22,6 +23,7 @@
     <result column="share_user_id" property="shareUserId" jdbcType="INTEGER" />
     <result column="from_app" property="fromApp" jdbcType="INTEGER" />
     <result column="custom_parameters" property="customParameters" jdbcType="VARCHAR" />
+    <result column="cart" property="cart" jdbcType="VARCHAR" />
     <result column="order_modify_at" property="orderModifyAt" jdbcType="TIMESTAMP" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
   </resultMap>

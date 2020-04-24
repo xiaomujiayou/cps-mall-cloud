@@ -1,5 +1,6 @@
 package com.xm.comment_utils.mybatis;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import lombok.Data;
@@ -36,5 +37,17 @@ public class PageBean<T> implements Serializable {
         }else {
             this.list = list;
         }
+    }
+    public PageBean(PageBean pageBean) {
+        this.pageNum = pageBean.getPageNum();
+        this.pageSize = pageBean.getPageSize();
+        this.total = pageBean.getTotal();
+        this.pages = pageBean.getPages();
+    }
+
+    public boolean hasNext(){
+        if(!ObjectUtil.isAllNotEmpty(pageNum,pageSize,total))
+            return false;
+        return pageNum * pageSize < total;
     }
 }

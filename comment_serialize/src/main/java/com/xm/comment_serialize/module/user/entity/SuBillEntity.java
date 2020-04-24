@@ -1,6 +1,7 @@
 package com.xm.comment_serialize.module.user.entity;
 
 import lombok.Data;
+import tk.mybatis.mapper.annotation.Version;
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -48,7 +49,7 @@ public class SuBillEntity implements Serializable{
 	private Integer promotionRate;
 
 	/**
-	 * 账单状态(1:待发放,2:准备发放,3:已发放,4:已失效,5:已处理,6:待支付,7:已支付)
+	 * 账单状态(1:等待确认,2:准备发放,3:已发放,4:已失效,5:已处理,6:待支付,7:已支付)
 	 */
 	private Integer state;
 
@@ -66,6 +67,16 @@ public class SuBillEntity implements Serializable{
 	 * 账单失效原因
 	 */
 	private String failReason;
+
+	/**
+	 * 信用支付状态(0:非信用支付,1:达到信用支付条件,3:信用支付失败)
+	 */
+	private Integer creditState;
+
+	/**
+	 * 打款时间
+	 */
+	private java.util.Date payTime;
 
 	/**
 	 * 最后更新时间

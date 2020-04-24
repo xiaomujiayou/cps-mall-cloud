@@ -5,11 +5,12 @@
     <result column="id" property="id" jdbcType="INTEGER" />
     <result column="app_type" property="appType" jdbcType="INTEGER" />
     <result column="platform_type" property="platformType" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="INTEGER" />
     <result column="name" property="name" jdbcType="VARCHAR" />
     <result column="url" property="url" jdbcType="VARCHAR" />
     <result column="img" property="img" jdbcType="VARCHAR" />
     <result column="target" property="target" jdbcType="INTEGER" />
-    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="app_id" property="appId" jdbcType="VARCHAR" />
     <result column="disable" property="disable" jdbcType="INTEGER" />
     <result column="sort" property="sort" jdbcType="INTEGER" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />

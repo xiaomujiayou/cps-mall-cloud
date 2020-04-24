@@ -11,8 +11,8 @@ import java.util.regex.Pattern;
 
 public class TextToGoodsUtils {
     public static Pattern PDD_URL_PATTERN = Pattern.compile("(?<=(yangkeduo)\\S{1,255}(goods_id=))[0-9]+");
-//    public static Pattern MGJ_URL_PATTERN = Pattern.compile("(?<=(mogu.com/))[0-9a-zA-Z]+");
     public static Pattern MGJ_URL_PATTERN = Pattern.compile("(?<=(mogu.com)\\S{1,255}(itemId=))[0-9a-zA-Z]+");
+    public static Pattern WPH_URL_PATTERN = Pattern.compile("(?<=(-))[0-9]{19}(?=.html)");
 
     /**
      * 解析剪辑版内容
@@ -32,6 +32,13 @@ public class TextToGoodsUtils {
         if(goodsId!=null){
             goodsSpec.setGoodsId(goodsId);
             goodsSpec.setPlatformType(PlatformTypeConstant.MGJ);
+            goodsSpec.setParseType(1);
+            return goodsSpec;
+        }
+        goodsId = RegeUtils.matchFrist(text,WPH_URL_PATTERN);
+        if(goodsId!=null){
+            goodsSpec.setGoodsId(goodsId);
+            goodsSpec.setPlatformType(PlatformTypeConstant.WPH);
             goodsSpec.setParseType(1);
             return goodsSpec;
         }

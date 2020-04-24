@@ -62,11 +62,13 @@ spring:
           initial-interval: 10000 # 消息多次消费的间隔10秒
 
   redis:
-    host: 47.92.6.56
+    host: 127.0.0.1
+#    password:
+#    host: 47.92.6.56
+#    password: kxy521yu
     port: 6379
-    password: kxy521yu
     database: 0
-    timeout: 25000
+    timeout: 2000
     jedis:
       pool:
         max-active: 8

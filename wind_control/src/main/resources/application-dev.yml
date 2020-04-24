@@ -1,21 +1,14 @@
 server:
-  port: 8108
+  port: 8113
 
 spring:
   datasource:
-    druid:
-      min-idle: 1
-      test-on-borrow: true
-      stat-view-servlet:
-        allow: true
-      max-active: 20
-      initial-size: 1
     driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
     url: jdbc:mysql://47.92.6.56:3306/share_wind?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
     password: xm123456
 
-# 默认之配置为TM的本机默认端口
 logging:
   logPath: D:\java\data\log\share\wind-control
   logLevel: debug

@@ -3,7 +3,6 @@ package com.xm.api_user.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -14,15 +13,20 @@ import com.xm.api_user.mapper.SuOrderMapper;
 import com.xm.api_user.mapper.SuUserMapper;
 import com.xm.api_user.mapper.custom.SuBillMapperEx;
 import com.xm.api_user.service.BillService;
+import com.xm.comment.utils.GoodsPriceUtil;
+import com.xm.comment.utils.LockHelper;
 import com.xm.comment_feign.module.mall.feign.MallFeignClient;
 import com.xm.comment_mq.message.config.BillMqConfig;
 import com.xm.comment_serialize.module.lottery.ex.SlPropSpecEx;
 import com.xm.comment_serialize.module.mall.constant.ConfigEnmu;
 import com.xm.comment_serialize.module.mall.constant.ConfigTypeConstant;
 import com.xm.comment_serialize.module.pay.entity.SpWxEntPayOrderInEntity;
+import com.xm.comment_serialize.module.user.bo.OrderCustomParameters;
 import com.xm.comment_serialize.module.user.bo.SuBillToPayBo;
 import com.xm.comment_serialize.module.user.constant.BillStateConstant;
 import com.xm.comment_serialize.module.user.constant.BillTypeConstant;
+import com.xm.comment_serialize.module.user.constant.OrderStateConstant;
+import com.xm.comment_serialize.module.user.dto.BillOrderDto;
 import com.xm.comment_serialize.module.user.dto.OrderBillDto;
 import com.xm.comment_serialize.module.user.entity.SuBillEntity;
 import com.xm.comment_serialize.module.user.entity.SuOrderEntity;
@@ -30,16 +34,14 @@ import com.xm.comment_serialize.module.user.entity.SuUserEntity;
 import com.xm.comment_serialize.module.user.vo.BillVo;
 import com.xm.comment_utils.mybatis.PageBean;
 import com.xm.comment_utils.product.GenNumUtil;
-import com.xm.comment_utils.project.PromotionUtils;
+import io.seata.core.context.RootContext;
 import io.seata.spring.annotation.GlobalTransactional;
+import io.seata.spring.annotation.GlobalTransactionalInterceptor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import tk.mybatis.mapper.entity.Example;
 import tk.mybatis.orderbyhelper.OrderByHelper;
 
@@ -65,22 +67,48 @@ public class BillServiceImpl implements BillService {
     @Autowired
     private BillService billService;
 
-    @GlobalTransactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void createByOrder(SuOrderEntity order) {
         //订单相关账单存在则返回
         List<SuBillEntity> userRelatedBills = getOrderRelatedBill(order);
         if(userRelatedBills != null && userRelatedBills.size() > 0)
             return;
-        JSONObject params = JSON.parseObject(order.getCustomParameters());
-        Integer shareUserId = params.getInteger("shareUserId");
+        OrderCustomParameters params = JSON.parseObject(order.getCustomParameters(), OrderCustomParameters.class);
+        Integer shareUserId = params.getShareUserId();
         if(shareUserId == null){
             //生成正常下单账单
-            createNormalOrderBill(order);
+            billService.createNormalOrderBill(order);
         }else {
             //生成分享订单账单
-            createShareOrderBill(shareUserId,order);
+            billService.createShareOrderBill(shareUserId,order);
         }
+    }
+
+    /**
+     * 创建分享订单所属账单
+     * 获取系统购买者分享订单费率 -> 计算购买者收益账单 -> 获取系统分享者订单费率 -> 计算分享者收益账单
+     * @param shareUserId
+     * @param order
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void createShareOrderBill(Integer shareUserId,SuOrderEntity order){
+        //属于分享订单
+        //生成分享者账单
+        Integer shareUserRate = Integer.valueOf(mallFeignClient.getOneConfig(
+                shareUserId,
+                ConfigEnmu.PRODUCT_SHARE_USER_RATE.getName(),
+                ConfigTypeConstant.SYS_CONFIG).getVal());
+        SuBillEntity shareUserBill = createOrderBill(shareUserId,order,BillTypeConstant.SHARE_PROFIT,shareUserRate,order.getUserId());
+        orderBillCreate(shareUserBill);
+        //生成购买者订单
+        Integer buyUserRate = Integer.valueOf(mallFeignClient.getOneConfig(
+                order.getUserId(),
+                ConfigEnmu.PRODUCT_SHARE_BUY_RATE.getName(),
+                ConfigTypeConstant.SYS_CONFIG).getVal());
+        SuBillEntity buyUserBill = createOrderBill(order.getUserId(),order,BillTypeConstant.BUY_SHARE,buyUserRate,null);
+        orderBillCreate(buyUserBill);
     }
 
     /**
@@ -88,7 +116,9 @@ public class BillServiceImpl implements BillService {
      * 获取系统自购费率 -> 计算购买用户收益账单 -> 获取系统代理费率 -> 计算上级代理收益账单
      * @param order
      */
-    private void createNormalOrderBill(SuOrderEntity order){
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void createNormalOrderBill(SuOrderEntity order){
         //属于正常购买订单
         //生成购买者账单
         Integer buyUserRate = Integer.valueOf(mallFeignClient.getOneConfig(
@@ -121,30 +151,6 @@ public class BillServiceImpl implements BillService {
     }
 
     /**
-     * 创建分享订单所属账单
-     * 获取系统购买者分享订单费率 -> 计算购买者收益账单 -> 获取系统分享者订单费率 -> 计算分享者收益账单
-     * @param shareUserId
-     * @param order
-     */
-    private void createShareOrderBill(Integer shareUserId,SuOrderEntity order){
-        //属于分享订单
-        //生成分享者账单
-        Integer shareUserRate = Integer.valueOf(mallFeignClient.getOneConfig(
-                shareUserId,
-                ConfigEnmu.PRODUCT_SHARE_USER_RATE.getName(),
-                ConfigTypeConstant.SYS_CONFIG).getVal());
-        SuBillEntity shareUserBill = createOrderBill(shareUserId,order,BillTypeConstant.SHARE_PROFIT,shareUserRate,order.getUserId());
-        orderBillCreate(shareUserBill);
-        //生成购买者订单
-        Integer buyUserRate = Integer.valueOf(mallFeignClient.getOneConfig(
-                order.getUserId(),
-                ConfigEnmu.PRODUCT_SHARE_BUY_RATE.getName(),
-                ConfigTypeConstant.SYS_CONFIG).getVal());
-        SuBillEntity buyUserBill = createOrderBill(order.getUserId(),order,BillTypeConstant.BUY_SHARE,buyUserRate,null);
-        orderBillCreate(buyUserBill);
-    }
-
-    /**
      * 获取上级代理
      * @param userId
      * @param level
@@ -174,7 +180,7 @@ public class BillServiceImpl implements BillService {
         SuBillEntity bill = new SuBillEntity();
         bill.setUserId(userId);
         bill.setFromUserId(formUserId);
-        bill.setMoney(PromotionUtils.calcByRate(order.getPromotionAmount(),rate));
+        bill.setMoney(GoodsPriceUtil.type(order.getPlatformType()).calcUserBuyProfit(order.getPromotionAmount().doubleValue(),rate.doubleValue()).intValue());
         bill.setType(billType);
         bill.setAttach(order.getId());
         bill.setPromotionRate(rate);
@@ -184,21 +190,26 @@ public class BillServiceImpl implements BillService {
         return bill;
     }
 
-    @GlobalTransactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void payOutOrderBill(SuOrderEntity order) {
         List<SuBillEntity> suBillEntities = getOrderRelatedBill(order);
-        suBillEntities.stream().forEach(o->{
+        suBillEntities.stream()
+                .filter(o-> o.getState().equals(BillStateConstant.WAIT))
+                .forEach(o->{
             billService.updateBillState(o,BillStateConstant.READY,null);
             rabbitTemplate.convertAndSend(BillMqConfig.EXCHANGE,BillMqConfig.KEY,o);
         });
     }
 
-    @GlobalTransactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void invalidOrderBill(SuOrderEntity order) {
         List<SuBillEntity> suBillEntities = getOrderRelatedBill(order);
-        suBillEntities.stream().forEach(o->{
+        suBillEntities.stream()
+                //已返现的账单不再修改状态
+                .filter(o -> !o.getState().equals(BillStateConstant.ALREADY))
+                .forEach(o->{
             billService.updateBillState(o,BillStateConstant.FAIL,order.getFailReason());
         });
     }
@@ -270,7 +281,7 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public List<OrderBillDto> getBillInfo(Integer userId, List<String> billIds) {
+    public List<BillOrderDto> getBillInfo(Integer userId, List<String> billIds) {
         OrderByHelper.orderBy("sb.create_time desc");
         return suBillMapperEx.getBillInfo(userId,billIds);
     }
@@ -355,6 +366,36 @@ public class BillServiceImpl implements BillService {
 //        SuBillEntity record = new SuBillEntity();
 //        record.setState(BillStateConstant.ALREADY);
 //        suBillMapper.updateByExampleSelective(record,example);
+    }
+
+    @Override
+    public void onCreditDelayArrived(SuBillEntity suBillEntity) {
+        billService.updateBillState(suBillEntity,BillStateConstant.READY,null);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void updateBillStateByOrderStateChange(SuOrderEntity oldOrder, Integer newState,String failReason) {
+        if(oldOrder.getState().equals(OrderStateConstant.CONFIRM_RECEIPT) && checkState(oldOrder,newState, OrderStateConstant.ALREADY_SETTLED)){
+            //达到发放状态，发放佣金
+            billService.payOutOrderBill(oldOrder);
+        }else if(checkState(oldOrder,newState, OrderStateConstant.FAIL_SETTLED)){
+            //达到失败状态，更新状态
+            billService.invalidOrderBill(oldOrder);
+        }
+    }
+    /**
+     * 订单是否到达预期状态
+     * @param oldOrder
+     * @param orderState    :预期状态(OrderStateConstant)
+     * @return
+     */
+    private boolean checkState(SuOrderEntity oldOrder,Integer newState,Integer... orderState){
+        List<Integer> states = Lists.newArrayList(orderState);
+        //老订单存在，则只在状态变更时发放收益
+        if(states.contains(newState))
+            return true;
+        return false;
     }
 
     private BillVo covertBillVo(SuBillEntity suBillEntity,SuOrderEntity suOrderEntity,SuUserEntity suUserEntity){

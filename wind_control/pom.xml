@@ -25,6 +25,11 @@
             <artifactId>comment_web</artifactId>
             <version>${project.current.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.xm</groupId>
+            <artifactId>comment_seata</artifactId>
+            <version>${project.current.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

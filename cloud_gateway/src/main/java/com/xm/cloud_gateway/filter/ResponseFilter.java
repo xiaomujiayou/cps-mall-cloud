@@ -35,7 +35,7 @@ public class ResponseFilter extends ZuulFilter {
 
     @Override
     public int filterOrder() {
-        return SEND_RESPONSE_FILTER_ORDER - 1;
+        return SEND_RESPONSE_FILTER_ORDER - 2;
     }
 
     @Override
@@ -55,7 +55,8 @@ public class ResponseFilter extends ZuulFilter {
         RequestContext context = RequestContext.getCurrentContext();
         AtomicBoolean should = new AtomicBoolean(false);
         context.getZuulResponseHeaders().stream().forEach(o ->{
-            should.set(o.first().equals("Content-Type") && o.second().contains("application/json"));
+            if(o.first().equals("Content-Type"))
+                should.set(o.second().contains("application/json"));
         });
         InputStream responseStream = context.getResponseDataStream();
         //原始报文

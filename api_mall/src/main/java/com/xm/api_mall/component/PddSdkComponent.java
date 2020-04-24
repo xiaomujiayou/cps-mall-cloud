@@ -18,6 +18,7 @@ import com.xm.comment_serialize.module.mall.constant.*;
 import com.xm.comment_serialize.module.mall.entity.SmConfigEntity;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
 import com.xm.comment_serialize.module.mall.ex.SmProductEntityEx;
+import com.xm.comment_serialize.module.mall.form.MallGoodsListForm;
 import com.xm.comment_serialize.module.mall.vo.SmProductSimpleVo;
 import com.xm.comment_utils.enu.EnumUtils;
 import com.xm.comment_utils.exception.GlobleException;
@@ -59,7 +60,7 @@ public class PddSdkComponent {
         request.setPageSize(criteria.getPageSize());
         request.setOptId(criteria.getOptionId() != null?Long.valueOf(criteria.getOptionId()):null);
         request.setKeyword(criteria.getKeyword());
-        request.setGoodsIdList(criteria.getGoodsIdList());
+        request.setGoodsIdList(criteria.getGoodsIdList() != null ? criteria.getGoodsIdList().stream().map(Long::valueOf).collect(Collectors.toList()) : null);
         request.setSortType(criteria.getOrderBy(PlatformTypeConstant.PDD) == null ? null : Integer.valueOf(criteria.getOrderBy(PlatformTypeConstant.PDD).toString()));
         request.setActivityTags(criteria.getActivityTags());
         request.setWithCoupon(criteria.getHasCoupon());
@@ -79,13 +80,31 @@ public class PddSdkComponent {
         }
         PddDdkGoodsSearchResponse response = popHttpClient.syncInvoke(request);
         List<PddDdkGoodsSearchResponse.GoodsSearchResponseGoodsListItem> goodsList = response.getGoodsSearchResponse().getGoodsList();
-        List<SmProductEntity> smProductEntityList = goodsList.stream().map(o ->{return convertGoodsList(o);}).collect(Collectors.toList());
+        List<SmProductEntity> smProductEntityList = goodsList.stream().map(o -> convertGoodsList(o)).collect(Collectors.toList());
         return packageToPageBean(
                 smProductEntityList,
                 response.getGoodsSearchResponse().getTotalCount().intValue(),
                 criteria.getPageNum(),
                 criteria.getPageSize());
 
+    }
+
+    /**
+     * 获取店铺商品
+     */
+    public PageBean<SmProductEntity> mallGoodsList(MallGoodsListForm mallGoodsListForm) throws Exception {
+        PddDdkMallGoodsListGetRequest request = new PddDdkMallGoodsListGetRequest();
+        request.setMallId(Long.valueOf(mallGoodsListForm.getMallId()));
+        request.setPageNumber(mallGoodsListForm.getPageNum());
+        request.setPageSize(mallGoodsListForm.getPageSize());
+        PddDdkMallGoodsListGetResponse response = popHttpClient.syncInvoke(request);
+        List<PddDdkMallGoodsListGetResponse.GoodsInfoListResponseGoodsListItem> list = response.getGoodsInfoListResponse().getGoodsList();
+        List<SmProductEntity> smProductEntityList = list.stream().map(o -> convertGoodsList(o)).collect(Collectors.toList());
+        return packageToPageBean(
+                smProductEntityList,
+                response.getGoodsInfoListResponse().getTotal().intValue(),
+                mallGoodsListForm.getPageNum(),
+                mallGoodsListForm.getPageSize());
     }
 
     /**
@@ -331,7 +350,9 @@ public class PddSdkComponent {
         smProductEntity.setDes(detailsItem.getGoodsDesc());
         smProductEntity.setOriginalPrice(detailsItem.getMinGroupPrice().intValue());
         smProductEntity.setCouponPrice(detailsItem.getCouponDiscount().intValue());
+        smProductEntity.setMallId(detailsItem.getMallId()+"");
         smProductEntity.setMallName(detailsItem.getMallName());
+        smProductEntity.setDiscount(detailsItem.getMallCouponDiscountPct().toString());
         smProductEntity.setSalesTip(detailsItem.getSalesTip());
         smProductEntity.setMallCps(2);
         smProductEntity.setPromotionRate(detailsItem.getPromotionRate().intValue() * 10);
@@ -370,5 +391,6 @@ public class PddSdkComponent {
         }
         return null;
     }
+
 
 }

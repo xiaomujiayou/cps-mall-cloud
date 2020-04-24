@@ -2,6 +2,8 @@ package com.xm.api_user.service;
 
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
 import com.xm.comment_serialize.module.mall.ex.SmProductEntityEx;
+import com.xm.comment_serialize.module.mall.vo.SmProductVo;
+import com.xm.comment_serialize.module.user.vo.SuProductHistoryVo;
 import com.xm.comment_utils.mybatis.PageBean;
 
 import java.util.List;
@@ -16,22 +18,27 @@ public interface ProductService {
      * @param suProductType
      * @return
      */
-    public PageBean<SmProductEntity> getUserProduct(Integer userId, Integer pageNum, Integer pageSize, Integer suProductType);
+    public PageBean<SuProductHistoryVo> getUserProduct(Integer userId, Integer pageNum, Integer pageSize, Integer suProductType);
 
     /**
      * 添加浏览历史记录
      * @param userId
-     * @param platformType
-     * @param goodsId
      */
-    public void addHistory(Integer userId,Integer platformType,String goodsId,Integer shareUserId);
+    public void addOrUpdateHistory(Integer userId, Integer shareUserId,String ip,Integer appType, SmProductEntityEx smProductEntityEx);
+
+    /**
+     * 添加一个新纪录
+     * @param userId
+     * @param shareUserId
+     * @param smProductEntityEx
+     */
+    public void newOne(Integer userId, Integer shareUserId,String ip,Integer appType, SmProductEntityEx smProductEntityEx);
 
     /**
      * @param userId
      * @param id
-     * @param isAll
      */
-    public void delHistory(Integer userId,Integer id,Boolean isAll);
+    public void delHistory(Integer userId,Integer id,Integer productType);
 
     /**
      * 是否收藏

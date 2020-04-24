@@ -2,6 +2,7 @@ package com.xm.api_mall.component;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.taobao.api.ApiException;
@@ -141,41 +142,43 @@ public class TbSdkComponent {
         smProductEntity.setGoodsId(o.getItemId().toString());
         smProductEntity.setGoodsThumbnailUrl(o.getPictUrl());
         smProductEntity.setName(o.getTitle());
-        smProductEntity.setOriginalPrice(o.getZkFinalPrice() != null ? Double.valueOf(Double.valueOf(o.getZkFinalPrice()) * 100).intValue() : null);
-        smProductEntity.setCouponPrice(o.getCouponAmount() != null ? Double.valueOf(Double.valueOf(o.getCouponAmount()) * 100).intValue() : null);
+        smProductEntity.setOriginalPrice(o.getZkFinalPrice() != null ? Double.valueOf(Double.valueOf(o.getZkFinalPrice()) * 100).intValue() : 0);
+        smProductEntity.setCouponPrice(o.getCouponAmount() != null ? Double.valueOf(Double.valueOf(o.getCouponAmount()) * 100).intValue() : 0);
         smProductEntity.setCouponStartFee(o.getCouponStartFee() == null ? null : Double.valueOf(Double.valueOf(o.getCouponStartFee()) * 100).intValue());
         smProductEntity.setMallName(o.getNick());
         smProductEntity.setSalesTip(o.getVolume().toString());
-        smProductEntity.setPromotionRate(Integer.valueOf(o.getCommissionRate()));
-        smProductEntity.setHasCoupon(o.getCouponId() != null ? 1 : 0);
+        smProductEntity.setPromotionRate(0);
+//        smProductEntity.setPromotionRate(Integer.valueOf(o.getCommissionRate()));
+        smProductEntity.setHasCoupon(o.getCouponAmount() != null && Double.valueOf(o.getCouponAmount()) > 0 ? 1 : 0);
         smProductEntity.setCashPrice(GoodsPriceUtil.type(PlatformTypeConstant.TB).calcProfit(smProductEntity).intValue());
         smProductEntity.setOptId(o.getCategoryId().toString());
-        smProductEntity.setTbBuyUrl("https:" + o.getCouponShareUrl());
-        smProductEntity.setGoodsGalleryUrls(o.getSmallImages().stream().collect(Collectors.joining(",")));
+        smProductEntity.setTbBuyUrl(StrUtil.isNotBlank(o.getCouponShareUrl()) ? "https:" + o.getCouponShareUrl() : o.getItemUrl());
+        smProductEntity.setGoodsGalleryUrls(o.getSmallImages() == null ? o.getPictUrl() : o.getSmallImages().stream().collect(Collectors.joining(",")));
         if(smProductEntity.getName().contains("口罩") || smProductEntity.getName().contains("医") || smProductEntity.getName().contains("药")){
             return null;
         }
         smProductEntity.setCreateTime(new Date());
         return smProductEntity;
     }
-
     private SmProductEntity convertGoodsList(TbkDgOptimusMaterialResponse.MapData o) {
         SmProductEntity smProductEntity = new SmProductEntity();
         smProductEntity.setType(PlatformTypeConstant.TB);
         smProductEntity.setGoodsId(o.getItemId().toString());
         smProductEntity.setGoodsThumbnailUrl(o.getPictUrl());
         smProductEntity.setName(o.getTitle());
-        smProductEntity.setOriginalPrice(o.getZkFinalPrice() != null ? Double.valueOf(Double.valueOf(o.getZkFinalPrice()) * 100).intValue() : null);
-        smProductEntity.setCouponPrice(o.getCouponAmount() != null ? Double.valueOf(Double.valueOf(o.getCouponAmount()) * 100).intValue() : null);
+        smProductEntity.setOriginalPrice(o.getZkFinalPrice() != null ? Double.valueOf(Double.valueOf(o.getZkFinalPrice()) * 100).intValue() : 0);
+        smProductEntity.setCouponPrice(o.getCouponAmount() != null ? Double.valueOf(Double.valueOf(o.getCouponAmount()) * 100).intValue() : 0);
         smProductEntity.setCouponStartFee(o.getCouponStartFee() == null ? null : Double.valueOf(Double.valueOf(o.getCouponStartFee()) * 100).intValue());
         smProductEntity.setMallName(o.getNick());
         smProductEntity.setSalesTip(o.getVolume().toString());
-        smProductEntity.setPromotionRate(Double.valueOf(Double.valueOf(o.getCommissionRate()) * 100).intValue());
+        smProductEntity.setPromotionRate(0);
+//        smProductEntity.setPromotionRate(Double.valueOf(Double.valueOf(o.getCommissionRate()) * 100).intValue());
         smProductEntity.setHasCoupon(o.getCouponAmount() != null && o.getCouponAmount() > 0 ? 1 : 0);
         smProductEntity.setCashPrice(GoodsPriceUtil.type(PlatformTypeConstant.TB).calcProfit(smProductEntity).intValue());
         smProductEntity.setOptId(o.getCategoryId().toString());
-        smProductEntity.setTbBuyUrl("https:" + o.getCouponShareUrl());
-        smProductEntity.setGoodsGalleryUrls(o.getSmallImages().stream().collect(Collectors.joining(",")));
+        smProductEntity.setTbBuyUrl(StrUtil.isNotBlank(o.getCouponShareUrl()) ? "https:" + o.getCouponShareUrl() : o.getClickUrl());
+        System.out.println(JSON.toJSONString(o,SerializerFeature.PrettyFormat));
+        smProductEntity.setGoodsGalleryUrls(o.getSmallImages() == null ? o.getPictUrl() : o.getSmallImages().stream().collect(Collectors.joining(",")));
         if(smProductEntity.getName().contains("口罩") || smProductEntity.getName().contains("医") || smProductEntity.getName().contains("药")){
             return null;
         }
@@ -241,10 +244,11 @@ public class TbSdkComponent {
         request.setAdzoneId(110169250471L);
         request.setMaterialId(6707L);
         request.setQ(goodsName);
-
-        request.setDeviceType("IMEI");
-        request.setDeviceEncrypt("MD5");
-        request.setDeviceValue(MD5.md5(userId.toString(),""));
+        if(userId != null){
+            request.setDeviceType("IMEI");
+            request.setDeviceEncrypt("MD5");
+            request.setDeviceValue(MD5.md5(userId.toString(),""));
+        }
         TbkDgMaterialOptionalResponse response = myTaobaoClient.execute(request);
         List<TbkDgMaterialOptionalResponse.MapData> mapData = response.getResultList().stream()
                  .filter(o -> o.getItemId().toString().equals(goodsId))

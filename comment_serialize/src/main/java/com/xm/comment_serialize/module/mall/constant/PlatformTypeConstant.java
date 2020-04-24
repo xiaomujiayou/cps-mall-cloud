@@ -12,4 +12,6 @@ public class PlatformTypeConstant {
     public static final int TB = 3;
     //蘑菇街
     public static final int MGJ = 4;
+    //唯品会
+    public static final int WPH = 5;
 }

@@ -4,6 +4,7 @@ import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.PageUtil;
 import com.github.pagehelper.PageHelper;
 import com.xm.api_user.mapper.*;
 import com.xm.api_user.mapper.custom.SuOrderMapperEx;
@@ -92,7 +93,11 @@ public class UserServiceImpl implements UserService {
         }else if(StringUtils.isNotBlank(getUserInfoForm.getOpenId())){
             SuUserEntity record = new SuUserEntity();
             record.setOpenId(getUserInfoForm.getOpenId());
-            return suUserMapper.selectOne(record);
+            SuUserEntity user = suUserMapper.selectOne(record);
+            record.setId(user.getId());
+            record.setLastLogin(new Date());
+            suUserMapper.updateByPrimaryKeySelective(record);
+            return user;
         }else {
             throw new GlobleException(MsgEnum.PARAM_VALID_ERROR);
         }
@@ -115,11 +120,7 @@ public class UserServiceImpl implements UserService {
         user.setCreateTime(new Date());
         user.setLastLogin(new Date());
         user.setPid(suPidEntity.getId());
-        suUserMapper.insertUseGeneratedKeys(user);
-        //创建用户汇总信息
-        SuSummaryEntity suSummaryEntity = summaryService.createNewSummary(user.getId());
-        user.setSummaryId(suSummaryEntity.getId());
-        suUserMapper.updateByPrimaryKeySelective(user);
+        suUserMapper.insertSelective(user);
         return user;
     }
 
@@ -183,30 +184,35 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public PageBean<ProxyProfitDto> getProxyProfit(Integer userId, Integer state, Integer orderColumn, Integer orderBy, Integer pageNum, Integer pageSize) {
+        String orderByStr = null;
         if(orderBy != null && orderColumn != null && orderBy != 0){
             String order = orderBy == 1?"asc":"desc";
             switch (orderColumn){
                 case 1:{
-                    OrderByHelper.orderBy("nickname " + order);
+                    orderByStr = "nickname " + order;
+//                    OrderByHelper.orderBy("nickname " + order);
                     break;
                 }
                 case 2:{
-                    OrderByHelper.orderBy("proxy_profit " + order);
+                    orderByStr = "proxy_profit " + order;
+//                    OrderByHelper.orderBy("proxy_profit " + order);
                     break;
                 }
                 case 3:{
-                    OrderByHelper.orderBy("proxy_num " + order);
+                    orderByStr = "proxy_num " + order;
+//                    OrderByHelper.orderBy("proxy_num " + order);
                     break;
                 }
                 case 4:{
-                    OrderByHelper.orderBy("create_time " + order);
+                    orderByStr = "create_time " + order;
+//                    OrderByHelper.orderBy("create_time " + order);
                     break;
                 }
             }
 
         }
-        PageHelper.startPage(pageNum,pageSize);
-        List<ProxyProfitDto> proxyProfitDtos = suUserMapperEx.getProxyProfit(userId,state);
+//        PageHelper.startPage(pageNum,pageSize);
+        List<ProxyProfitDto> proxyProfitDtos = suUserMapperEx.getProxyProfit(userId,state,orderByStr,PageUtil.getStart(pageNum,pageSize),pageSize);
         return new PageBean<>(proxyProfitDtos);
     }
 

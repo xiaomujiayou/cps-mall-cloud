@@ -1,8 +1,10 @@
 package com.xm.api_mall.aspect;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.xm.api_mall.utils.TextToGoodsUtils;
 import com.xm.comment_mq.message.config.UserActionConfig;
+import com.xm.comment_mq.message.impl.UserClickGoodsMessage;
 import com.xm.comment_mq.message.impl.UserSearchGoodsMessage;
 import com.xm.comment_mq.message.impl.UserShareGoodsMessage;
 import com.xm.comment_mq.message.impl.UserSmartSearchGoodsMessage;
@@ -11,6 +13,7 @@ import com.xm.comment_serialize.module.mall.form.GoodsDetailForm;
 import com.xm.comment_serialize.module.mall.form.KeywordGoodsListForm;
 import com.xm.comment_serialize.module.mall.form.ProductListForm;
 import com.xm.comment_serialize.module.mall.form.UrlParseForm;
+import com.xm.comment_serialize.module.mall.vo.SmProductVo;
 import com.xm.comment_utils.mybatis.PageBean;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -32,24 +35,50 @@ public class UserActionMessageAspect {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-    @Pointcut("execution(public * com.xm.api_mall.service.api.impl.def.GoodsServiceImpl.detail(..))")
-    public void goodsDetailMessagePointCut(){}
+    @Pointcut("execution(public * com.xm.api_mall.controller.ProductController.getDetailEx(..))")
+    public void clickGoodsMessagePointCut(){}
 
     /**
      * 生成
+     * UserClickGoodsMessage
      * UserShareGoodsMessage
      * @param joinPoint
      * @return
      * @throws Throwable
      */
-    @Around("goodsDetailMessagePointCut()")
-    public Object goodsDetailMessagePointCut(ProceedingJoinPoint joinPoint) throws Throwable{
+    @Around("clickGoodsMessagePointCut()")
+    public Object clickGoodsMessagePointCut(ProceedingJoinPoint joinPoint) throws Throwable{
         SmProductEntityEx smProductEntityEx = (SmProductEntityEx)joinPoint.proceed();
         GoodsDetailForm goodsDetailForm = (GoodsDetailForm) joinPoint.getArgs()[0];
-        if(goodsDetailForm.getShareUserId() != null && goodsDetailForm.getUserId() != null && !goodsDetailForm.getShareUserId().equals(goodsDetailForm.getUserId()))
-            rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE,"",new UserShareGoodsMessage(goodsDetailForm.getShareUserId(),goodsDetailForm.getUserId(),smProductEntityEx));
+        if(goodsDetailForm.getUserId() != null){
+            Integer shareUserId = null;
+            if(ObjectUtil.isAllNotEmpty(goodsDetailForm.getShareUserId(),goodsDetailForm.getUserId()) && !goodsDetailForm.getShareUserId().equals(goodsDetailForm.getUserId())) {
+                shareUserId = goodsDetailForm.getShareUserId();
+                rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE,"",new UserShareGoodsMessage(shareUserId,goodsDetailForm.getUserId(),smProductEntityEx));
+            }
+            rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE,"",new UserClickGoodsMessage(goodsDetailForm.getUserId(),shareUserId,goodsDetailForm.getIp(),goodsDetailForm.getAppType(),smProductEntityEx));
+        }
         return smProductEntityEx;
     }
+
+//    @Pointcut("execution(public * com.xm.api_mall.service.api.impl.def.GoodsServiceImpl.detail(..))")
+//    public void goodsDetailMessagePointCut(){}
+//
+//    /**
+//     * 生成
+//     * UserShareGoodsMessage
+//     * @param joinPoint
+//     * @return
+//     * @throws Throwable
+//     */
+//    @Around("goodsDetailMessagePointCut()")
+//    public Object goodsDetailMessagePointCut(ProceedingJoinPoint joinPoint) throws Throwable{
+//        SmProductEntityEx smProductEntityEx = (SmProductEntityEx)joinPoint.proceed();
+//        GoodsDetailForm goodsDetailForm = (GoodsDetailForm) joinPoint.getArgs()[0];
+//        if(goodsDetailForm.getShareUserId() != null && goodsDetailForm.getUserId() != null && !goodsDetailForm.getShareUserId().equals(goodsDetailForm.getUserId()))
+//            rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE,"",new UserShareGoodsMessage(goodsDetailForm.getShareUserId(),goodsDetailForm.getUserId(),smProductEntityEx));
+//        return smProductEntityEx;
+//    }
 
 
     @Pointcut("execution(public * com.xm.api_mall.service.api.impl.def.GoodsListServiceImpl.keyword(..))")

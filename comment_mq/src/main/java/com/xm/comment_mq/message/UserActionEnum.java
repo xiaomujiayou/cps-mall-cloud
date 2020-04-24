@@ -16,7 +16,9 @@ public enum UserActionEnum {
     USER_FRIST_LOGIN(10000,"首次登录","api-user", UserFristLoginMessage.class,true),
     USER_ADD_PROXY(10001,"新增一个下级用户","api-user", UserAddProxyMessage.class,true),
     USER_SHARE_GOODS(10002,"分享商品被点击","api-mail", UserShareGoodsMessage.class,true),
-    USER_SHARE_APP(10003,"分享程序被点击","", SuUserEntity.class,false),
+    USER_CLICK_GOODS(10003,"用户点击一个商品","api-mail", UserClickGoodsMessage.class,true),
+    USER_SHARE_APP(10004,"分享程序被点击","", SuUserEntity.class,false),
+    USER_LOGIN(10005,"登录","api-user", UserLoginMessage.class,true),
 
     //用户订单事件
     ORDER_CREATE(10101,"用户下单","api-user", OrderCreateMessage.class,true),
@@ -32,6 +34,12 @@ public enum UserActionEnum {
     USER_BILL_COMMISSION_SUCESS(10303,"用户账单结算成功(钱到位)","", UserBillCommissionSucessMessage.class,false),
     USER_BILL_COMMISSION_FAIL(10304,"用户账单结算失败(钱到位)","", UserBillCommissionFailSucessMessage.class,false),
     USER_PAYMENT_SUCESS(10305,"用户佣金发放成功","",UserPaymentSucessMessage.class,true),
+    USER_CREDIT_PAY_BILL(10306,"用户信用预支一笔订单","",UserCreditPayBillCreateMessage.class,true),
+    USER_CREDIT_BILL_COUNT_DOWN(10307,"用户信用预支开始倒计时","",UserCreditBillCountDownMessage.class,true),
+    USER_BIND_CREDIT_BILL(10308,"用户信用绑定一笔账单","",UserBindCreditBillMessage.class,true),
+    USER_UN_BIND_CREDIT_BILL(10309,"用户信用解绑一笔订单","",UserUnBindCreditBillMessage.class,true),
+    USER_MALICE_CREDIT_BILL(10310,"用户恶意退款（收货返现后退款）","",UserMaliceCreditBillMessage.class,true),
+    USER_CREDIT_CHANGE(10311,"用户信用变更","",UserCreditChangeMessage.class,true),
 
     //用户使用事件
     USER_OPEN_APP(10201,"用户打开程序","", UserOpenAppMessage.class,false),

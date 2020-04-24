@@ -1,6 +1,7 @@
 package com.xm.comment_serialize.module.mall.entity;
 
 import lombok.Data;
+import tk.mybatis.mapper.annotation.Version;
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -73,14 +74,19 @@ public class SmProductEntity implements Serializable{
 	private String mallName;
 
 	/**
-	 * 商品售卖数量
+	 * 店铺类型
 	 */
-	private String salesTip;
+	private String mallType;
 
 	/**
 	 * 所在店铺是否参与全店推广，0：否，1：是
 	 */
 	private Integer mallCps;
+
+	/**
+	 * 商品售卖数量
+	 */
+	private String salesTip;
 
 	/**
 	 * 是否有优惠券(0:没有,1:有)
@@ -121,6 +127,26 @@ public class SmProductEntity implements Serializable{
 	 * 淘宝购买链接
 	 */
 	private String tbBuyUrl;
+
+	/**
+	 * 商品折扣(唯品会)
+	 */
+	private String discount;
+
+	/**
+	 * 好评率(唯品会)
+	 */
+	private String commentsRate;
+
+	/**
+	 * 品牌LOGO链接(唯品会)
+	 */
+	private String brandLogoUrl;
+
+	/**
+	 * 品牌名称
+	 */
+	private String brandName;
 
 	/**
 	 * 创建时间

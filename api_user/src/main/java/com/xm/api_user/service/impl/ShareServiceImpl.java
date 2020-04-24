@@ -1,28 +1,38 @@
 package com.xm.api_user.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.xm.api_user.mapper.SuShareMapper;
 import com.xm.api_user.service.ShareService;
+import com.xm.comment.utils.LockHelper;
 import com.xm.comment_feign.module.mall.feign.MallFeignClient;
 import com.xm.comment.utils.GoodsPriceUtil;
 import com.xm.comment_serialize.module.mall.bo.ProductIndexBo;
 import com.xm.comment_serialize.module.mall.constant.ConfigEnmu;
 import com.xm.comment_serialize.module.mall.constant.ConfigTypeConstant;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
+import com.xm.comment_serialize.module.mall.ex.SmProductEntityEx;
+import com.xm.comment_serialize.module.mall.vo.SmProductVo;
 import com.xm.comment_serialize.module.user.entity.SuOrderEntity;
 import com.xm.comment_serialize.module.user.entity.SuShareEntity;
 import com.xm.comment_serialize.module.user.vo.ShareVo;
 import com.xm.comment_utils.mybatis.PageBean;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.orderbyhelper.OrderByHelper;
 
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service("shareService")
 public class ShareServiceImpl implements ShareService {
 
@@ -30,64 +40,58 @@ public class ShareServiceImpl implements ShareService {
     private SuShareMapper suShareMapper;
     @Autowired
     private MallFeignClient mallFeignClient;
+    @Lazy
+    @Autowired
+    private ShareService shareService;
 
-    @Override
-    public void shareOne(Integer userId, String goodsId, Integer platformType) {
-        SuShareEntity example = new SuShareEntity();
-        example.setUserId(userId);
-        example.setGoodsId(goodsId);
-        example.setPlatformType(platformType);
-
-        example = suShareMapper.selectOne(example);
-        if(example == null){
-            //创建新的分享
-            example = new SuShareEntity();
-            example.setUserId(userId);
-            example.setGoodsId(goodsId);
-            example.setPlatformType(platformType);
-            example.setSell(0);
-            example.setWatch(1);
-            example.setDel(1);
-            example.setCreateTime(new Date());
-            example.setUpdateTime(new Date());
-            suShareMapper.insertSelective(example);
-        }
-//        else {
-//            //更新状态
-//            example.setDel(1);
-//            example.setUpdateTime(new Date());
-//            suShareMapper.updateByPrimaryKeySelective(example);
-//        }
-
+    private void newShare(Integer userId,SmProductEntityEx smProductEntityEx) {
+        SuShareEntity record = new SuShareEntity();
+        record.setUserId(userId);
+        record.setGoodsId(smProductEntityEx.getGoodsId());
+        record.setPlatformType(smProductEntityEx.getType());
+        record.setSell(0);
+        record.setWatch(1);
+        record.setDel(1);
+        record.setGoodsInfo(JSON.toJSONString(smProductEntityEx));
+        record.setCreateTime(new Date());
+        record.setUpdateTime(record.getCreateTime());
+        suShareMapper.insertSelective(record);
     }
 
-    @Async("myExecutor")
+    @Transactional(rollbackFor = Exception.class)
     @Override
-    public void show(Integer userId, String goodsId, Integer platformType) {
+    public void show(Integer userId,SmProductEntityEx smProductEntityEx) {
         SuShareEntity example = new SuShareEntity();
         example.setUserId(userId);
-        example.setGoodsId(goodsId);
-        example.setPlatformType(platformType);
-        example = suShareMapper.selectOne(example);
-        if(example != null && example.getId() != null){
+        example.setGoodsId(smProductEntityEx.getGoodsId());
+        example.setPlatformType(smProductEntityEx.getType());
+        SuShareEntity record = suShareMapper.selectOne(example);
+        if(record != null && record.getId() != null){
+            example.setGoodsInfo(JSON.toJSONString(smProductEntityEx));
             example.setWatch(example.getWatch() + 1);
             example.setUpdateTime(new Date());
             suShareMapper.updateByPrimaryKeySelective(example);
         }else {
-            shareOne(userId,goodsId,platformType);
+            try {
+                newShare(userId,smProductEntityEx);
+            }catch (DuplicateKeyException e){
+                log.warn("SuShareEntity 重复插入：{}",JSON.toJSONString(example));
+                example = suShareMapper.selectOne(example);
+                example.setGoodsInfo(JSON.toJSONString(smProductEntityEx));
+                example.setWatch(example.getWatch() + 1);
+                example.setUpdateTime(new Date());
+                suShareMapper.updateByPrimaryKeySelective(example);
+            }
         }
     }
 
-    @Async("myExecutor")
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void buy(SuOrderEntity suOrderEntity) {
         if(suOrderEntity.getShareUserId() == null)
             return;
         SuShareEntity example = new SuShareEntity();
-        example.setUserId(suOrderEntity.getShareUserId());
-        example.setGoodsId(suOrderEntity.getProductId());
-        example.setPlatformType(suOrderEntity.getPlatformType());
-        example = suShareMapper.selectOne(example);
+        example = getShareExtity(suOrderEntity.getShareUserId(),suOrderEntity.getProductId(),suOrderEntity.getPlatformType());
         if(example != null && example.getId() != null){
             String userShareRate = mallFeignClient.getOneConfig(suOrderEntity.getShareUserId(), ConfigEnmu.PRODUCT_SHARE_USER_RATE.getName(),ConfigTypeConstant.SELF_CONFIG).getVal();
             Integer willGetMoney = GoodsPriceUtil.type(suOrderEntity.getPlatformType()).calcUserShareProfit(Double.valueOf(suOrderEntity.getPromotionAmount()),Double.valueOf(userShareRate)).intValue();
@@ -100,7 +104,33 @@ public class ShareServiceImpl implements ShareService {
 
     @Override
     public void buyFail(SuOrderEntity suOrderEntity) {
+        if(suOrderEntity.getShareUserId() == null)
+            return;
+        SuShareEntity example = new SuShareEntity();
+        example.setUserId(suOrderEntity.getShareUserId());
+        example.setGoodsId(suOrderEntity.getProductId());
+        example.setPlatformType(suOrderEntity.getPlatformType());
+        example = getShareExtity(suOrderEntity.getShareUserId(),suOrderEntity.getProductId(),suOrderEntity.getPlatformType());
+        if(example != null && example.getId() != null){
+            String userShareRate = mallFeignClient.getOneConfig(suOrderEntity.getShareUserId(), ConfigEnmu.PRODUCT_SHARE_USER_RATE.getName(),ConfigTypeConstant.SELF_CONFIG).getVal();
+            Integer willGetMoney = GoodsPriceUtil.type(suOrderEntity.getPlatformType()).calcUserShareProfit(Double.valueOf(suOrderEntity.getPromotionAmount()),Double.valueOf(userShareRate)).intValue();
+            example.setWillMakeMoney(example.getWillMakeMoney() - willGetMoney);
+            if(example.getWillMakeMoney() < 0)
+                example.setWillMakeMoney(0);
+            example.setSell(example.getSell() - 1);
+            if(example.getSell() < 0)
+                example.setSell(0);
+            example.setUpdateTime(new Date());
+            suShareMapper.updateByPrimaryKeySelective(example);
+        }
+    }
 
+    private SuShareEntity getShareExtity(Integer userId,String goodsId,Integer platformType){
+        SuShareEntity example = new SuShareEntity();
+        example.setUserId(userId);
+        example.setGoodsId(goodsId);
+        example.setPlatformType(platformType);
+        return suShareMapper.selectOne(example);
     }
 
     @Override
@@ -139,29 +169,39 @@ public class ShareServiceImpl implements ShareService {
         example.setUserId(userId);
         example.setDel(1);
         List<SuShareEntity> suShareEntities = suShareMapper.select(example);
-        PageBean pageBean = new PageBean(suShareEntities);
-         String userBuyRate = mallFeignClient.getOneConfig(userId, ConfigEnmu.PRODUCT_BUY_RATE.getName(),ConfigTypeConstant.PROXY_CONFIG).getVal();
-        String userShareRate = mallFeignClient.getOneConfig(userId, ConfigEnmu.PRODUCT_SHARE_USER_RATE.getName(),ConfigTypeConstant.SELF_CONFIG).getVal();
-        List<SmProductEntity> smProductEntities = mallFeignClient.getProductDetails(suShareEntities.stream().map(o->{
-            ProductIndexBo productIndexBo = new ProductIndexBo();
-            productIndexBo.setGoodsId(o.getGoodsId());
-            productIndexBo.setPlatformType(o.getPlatformType());
-            return productIndexBo;
-        }).collect(Collectors.toList()));
 
-        List<ShareVo> shareVos = suShareEntities.stream().map(o ->{
-            SmProductEntity smProductEntity = smProductEntities.stream().filter(j->{return o.getGoodsId().equals(j.getGoodsId());}).findFirst().get();
-            if(smProductEntity == null)
-                return null;
-            ShareVo shareVo = convertVo(o,smProductEntity,Double.valueOf(userBuyRate),Double.valueOf(userShareRate));
+        PageBean pageBean = new PageBean(suShareEntities);
+        List<ShareVo> vos = suShareEntities.stream().map(o ->{
+            SmProductEntityEx smProductEntityEx = JSON.parseObject(o.getGoodsInfo(),SmProductEntityEx.class);
+            ShareVo shareVo = convertVo(o,smProductEntityEx);
             return shareVo;
         }).collect(Collectors.toList());
-        shareVos.remove(null);
-        pageBean.setList(shareVos);
+        pageBean.setList(vos);
         return pageBean;
+
+//        PageBean pageBean = new PageBean(suShareEntities);
+//         String userBuyRate = mallFeignClient.getOneConfig(userId, ConfigEnmu.PRODUCT_BUY_RATE.getName(),ConfigTypeConstant.PROXY_CONFIG).getVal();
+//        String userShareRate = mallFeignClient.getOneConfig(userId, ConfigEnmu.PRODUCT_SHARE_USER_RATE.getName(),ConfigTypeConstant.SELF_CONFIG).getVal();
+//        List<SmProductEntity> smProductEntities = mallFeignClient.getProductDetails(suShareEntities.stream().map(o->{
+//            ProductIndexBo productIndexBo = new ProductIndexBo();
+//            productIndexBo.setGoodsId(o.getGoodsId());
+//            productIndexBo.setPlatformType(o.getPlatformType());
+//            return productIndexBo;
+//        }).collect(Collectors.toList()));
+//
+//        List<ShareVo> shareVos = suShareEntities.stream().map(o ->{
+//            SmProductEntity smProductEntity = smProductEntities.stream().filter(j->{return o.getGoodsId().equals(j.getGoodsId());}).findFirst().get();
+//            if(smProductEntity == null)
+//                return null;
+//            ShareVo shareVo = convertVo(o,smProductEntity,Double.valueOf(userBuyRate),Double.valueOf(userShareRate));
+//            return shareVo;
+//        }).collect(Collectors.toList());
+//        shareVos.remove(null);
+//        pageBean.setList(shareVos);
+//        return pageBean;
     }
 
-    private ShareVo convertVo(SuShareEntity suShareEntity,SmProductEntity smProductEntity,Double userBuyRate,Double userShareRate){
+    private ShareVo convertVo(SuShareEntity suShareEntity,SmProductEntityEx smProductEntity){
         ShareVo shareVo = new ShareVo();
         shareVo.setId(suShareEntity.getId());
         shareVo.setGoodsId(smProductEntity.getGoodsId());
@@ -170,8 +210,8 @@ public class ShareServiceImpl implements ShareService {
         shareVo.setTitle(smProductEntity.getName());
         shareVo.setOriginalPrice(smProductEntity.getOriginalPrice());
         shareVo.setCoupon(smProductEntity.getCouponPrice());
-        shareVo.setRed(GoodsPriceUtil.type(suShareEntity.getPlatformType()).calcUserBuyProfit(smProductEntity,userBuyRate).intValue());
-        shareVo.setShareMoney(GoodsPriceUtil.type(suShareEntity.getPlatformType()).calcUserShareProfit(smProductEntity,userShareRate).intValue());
+        shareVo.setRed(smProductEntity.getBuyPrice());
+        shareVo.setShareMoney(smProductEntity.getSharePrice());
         shareVo.setShow(suShareEntity.getWatch());
         shareVo.setSellOut(suShareEntity.getSell());
         shareVo.setWillMakeMoney(suShareEntity.getWillMakeMoney());

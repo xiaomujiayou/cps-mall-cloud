@@ -1,22 +1,12 @@
 package com.xm.cron_service.task;
 
-import cn.hutool.core.date.DateField;
-import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
-import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.xm.comment_mq.message.config.OrderMqConfig;
+import com.xm.comment_serialize.module.cron.bo.OrderWithResBo;
 import com.xm.comment_serialize.module.cron.entity.ScMgjOrderRecordEntity;
-import com.xm.comment_serialize.module.cron.entity.ScMgjOrderSyncHistoryEntity;
-import com.xm.comment_serialize.module.cron.entity.ScPddOrderSyncHistoryEntity;
-import com.xm.comment_serialize.module.user.entity.SuOrderEntity;
-import com.xm.comment_utils.exception.GlobleException;
 import com.xm.comment_utils.mybatis.PageBean;
-import com.xm.comment_utils.mybatis.PageUtils;
-import com.xm.comment_utils.response.MsgEnum;
 import com.xm.cron_service.mapper.ScMgjOrderRecordMapper;
-import com.xm.cron_service.mapper.ScMgjOrderSyncHistoryMapper;
-import com.xm.cron_service.mapper.ScPddOrderSyncHistoryMapper;
 import com.xm.cron_service.service.TaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -28,26 +18,22 @@ import tk.mybatis.mapper.entity.Example;
 import tk.mybatis.orderbyhelper.OrderByHelper;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 /**
- * 同步拼多多订单
+ * 同步蘑菇街订单
  */
 @Slf4j
 @Component
-@EnableScheduling
 public class MgjOrderSyncTask {
 
     @Autowired
-    private ScMgjOrderSyncHistoryMapper scMgjOrderSyncHistoryMapper;
-    @Autowired
     private ScMgjOrderRecordMapper scMgjOrderRecordMapper;
-    @Autowired
-    private RabbitTemplate rabbitTemplate;
     @Resource(name = "mgjTaskService")
     private TaskService mgjTaskService;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     /**
      * 发现新订单
@@ -56,50 +42,14 @@ public class MgjOrderSyncTask {
 //    @Async("threadPool")
     @Scheduled(cron = "0/30 * * * * ?")
     public void getNewOrder() {
-        log.debug("蘑菇街订单服务 start");
-        Date yesterDay = DateUtil.yesterday();
-        Date toDay = DateUtil.parse(DateUtil.today());
-        List<SuOrderEntity> orderEntities = new ArrayList<>();
-        getAll(yesterDay,toDay,1,40,orderEntities);
-        orderEntities.stream().forEach(o->{
-            ScMgjOrderRecordEntity scMgjOrderRecordEntity = new ScMgjOrderRecordEntity();
-            scMgjOrderRecordEntity.setOrderNum(o.getOrderSn());
-            int count = scMgjOrderRecordMapper.selectCount(scMgjOrderRecordEntity);
-            if(count <= 0){
-                scMgjOrderRecordEntity.setOrderNum(o.getOrderSn());
-                scMgjOrderRecordEntity.setState(o.getState());
-                scMgjOrderRecordEntity.setLastUpdate(new Date());
-                scMgjOrderRecordEntity.setCreateTime(scMgjOrderRecordEntity.getLastUpdate());
-                scMgjOrderRecordMapper.insertSelective(scMgjOrderRecordEntity);
-            }
-            log.debug("蘑菇街订单服务 - 收到订单：[{}]", JSON.toJSONString(o));
-            rabbitTemplate.convertAndSend(OrderMqConfig.EXCHANGE,OrderMqConfig.KEY,o);
-        });
-        ScMgjOrderSyncHistoryEntity entity = new ScMgjOrderSyncHistoryEntity();
-        entity.setStartUpdateTime(yesterDay);
-        entity.setEndUpdateTime(toDay);
-        entity.setReturnCount(orderEntities.size());
-        entity.setCreateTime(new Date());
-        scMgjOrderSyncHistoryMapper.insertSelective(entity);
-        log.debug("蘑菇街订单服务 end");
+        mgjTaskService.start();
     }
 
-    private void getAll(Date start,Date end,Integer pageNum,Integer pageSize,List<SuOrderEntity> orders){
-        PageBean<SuOrderEntity> pageBean = null;
-        try {
-            pageBean = mgjTaskService.getOrderByIncrement(start,end,pageNum ,40);
-            if(pageBean.getList() != null)
-                orders.addAll(pageBean.getList());
-            if(pageBean.getTotal() > (pageNum * pageSize)){
-                //查询下一页
-                Thread.sleep(500);
-                getAll(start,end,pageNum + 1,pageSize,orders);
-            }
-        } catch (Exception e) {
-            log.error("蘑菇街订单服务 - 同步出错：[{}]", e);
-        }
-    }
 
+    /**
+     * 更新订单状态
+     * 蘑菇街不支持最新时间
+     */
     @Scheduled(cron = "0/30 * * * * ?")
     public void updateOrder(){
         Integer pageNum = 1;
@@ -114,6 +64,7 @@ public class MgjOrderSyncTask {
             list.stream().forEach(o->{
                 try {
                     update(o);
+                    Thread.sleep(250);  //蘑菇街订单API限定，每秒五次
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -129,8 +80,9 @@ public class MgjOrderSyncTask {
                 list.stream().forEach(o->{
                     try {
                         update(o);
+                        Thread.sleep(250);  //蘑菇街订单API限定，每秒五次
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        log.error("蘑菇街 更新订单状态失败 无效单号：{} 异常：{}",o.getOrderSubSn(),e);
                     }
                 });
             pageBean = new PageBean<>(list);
@@ -138,13 +90,22 @@ public class MgjOrderSyncTask {
     }
 
     private void update(ScMgjOrderRecordEntity scMgjOrderRecordEntity) throws Exception {
-        SuOrderEntity order = mgjTaskService.getOrderByNum(scMgjOrderRecordEntity.getOrderNum());
-        if(!scMgjOrderRecordEntity.getState().equals(order.getState())){
-            scMgjOrderRecordEntity.setState(order.getState());
-            rabbitTemplate.convertAndSend(OrderMqConfig.EXCHANGE,OrderMqConfig.KEY,order);
+        try {
+            List<OrderWithResBo> orderWithResBos = mgjTaskService.getOrderByNum(scMgjOrderRecordEntity.getOrderSn());
+            if(orderWithResBos != null && !orderWithResBos.isEmpty()){
+                for (OrderWithResBo orderWithResBo : orderWithResBos) {
+                    if(!orderWithResBo.getSuOrderEntity().getOrderSubSn().equals(scMgjOrderRecordEntity.getOrderSubSn()))
+                        continue;
+                    if(scMgjOrderRecordEntity.getState().equals(orderWithResBo.getScOrderStateRecordEntity().getState()))
+                        continue;
+                    //更新订单状态
+                    scMgjOrderRecordEntity.setState(orderWithResBo.getScOrderStateRecordEntity().getState());
+                    rabbitTemplate.convertAndSend(OrderMqConfig.EXCHANGE,OrderMqConfig.KEY,orderWithResBo.getSuOrderEntity());
+                }
+            }
+        }finally {
+            scMgjOrderRecordEntity.setLastUpdate(new Date());
+            scMgjOrderRecordMapper.updateByPrimaryKeySelective(scMgjOrderRecordEntity);
         }
-        scMgjOrderRecordEntity.setLastUpdate(new Date());
-        scMgjOrderRecordMapper.updateByPrimaryKeySelective(scMgjOrderRecordEntity);
     }
-
 }

@@ -42,6 +42,12 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- IP解析 -->
+            <dependency>
+                <groupId>org.lionsoul</groupId>
+                <artifactId>ip2region</artifactId>
+                <version>1.7.2</version>
+            </dependency>
             <!-- 阿里poi -->
             <dependency>
                 <groupId>com.alibaba</groupId>
@@ -134,7 +140,7 @@
                 <groupId>com.xm.pdd</groupId>
                 <artifactId>pop-sdk</artifactId>
                 <classifier>all</classifier>
-                <version>1.2.4</version>
+                <version>1.6.1</version>
             </dependency>
 
             <!--分页相关-->

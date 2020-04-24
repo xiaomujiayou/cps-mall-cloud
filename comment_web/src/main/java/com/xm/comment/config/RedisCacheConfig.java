@@ -31,7 +31,7 @@ public class RedisCacheConfig extends CachingConfigurerSupport {
      */
     @Bean
     public RedisLockRegistry redisLockRegistry(RedisConnectionFactory redisConnectionFactory) {
-        return new RedisLockRegistry(redisConnectionFactory, "spring-cloud");
+        return new RedisLockRegistry(redisConnectionFactory, "spring-cloud",120 * 1000);
     }
 
     @Bean

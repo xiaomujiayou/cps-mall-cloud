@@ -6,6 +6,6 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class GoodsDetailsForm extends BaseForm {
+public class GoodsDetailsForm extends GoodsListForm {
     private List<String> goodsIds;
 }

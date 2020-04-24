@@ -1,6 +1,8 @@
 package com.xm.api_mall.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.xm.api_mall.service.ConfigService;
 import com.xm.api_mall.service.ProfitService;
 import com.xm.comment.utils.GoodsPriceUtil;
@@ -31,7 +33,7 @@ public class ProfitServiceImpl implements ProfitService {
         Integer configType = ConfigTypeConstant.PROXY_CONFIG;
         Integer buyRate = Integer.valueOf(configService.getConfig(isShare?shareUserId:userId, isShare?ConfigEnmu.PRODUCT_SHARE_BUY_RATE:ConfigEnmu.PRODUCT_BUY_RATE,isShare?ConfigTypeConstant.SELF_CONFIG: configType).getVal());
         Integer shareRate = Integer.valueOf(configService.getConfig(userId, ConfigEnmu.PRODUCT_SHARE_USER_RATE, configType).getVal());
-        return calcProfit(smProductEntity,buyRate,shareRate);
+        return calcProfit(userId,smProductEntity,buyRate,shareRate);
     }
 
     @Override
@@ -40,13 +42,14 @@ public class ProfitServiceImpl implements ProfitService {
         Integer buyRate = Integer.valueOf(configService.getConfig(userId, ConfigEnmu.PRODUCT_BUY_RATE,configType).getVal());
         Integer shareRate = Integer.valueOf(configService.getConfig(userId, ConfigEnmu.PRODUCT_SHARE_USER_RATE, configType).getVal());
         return smProductEntitys.stream().map(o->{
-            return calcProfit(o,buyRate,shareRate);
+            return calcProfit(userId,o,buyRate,shareRate);
         }).collect(Collectors.toList());
     }
 
-    private SmProductEntityEx calcProfit(SmProductEntity smProductEntity,Integer buyRate,Integer shareRate){
+    private SmProductEntityEx calcProfit(Integer userId,SmProductEntity smProductEntity,Integer buyRate,Integer shareRate){
         SmProductEntityEx smProductEntityEx = new SmProductEntityEx();
         BeanUtil.copyProperties(smProductEntity,smProductEntityEx);
+        smProductEntityEx.setUserId(userId);
         smProductEntityEx.setBuyRate(buyRate);
         smProductEntityEx.setShareRate(shareRate);
         smProductEntityEx.setBuyPrice(GoodsPriceUtil.type(smProductEntity.getType()).calcUserBuyProfit(smProductEntity,buyRate.doubleValue()).intValue());

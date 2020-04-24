@@ -5,6 +5,7 @@ import com.xm.api_user.service.BillService;
 import com.xm.comment.annotation.LoginUser;
 import com.xm.comment_serialize.module.lottery.ex.SlPropSpecEx;
 import com.xm.comment_serialize.module.user.bo.SuBillToPayBo;
+import com.xm.comment_serialize.module.user.dto.BillOrderDto;
 import com.xm.comment_serialize.module.user.dto.OrderBillDto;
 import com.xm.comment_serialize.module.user.entity.SuBillEntity;
 import com.xm.comment_serialize.module.user.vo.BillVo;
@@ -43,7 +44,7 @@ public class BillController {
     }
 
     @GetMapping("/info")
-    public List<OrderBillDto> getBillInfo(Integer userId,@RequestParam("billIds") List<String> billIds){
+    public List<BillOrderDto> getBillInfo(Integer userId, @RequestParam("billIds") List<String> billIds){
         return billService.getBillInfo(userId,billIds);
     }
 }

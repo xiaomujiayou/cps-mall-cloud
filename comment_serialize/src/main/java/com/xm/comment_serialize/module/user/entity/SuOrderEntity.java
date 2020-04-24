@@ -1,6 +1,7 @@
 package com.xm.comment_serialize.module.user.entity;
 
 import lombok.Data;
+import tk.mybatis.mapper.annotation.Version;
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -23,6 +24,11 @@ public class SuOrderEntity implements Serializable{
 	private String orderSn;
 
 	/**
+	 * 子订单号
+	 */
+	private String orderSubSn;
+
+	/**
 	 * 商品id
 	 */
 	private String productId;
@@ -43,7 +49,7 @@ public class SuOrderEntity implements Serializable{
 	private Integer platformType;
 
 	/**
-	 * 订单状态(-1 未支付; 0-已支付；1-已成团；2-确认收货；3-审核成功；4-审核失败（不可提现）；5-已经结算；8-非多多进宝商品（无佣金订单）;10-已处罚)
+	 * 订单状态(1:已支付,2:确认收货,3:已结算,4:结算失败)
 	 */
 	private Integer state;
 
@@ -106,6 +112,11 @@ public class SuOrderEntity implements Serializable{
 	 * 自定义参数(userId:购买用户,shareUserId:分享的用户,fromApp:app来源)
 	 */
 	private String customParameters;
+
+	/**
+	 * 购物车所有商品ID(,号分割)
+	 */
+	private String cart;
 
 	/**
 	 * 最后更新时间

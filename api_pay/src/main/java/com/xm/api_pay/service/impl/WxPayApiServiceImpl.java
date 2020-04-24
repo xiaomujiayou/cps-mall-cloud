@@ -180,6 +180,7 @@ public class WxPayApiServiceImpl implements WxPayApiService {
     private SpWxEntPayOrderInEntity entPay(EntPayMessage entPayMessage,EntPayRequest request,EntPayResult result,WxPayException e){
         SpWxEntPayOrderInEntity entity = new SpWxEntPayOrderInEntity();
         BeanUtil.copyProperties(request,entity);
+        entity.setUserId(entPayMessage.getScBillPayEntity().getUserId());
         entity.setBillPayId(entPayMessage.getScBillPayEntity().getId());
         entity.setBillIds(entPayMessage.getScBillPayEntity().getBillIds());
         entity.setDes(request.getDescription());
@@ -196,7 +197,7 @@ public class WxPayApiServiceImpl implements WxPayApiService {
             entity.setErrCodeDes(e.getErrCodeDes());
             entity.setState(2);
         }
-        spWxEntPayOrderInMapper.insertUseGeneratedKeys(entity);
+        spWxEntPayOrderInMapper.insertSelective(entity);
         return entity;
     }
 

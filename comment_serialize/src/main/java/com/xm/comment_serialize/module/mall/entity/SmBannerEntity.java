@@ -1,6 +1,7 @@
 package com.xm.comment_serialize.module.mall.entity;
 
 import lombok.Data;
+import tk.mybatis.mapper.annotation.Version;
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -18,6 +19,11 @@ public class SmBannerEntity implements Serializable{
 	private Integer appType;
 
 	private Integer platformType;
+
+	/**
+	 * 类型(1:首页轮播图,2:首页滑动列表)
+	 */
+	private Integer type;
 
 	/**
 	 * 标题
@@ -40,9 +46,9 @@ public class SmBannerEntity implements Serializable{
 	private Integer target;
 
 	/**
-	 * 类型(1:首页轮播图,2:首页滑动列表)
+	 * 目标小程序appId
 	 */
-	private Integer type;
+	private String appId;
 
 	/**
 	 * 是否可用(0:不可用,1：可用)

@@ -1,65 +1,100 @@
 package com.xm.cron_service.service.impl;
 
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.math.MathUtil;
-import cn.hutool.core.util.NumberUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.mogujie.openapi.exceptions.ApiException;
 import com.mogujie.openapi.response.MgjResponse;
-import com.pdd.pop.sdk.http.PopHttpClient;
-import com.pdd.pop.sdk.http.api.request.PddDdkOrderListIncrementGetRequest;
-import com.pdd.pop.sdk.http.api.request.PddTimeGetRequest;
-import com.pdd.pop.sdk.http.api.response.PddDdkOrderListIncrementGetResponse;
-import com.pdd.pop.sdk.http.api.response.PddTimeGetResponse;
+import com.vip.adp.api.open.service.OrderDetailInfo;
 import com.xm.comment_api.client.MyMogujieClient;
 import com.xm.comment_api.module.mgj.OrderInfoQueryBean;
 import com.xm.comment_api.module.mgj.XiaoDianCpsdataOrderListGetRequest;
-import com.xm.comment_api.module.mgj.XiaoDianCpsdataOrderListGetResponse;
+import com.xm.comment_mq.message.config.OrderMqConfig;
+import com.xm.comment_serialize.module.cron.bo.OrderWithResBo;
+import com.xm.comment_serialize.module.cron.entity.ScMgjOrderRecordEntity;
+import com.xm.comment_serialize.module.cron.entity.ScOrderStateRecordEntity;
 import com.xm.comment_serialize.module.mall.constant.PlatformTypeConstant;
+import com.xm.comment_serialize.module.mall.constant.PlatformTypeEnum;
 import com.xm.comment_serialize.module.user.bo.OrderCustomParameters;
 import com.xm.comment_serialize.module.user.constant.OrderStateConstant;
 import com.xm.comment_serialize.module.user.entity.SuOrderEntity;
 import com.xm.comment_utils.exception.GlobleException;
 import com.xm.comment_utils.mybatis.PageBean;
-import com.xm.comment_utils.number.MathUtils;
-import com.xm.comment_utils.number.NumberUtils;
 import com.xm.comment_utils.response.MsgEnum;
-import com.xm.cron_service.service.TaskService;
-import org.apache.commons.lang3.time.DateUtils;
+import com.xm.cron_service.mapper.ScMgjOrderRecordMapper;
+import com.xm.cron_service.utils.OrderStateParseUtil;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service("mgjTaskService")
-public class MgjTaskServiceImpl implements TaskService {
+public class MgjTaskServiceImpl extends AbsTask {
+
+    private static final int PAGE_SIZE = 20;
 
     @Autowired
     private MyMogujieClient myMogujieClient;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+    @Autowired
+    private ScMgjOrderRecordMapper scMgjOrderRecordMapper;
 
     @Override
-    public PageBean<SuOrderEntity> getOrderByIncrement(Date startUpdateTime, Date endUpdateTime, Integer pageNum, Integer pageSize) throws Exception {
-        Integer startTime = Integer.valueOf(DateUtil.format(startUpdateTime,"yyyyMMdd"));
-        Integer endTime = Integer.valueOf(DateUtil.format(endUpdateTime,"yyyyMMdd"));
+    public void start() {
+        log.debug("蘑菇街 订单同步开始");
+        Date startTime = DateUtil.yesterday();
+        Date endTime = DateUtil.parse(DateUtil.today());
+        processOrders(startTime,endTime,1,PAGE_SIZE);
+        log.debug("蘑菇街 订单同步结束");
+    }
+
+    @Override
+    protected PlatformTypeEnum getPlatform() {
+        return PlatformTypeEnum.MGJ;
+    }
+
+
+    @Override
+    public PageBean<OrderWithResBo> getOrderByIncrement(Date startTime, Date endTime, Integer pageNum, Integer pageSize) throws Exception {
+        Integer startTimeInt = Integer.valueOf(DateUtil.format(startTime,"yyyyMMdd"));
+        Integer endTimeInt = Integer.valueOf(DateUtil.format(endTime,"yyyyMMdd"));
         OrderInfoQueryBean queryBean = new OrderInfoQueryBean();
-        queryBean.setStart(startTime);
-        queryBean.setEnd(endTime);
+        queryBean.setStart(startTimeInt);
+        queryBean.setEnd(endTimeInt);
         queryBean.setPage(pageNum);
         queryBean.setPagesize(pageSize);
         MgjResponse<String> res = myMogujieClient.execute(new XiaoDianCpsdataOrderListGetRequest(queryBean));
+        if(res.getResult().getData() == null)
+            return null;
         JSONObject jsonResult = JSON.parseObject(res.getResult().getData());
         JSONArray listItem = jsonResult.getJSONArray("orders");
-        List<SuOrderEntity> orderEntities = null;
-        if(listItem != null) {
-            orderEntities = listItem.stream().map(o -> {
-                return convertOrder((JSONObject) o);
-            }).collect(Collectors.toList());
+        List<OrderWithResBo> orderEntities = new ArrayList<>();
+        for (int i = 0; i < listItem.size(); i++) {
+            orderEntities.addAll(convertOrder((JSONObject) listItem.get(i)));
         }
-        PageBean<SuOrderEntity> pageBean = new PageBean<>(orderEntities);
+        orderEntities.stream().forEach(o->{
+            ScMgjOrderRecordEntity scMgjOrderRecordEntity = new ScMgjOrderRecordEntity();
+            scMgjOrderRecordEntity.setOrderSubSn(o.getSuOrderEntity().getOrderSubSn());
+            int count = scMgjOrderRecordMapper.selectCount(scMgjOrderRecordEntity);
+            if(count <= 0){
+                scMgjOrderRecordEntity.setOrderSn(o.getSuOrderEntity().getOrderSn());
+                scMgjOrderRecordEntity.setOrderSubSn(o.getSuOrderEntity().getOrderSubSn());
+                scMgjOrderRecordEntity.setState(o.getSuOrderEntity().getState());
+                scMgjOrderRecordEntity.setLastUpdate(new Date());
+                scMgjOrderRecordEntity.setCreateTime(scMgjOrderRecordEntity.getLastUpdate());
+                scMgjOrderRecordMapper.insertSelective(scMgjOrderRecordEntity);
+            }
+        });
+        PageBean<OrderWithResBo> pageBean = new PageBean<>(orderEntities);
         pageBean.setList(orderEntities);
         pageBean.setPageNum(pageNum);
         pageBean.setPageSize(pageSize);
@@ -68,81 +103,70 @@ public class MgjTaskServiceImpl implements TaskService {
     }
 
     @Override
-    public SuOrderEntity getOrderByNum(String orderNum) throws ApiException {
+    public List<OrderWithResBo> getOrderByNum(String orderNum) throws ApiException {
         OrderInfoQueryBean queryBean = new OrderInfoQueryBean();
         queryBean.setOrderNo(Long.valueOf(orderNum));
         try {
             MgjResponse<String> res = myMogujieClient.execute(new XiaoDianCpsdataOrderListGetRequest(queryBean));
+            if(res.getResult().getData() == null)
+                throw new GlobleException(MsgEnum.ORDER_INVALID_ERROR,"蘑菇街 无效单号：",orderNum);
             JSONObject jsonResult = JSON.parseObject(res.getResult().getData());
             JSONArray listItem = jsonResult.getJSONArray("orders");
-            return convertOrder(listItem.getJSONObject(0));
+            List<OrderWithResBo> suOrderEntities = convertOrder(listItem.getJSONObject(0));
+//            suOrderEntities.stream().forEach(o->{
+//                rabbitTemplate.convertAndSend(OrderMqConfig.EXCHANGE,OrderMqConfig.KEY,o);
+//            });
+            return suOrderEntities;
         }catch (ApiException e){
             throw new GlobleException(MsgEnum.ORDER_INVALID_ERROR,"蘑菇街 无效单号：",orderNum);
         }
     }
 
-    @Override
-    public Date getTime() throws Exception {
-        return null;
+    private List<OrderWithResBo> convertOrder(JSONObject item){
+
+        JSONArray products = item.getJSONArray("products");
+        String cart = products.stream().map(o->{
+            JSONObject goodsInfo = (JSONObject)o;
+            return goodsInfo.getString("productNo");
+        }).collect(Collectors.joining(","));
+        List<OrderWithResBo> list = products.stream().map(o->{
+            JSONObject goodsInfo = (JSONObject)o;
+            Map<String,Object> stateMap = OrderStateParseUtil.parse(PlatformTypeConstant.MGJ,goodsInfo.getString("orderStatus").toString());
+            ScOrderStateRecordEntity stateRecordEntity = new ScOrderStateRecordEntity();
+            stateRecordEntity.setOrderSn(item.getString("orderNo"));
+            stateRecordEntity.setOrderSubSn(goodsInfo.getString("subOrderNo"));
+            stateRecordEntity.setPlatformType(PlatformTypeConstant.MGJ);
+            stateRecordEntity.setOriginState(goodsInfo.getString("orderStatus"));
+            stateRecordEntity.setOriginStateDes((String) stateMap.get(OrderStateParseUtil.DES));
+            stateRecordEntity.setState((Integer) stateMap.get(OrderStateParseUtil.STATE));
+            stateRecordEntity.setRes(item.toJSONString());
+
+            SuOrderEntity orderEntity = new SuOrderEntity();
+            orderEntity.setOrderSn(item.getString("orderNo"));
+            orderEntity.setOrderSubSn(goodsInfo.getString("subOrderNo"));
+            orderEntity.setProductId(goodsInfo.getString("productNo"));
+            orderEntity.setProductName(goodsInfo.getString("name"));
+            orderEntity.setImgUrl(goodsInfo.getString("mainImg"));
+            orderEntity.setPlatformType(PlatformTypeConstant.MGJ);
+            orderEntity.setState(stateRecordEntity.getState());
+            orderEntity.setPId(item.getString("groupId"));
+            orderEntity.setOriginalPrice(new Double(goodsInfo.getDouble("price") * 100d).intValue());
+            orderEntity.setQuantity(goodsInfo.getInteger("amount"));
+            orderEntity.setAmount(orderEntity.getOriginalPrice());
+            orderEntity.setPromotionRate(new Double(Double.valueOf(goodsInfo.getString("commission").replace("%",""))*1000d).intValue());
+            orderEntity.setPromotionAmount(goodsInfo.getInteger("expense"));
+            orderEntity.setType(0);
+            orderEntity.setOrderModifyAt(new Date(item.getInteger("updateTime") * 1000));
+            orderEntity.setCustomParameters(null);
+            orderEntity.setCart(cart);
+
+            OrderWithResBo orderWithResBo = new OrderWithResBo();
+            orderWithResBo.setSuOrderEntity(orderEntity);
+            orderWithResBo.setScOrderStateRecordEntity(stateRecordEntity);
+            return orderWithResBo;
+        }).collect(Collectors.toList());
+        return list;
     }
 
-    private SuOrderEntity convertOrder(JSONObject item){
-        SuOrderEntity orderEntity = new SuOrderEntity();
-        JSONObject goodsInfo = item.getJSONArray("products").getJSONObject(0);
-        orderEntity.setOrderSn(item.getString("orderNo"));
-        orderEntity.setProductId(goodsInfo.getString("productNo"));
-        orderEntity.setProductName(goodsInfo.getString("name"));
-        orderEntity.setImgUrl(goodsInfo.getString("productUrl"));
-        orderEntity.setPlatformType(PlatformTypeConstant.MGJ);
-        convertOrderState(item.getString("paymentStatus"),orderEntity);
-        orderEntity.setPId(item.getString("groupId"));
-        orderEntity.setOriginalPrice(new Double(goodsInfo.getDouble("price") * 100d).intValue());
-        orderEntity.setQuantity(goodsInfo.getInteger("amount"));
-        orderEntity.setAmount(orderEntity.getOriginalPrice());
-        orderEntity.setPromotionRate(new Double(Double.valueOf(goodsInfo.getString("commission").replace("%",""))*100d).intValue());
-        orderEntity.setPromotionAmount(new Double(item.getDouble("expense") * 100d).intValue());
-        orderEntity.setType(0);
-//        orderEntity.setCustomParameters(item.getString("feedback"));
-        OrderCustomParameters orderCustomParameters = new OrderCustomParameters();
-        orderCustomParameters.setPid(item.getString("groupId"));
-        orderEntity.setCustomParameters(JSON.toJSONString(orderCustomParameters));
-        orderEntity.setOrderModifyAt(new Date(item.getInteger("updateTime") * 1000));
-        return orderEntity;
-    }
 
-    private void convertOrderState(String mgjOrderState,SuOrderEntity suOrderEntity){
-        switch (mgjOrderState){
-            case "10000":{
-                suOrderEntity.setState(OrderStateConstant.UN_PAY);
-                break;
-            }
-            case "20000":{
-                suOrderEntity.setState(OrderStateConstant.PAY);
-                break;
-            }
-            case "30000":{
-                suOrderEntity.setState(OrderStateConstant.CHECK_FAIL);
-                suOrderEntity.setFailReason("订单已退款");
-                break;
-            }
-            case "40000":{
-                suOrderEntity.setState(OrderStateConstant.CONFIRM_RECEIPT);
-                break;
-            }
-            case "45000":{
-                suOrderEntity.setState(OrderStateConstant.CHECK_SUCESS);
-                break;
-            }
-            case "90000":{
-                suOrderEntity.setState(OrderStateConstant.CHECK_FAIL);
-                suOrderEntity.setFailReason("订单已取消");
-                break;
-            }
-            case "95000":{
-                suOrderEntity.setState(OrderStateConstant.CHECK_FAIL);
-                suOrderEntity.setFailReason("订单被风控");
-                break;
-            }
-        }
-    }
 }

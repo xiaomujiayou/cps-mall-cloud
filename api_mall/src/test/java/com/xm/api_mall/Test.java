@@ -18,6 +18,12 @@ public class Test {
         String clientSecret = "702bee4684121e512392cb0405b9292fbc624234";
         PopClient client = new PopHttpClient(clientId, clientSecret);
 
+        PddDdkRpPromUrlGenerateRequest request = new PddDdkRpPromUrlGenerateRequest();
+        request.setChannelType(3);
+        request.setGenerateWeApp(true);
+        request.setPIdList(Arrays.asList("8944230_125518088"));
+        System.out.println(JSON.toJSONString(client.syncInvoke(request),SerializerFeature.PrettyFormat));
+
 //        PddGoodsOptGetRequest request = new PddGoodsOptGetRequest();
 //        request.setParentOptId(1);
 //        System.out.println(JSON.toJSONString(client.syncInvoke(request),SerializerFeature.PrettyFormat));
@@ -72,9 +78,9 @@ public class Test {
 //        request.setGoodsIdList(Arrays.asList(39747417643l));
 //        System.out.println(JSON.toJSONString(client.syncInvoke(request),SerializerFeature.PrettyFormat));
 
-        PddDdkGoodsBasicInfoGetRequest request = new PddDdkGoodsBasicInfoGetRequest();
-        request.setGoodsIdList(Arrays.asList(60010575991L));
-        System.out.println(JSON.toJSONString(client.syncInvoke(request), SerializerFeature.PrettyFormat));
+//        PddDdkGoodsBasicInfoGetRequest request = new PddDdkGoodsBasicInfoGetRequest();
+//        request.setGoodsIdList(Arrays.asList(25199066308L));
+//        System.out.println(JSON.toJSONString(client.syncInvoke(request), SerializerFeature.PrettyFormat));
 
 //        PddDdkGoodsSearchRequest request = new PddDdkGoodsSearchRequest();
 //        request.setGoodsIdList(Arrays.asList(68385598599l,45793598207l));

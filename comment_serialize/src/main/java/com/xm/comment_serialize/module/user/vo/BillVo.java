@@ -7,6 +7,7 @@ public class BillVo {
     private Integer money;
     private Integer type;
     private Integer state;
+    private Integer creditState;
     private Integer income;
     private String time;
     private String failReason;

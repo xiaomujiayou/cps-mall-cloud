@@ -1,6 +1,7 @@
 package com.xm.comment_serialize.module.user.entity;
 
 import lombok.Data;
+import tk.mybatis.mapper.annotation.Version;
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -46,6 +47,11 @@ public class SuShareEntity implements Serializable{
 	 * 删除(0:删除,1:未删除)
 	 */
 	private Integer del;
+
+	/**
+	 * 商品信息快照(json)
+	 */
+	private String goodsInfo;
 
 	/**
 	 * 更新时间

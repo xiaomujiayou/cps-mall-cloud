@@ -19,6 +19,11 @@
 
     <dependencies>
 
+        <dependency>
+            <groupId>com.xm</groupId>
+            <artifactId>comment_api</artifactId>
+            <version>${project.current.version}</version>
+        </dependency>
         <!-- 微信小程序第三方sdk -->
         <dependency>
             <groupId>com.github.binarywang</groupId>
@@ -45,6 +50,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.xm.wph</groupId>
+            <artifactId>vop-sdk</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

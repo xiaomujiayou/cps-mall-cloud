@@ -1,6 +1,7 @@
 package com.xm.api_user.mapper.custom;
 
 import com.xm.api_user.utils.MyMapper;
+import com.xm.comment_serialize.module.user.dto.BillOrderDto;
 import com.xm.comment_serialize.module.user.dto.OrderBillDto;
 import com.xm.comment_serialize.module.user.entity.SuBillEntity;
 import com.xm.comment_serialize.module.user.entity.SuRoleEntity;
@@ -26,6 +27,6 @@ public interface SuBillMapperEx extends MyMapper<SuBillEntity> {
      * @param userId
      * @return
      */
-    List<OrderBillDto> getBillInfo(Integer userId,List<String> billIds);
+    List<BillOrderDto> getBillInfo(Integer userId, List<String> billIds);
 
 }

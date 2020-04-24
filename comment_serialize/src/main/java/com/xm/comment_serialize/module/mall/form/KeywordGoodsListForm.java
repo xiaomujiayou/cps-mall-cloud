@@ -15,4 +15,11 @@ public class KeywordGoodsListForm extends GoodsListForm {
     private Integer minPrice;
     private Integer maxPrice;
     private Boolean hasCoupon;
+
+    //是否包邮
+    private Boolean parcels;
+    //是否为天猫
+    private Boolean isTmall;
+    //发货地
+    private String location;
 }

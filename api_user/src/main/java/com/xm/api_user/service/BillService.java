@@ -4,6 +4,7 @@ import com.xm.api_user.mapper.custom.SuBillMapperEx;
 import com.xm.comment_serialize.module.lottery.ex.SlPropSpecEx;
 import com.xm.comment_serialize.module.pay.entity.SpWxEntPayOrderInEntity;
 import com.xm.comment_serialize.module.user.bo.SuBillToPayBo;
+import com.xm.comment_serialize.module.user.dto.BillOrderDto;
 import com.xm.comment_serialize.module.user.dto.OrderBillDto;
 import com.xm.comment_serialize.module.user.entity.SuBillEntity;
 import com.xm.comment_serialize.module.user.entity.SuOrderEntity;
@@ -21,17 +22,28 @@ public interface BillService {
     public void createByOrder(SuOrderEntity order);
 
     /**
+     * 创建正常购买账单
+     * @param order
+     */
+    public void createNormalOrderBill(SuOrderEntity order);
+
+    /**
+     * 创建分享购买账单
+     * @param shareUserId
+     * @param order
+     */
+    public void createShareOrderBill(Integer shareUserId,SuOrderEntity order);
+
+    /**
      * 订单达到成功条件
      * @param order
      */
     public void payOutOrderBill(SuOrderEntity order);
-
-
     /**
      * 订单达到失败条件
-     * @param order
      */
     public void invalidOrderBill(SuOrderEntity order);
+
 
     public PageBean<BillVo> getList(Integer userId, Integer state, Integer type, Integer pageNum, Integer pageSize);
 
@@ -40,7 +52,7 @@ public interface BillService {
      * @param userId
      * @return
      */
-    public List<OrderBillDto> getBillInfo(Integer userId, List<String> billIds);
+    public List<BillOrderDto> getBillInfo(Integer userId, List<String> billIds);
 
     /**
      * 创建账单
@@ -81,4 +93,16 @@ public interface BillService {
     public void onEntPayResult(SpWxEntPayOrderInEntity spWxEntPayOrderInEntity);
 
 
+    /**
+     * 信用账单延时支付到期
+     * @param suBillEntity
+     */
+    public void onCreditDelayArrived(SuBillEntity suBillEntity);
+
+    /**
+     * 根据订单状态，设置账单状态
+     * @param oldOrder
+     * @param newState
+     */
+    public void updateBillStateByOrderStateChange(SuOrderEntity oldOrder, Integer newState,String failReason);
 }

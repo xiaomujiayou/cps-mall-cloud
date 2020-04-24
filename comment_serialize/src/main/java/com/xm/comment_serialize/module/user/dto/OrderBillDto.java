@@ -6,7 +6,7 @@ import com.xm.comment_serialize.module.user.entity.SuUserEntity;
 import lombok.Data;
 
 @Data
-public class OrderBillDto extends SuBillEntity {
-    private SuOrderEntity suOrderEntity;
+public class OrderBillDto extends SuOrderEntity {
+    private SuBillEntity suBillEntity;
     private SuUserEntity suUserEntity;
 }

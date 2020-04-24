@@ -43,10 +43,10 @@
                     <groupId>com.alibaba</groupId>
                     <artifactId>druid-spring-boot-starter</artifactId>
                 </exclusion>
-                <exclusion>
-                    <groupId>com.xm</groupId>
-                    <artifactId>comment_mq</artifactId>
-                </exclusion>
+<!--                <exclusion>-->
+<!--                    <groupId>com.xm</groupId>-->
+<!--                    <artifactId>comment_mq</artifactId>-->
+<!--                </exclusion>-->
             </exclusions>
         </dependency>
 

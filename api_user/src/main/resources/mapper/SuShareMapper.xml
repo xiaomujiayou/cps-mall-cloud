@@ -10,6 +10,7 @@
     <result column="sell" property="sell" jdbcType="INTEGER" />
     <result column="will_make_money" property="willMakeMoney" jdbcType="INTEGER" />
     <result column="del" property="del" jdbcType="INTEGER" />
+    <result column="goods_info" property="goodsInfo" jdbcType="VARCHAR" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
   </resultMap>

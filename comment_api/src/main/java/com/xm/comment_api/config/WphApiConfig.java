@@ -1,5 +1,6 @@
 package com.xm.comment_api.config;
 
+import com.vip.osp.sdk.context.ClientInvocationContext;
 import com.vip.osp.sdk.context.InvocationContext;
 import com.xm.comment_api.client.MyMogujieClient;
 import lombok.Data;
@@ -17,16 +18,18 @@ public class WphApiConfig {
     private String appKey;
     private String appSecret;
     private String url;
+    private String weAppId;
 
     /**
      * 初始化唯品会api参数
      */
-    @PostConstruct
-    public void init(){
-        InvocationContext instance = InvocationContext.Factory.getInstance();
+    @Bean
+    public ClientInvocationContext clientInvocationContext(){
+        ClientInvocationContext instance = new ClientInvocationContext();
         instance.setAppKey(appKey);
         instance.setAppSecret(appSecret);
         instance.setAppURL(url);
+        return instance;
     }
 }
 

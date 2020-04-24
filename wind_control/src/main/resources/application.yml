@@ -2,4 +2,4 @@ spring:
   application:
     name: wind-control
   profiles:
-    active: dev,plugin,cloud-dev,assembly-dev,api-dev
+    active: dev,plugin,cloud-dev,assembly-dev,api-dev,seata-dev

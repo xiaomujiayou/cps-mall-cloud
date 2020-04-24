@@ -1,9 +1,15 @@
 package com.xm.api_user.aspect;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.github.pagehelper.PageHelper;
+import com.xm.api_user.mapper.SuBillMapper;
+import com.xm.api_user.mapper.SuOrderMapper;
 import com.xm.api_user.mapper.SuUserMapper;
 import com.xm.comment_mq.message.config.UserActionConfig;
 import com.xm.comment_mq.message.impl.*;
+import com.xm.comment_serialize.module.user.constant.BillStateConstant;
+import com.xm.comment_serialize.module.user.constant.BillTypeConstant;
+import com.xm.comment_serialize.module.user.constant.OrderStateConstant;
 import com.xm.comment_serialize.module.user.entity.SuBillEntity;
 import com.xm.comment_serialize.module.user.entity.SuOrderEntity;
 import com.xm.comment_serialize.module.user.entity.SuUserEntity;
@@ -14,7 +20,11 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.interceptor.TransactionInterceptor;
+
+import java.util.Arrays;
 
 /**
  * 消息生成器
@@ -26,9 +36,12 @@ public class UserActionMessageAspect {
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
-
     @Autowired
     private SuUserMapper suUserMapper;
+    @Autowired
+    private SuBillMapper suBillMapper;
+    @Autowired
+    private SuOrderMapper suOrderMapper;
 
     @Pointcut("execution(public * com.xm.api_user.service.UserService.addNewUser(..))")
     public void addNewUserPointCut(){}
@@ -52,6 +65,22 @@ public class UserActionMessageAspect {
             if(parentUser.getParentId() != null)
                 rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE,"",new UserAddProxyMessage(parentUser.getParentId(),2, suUserEntity));
         }
+        return suUserEntity;
+    }
+    @Pointcut("execution(public * com.xm.api_user.service.UserService.getUserInfo(..))")
+    public void userLoginPointCut(){}
+    /**
+     * 生成
+     * UserLoginMessage
+     * @param joinPoint
+     * @return
+     * @throws Throwable
+     */
+    @Around("userLoginPointCut()")
+    public Object userLogin(ProceedingJoinPoint joinPoint) throws Throwable {
+        SuUserEntity suUserEntity = (SuUserEntity)joinPoint.proceed();
+        //首次登录消息
+        rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE,"",new UserLoginMessage(suUserEntity.getId(),suUserEntity));
         return suUserEntity;
     }
 
@@ -86,7 +115,18 @@ public class UserActionMessageAspect {
         Object obj = joinPoint.proceed();
         SuOrderEntity newOrder = (SuOrderEntity)joinPoint.getArgs()[0];
         SuOrderEntity oldOrder = (SuOrderEntity)joinPoint.getArgs()[1];
-        rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE,"",new OrderStateChangeMessage(newOrder.getUserId(),oldOrder,newOrder.getState()));
+
+        SuBillEntity example = new SuBillEntity();
+        SuBillEntity suBillEntity = null;
+        if(oldOrder.getUserId() != null){
+            example.setUserId(oldOrder.getUserId());
+            example.setAttach(oldOrder.getId());
+            PageHelper.startPage(1,1).count(false);
+            suBillEntity = suBillMapper.selectOne(example);
+        }
+        rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE,"",new OrderStateChangeMessage(suBillEntity.getUserId(),oldOrder,newOrder.getState(),suBillEntity));
+        if(suBillEntity.getState().equals(BillStateConstant.ALREADY) && newOrder.getState().equals(OrderStateConstant.FAIL_SETTLED))
+            rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE,"",new UserMaliceCreditBillMessage(suBillEntity.getUserId(),suBillEntity,oldOrder,newOrder));
         return obj;
     }
 
@@ -137,10 +177,12 @@ public class UserActionMessageAspect {
     public Object addBillPointCut(ProceedingJoinPoint joinPoint) throws Throwable {
         Object obj = joinPoint.proceed();
         SuBillEntity suBillEntity = (SuBillEntity)joinPoint.getArgs()[0];
-        rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE,"",new UserBillCreateMessage(suBillEntity.getUserId(),suBillEntity));
+        SuOrderEntity suOrderEntity = null;
+        if(Arrays.asList(BillTypeConstant.BUY_NORMAL,BillTypeConstant.BUY_SHARE).contains(suBillEntity.getType()))
+            suOrderEntity = suOrderMapper.selectByPrimaryKey(suBillEntity.getAttach());
+        rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE,"",new UserBillCreateMessage(suBillEntity.getUserId(),suBillEntity,suOrderEntity));
         return obj;
     }
-
 
     @Pointcut("execution(public * com.xm.api_user.service.BillService.updateBillState(..))")
     public void updateBillStatePointCut(){}

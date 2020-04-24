@@ -4,6 +4,8 @@ import com.xm.comment_serialize.module.user.dto.OrderBillDto;
 import com.xm.comment_serialize.module.user.entity.SuOrderEntity;
 import com.xm.comment_utils.mybatis.PageBean;
 
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * 用户订单服务
  */
@@ -14,14 +16,14 @@ public interface OrderService {
      * 收到一条订单消息
      * @param order
      */
-    public void receiveOrderMsg(SuOrderEntity order);
+    public void receiveOrderMsg(SuOrderEntity order) throws Exception;
 
     /**
      * 新订单处理
      * 订单处理的核心逻辑
      * @param order
      */
-    public void onOrderCreate(SuOrderEntity order);
+    public void onOrderCreate(SuOrderEntity order) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException;
 
 
     /**

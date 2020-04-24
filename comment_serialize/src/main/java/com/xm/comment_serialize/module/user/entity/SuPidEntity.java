@@ -1,6 +1,7 @@
 package com.xm.comment_serialize.module.user.entity;
 
 import lombok.Data;
+import tk.mybatis.mapper.annotation.Version;
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -31,6 +32,11 @@ public class SuPidEntity implements Serializable{
 	 * 淘宝
 	 */
 	private String tb;
+
+	/**
+	 * 唯品会
+	 */
+	private String wph;
 
 	/**
 	 * 状态(0:不完善,1:可用,2:已被使用)

@@ -28,6 +28,7 @@ public enum  MsgEnum {
     DATA_ALREADY_NOT_EXISTS(10305,"数据不存在"),
     DATA_INVALID_ERROR(10306,"无效数据"),
     TYPE_NOTFOUND_ERROR(10307,"找不到指定类型"),
+    CONF_NOTFOUND_ERROR(10308,"找不到指定配置"),
 
     /* 服务系列*/
     SERVICE_AVAILABLE(10401,"服务不可用"),

@@ -12,4 +12,3 @@ spring:
 logging:
   logPath: D:\java\data\log\share\cron-service
   logLevel: debug
-

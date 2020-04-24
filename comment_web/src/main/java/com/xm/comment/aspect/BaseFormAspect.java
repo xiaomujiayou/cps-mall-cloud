@@ -28,6 +28,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -57,6 +58,10 @@ public class BaseFormAspect {
             BaseForm baseForm = (BaseForm)joinPoint.getArgs()[index];
             if(baseForm == null)
                 baseForm = (BaseForm)parameters[i].getType().newInstance();
+
+            //装配真实IP
+            String ip = request.getHeader(RequestHeaderConstant.IP);
+            baseForm.setIp(ip);
 
             //装配userId
             if(baseForm.getUserId() == null){
@@ -114,8 +119,12 @@ public class BaseFormAspect {
                             pid = suPidEntity.getMgj();
                             break;
                         }
-                        case PlatformTypeConstant.TB:{
+                        case PlatformTypeConstant.TB: {
                             pid = suPidEntity.getTb();
+                            break;
+                        }
+                        case PlatformTypeConstant.WPH:{
+                            pid = suPidEntity.getWph();
                             break;
                         }
                     }

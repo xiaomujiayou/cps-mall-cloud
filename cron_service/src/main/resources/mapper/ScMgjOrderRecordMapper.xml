@@ -3,7 +3,8 @@
 <mapper namespace="com.xm.cron_service.mapper.ScMgjOrderRecordMapper" >
   <resultMap id="BaseResultMap" type="com.xm.comment_serialize.module.cron.entity.ScMgjOrderRecordEntity" >
     <result column="id" property="id" jdbcType="INTEGER" />
-    <result column="order_num" property="orderNum" jdbcType="VARCHAR" />
+    <result column="order_sn" property="orderSn" jdbcType="VARCHAR" />
+    <result column="order_sub_sn" property="orderSubSn" jdbcType="VARCHAR" />
     <result column="state" property="state" jdbcType="INTEGER" />
     <result column="last_update" property="lastUpdate" jdbcType="TIMESTAMP" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />

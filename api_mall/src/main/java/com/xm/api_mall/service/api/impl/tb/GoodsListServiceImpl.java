@@ -5,6 +5,7 @@ import com.xm.api_mall.component.TbSdkComponent;
 import com.xm.api_mall.mapper.SmOptMapper;
 import com.xm.api_mall.service.api.GoodsListService;
 import com.xm.api_mall.service.api.OptionService;
+import com.xm.api_mall.service.api.impl.abs.GoodsListServiceAbs;
 import com.xm.comment_api.config.TbApiConfig;
 import com.xm.comment_feign.module.user.feign.UserFeignClient;
 import com.xm.comment_serialize.module.mall.bo.ProductCriteriaBo;
@@ -21,7 +22,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service("tbGoodsListService")
-public class GoodsListServiceImpl implements GoodsListService {
+public class GoodsListServiceImpl extends GoodsListServiceAbs {
     @Autowired
     private TbSdkComponent tbSdkComponent;
     @Autowired
@@ -85,6 +86,8 @@ public class GoodsListServiceImpl implements GoodsListService {
     public PageBean<SmProductEntityEx> option(OptionGoodsListForm optionGoodsListForm) throws Exception {
         if(optionGoodsListForm.getOptionId() == null)
             throw new GlobleException(MsgEnum.PARAM_VALID_ERROR,"goodsId 不能为空");
+
+
         OptionForm optionForm = new OptionForm();
         BeanUtil.copyProperties(optionGoodsListForm,optionForm);
         optionForm.setTargetOptId(optionGoodsListForm.getOptionId());
@@ -96,6 +99,7 @@ public class GoodsListServiceImpl implements GoodsListService {
         BeanUtil.copyProperties(optionGoodsListForm,keywordGoodsListForm);
         keywordGoodsListForm.setKeywords(keyWords);
         ProductCriteriaBo criteriaBo = new ProductCriteriaBo();
+        criteriaBo.setUserId(optionGoodsListForm.getUserId());
         criteriaBo.setHasCoupon(true);
         criteriaBo.setPageNum(keywordGoodsListForm.getPageNum());
         criteriaBo.setPageSize(keywordGoodsListForm.getPageSize());
@@ -115,5 +119,10 @@ public class GoodsListServiceImpl implements GoodsListService {
                         tbApiConfig.getAdzoneId(),
                         13256L,
                         Long.valueOf(similarGoodsListForm.getGoodsId())));
+    }
+
+    @Override
+    public PageBean<SmProductEntityEx> mall(MallGoodsListForm mallGoodsListForm) throws Exception {
+        return null;
     }
 }

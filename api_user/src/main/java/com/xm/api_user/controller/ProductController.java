@@ -1,5 +1,6 @@
 package com.xm.api_user.controller;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.xm.api_user.service.ProductService;
 import com.xm.api_user.service.ShareService;
 import com.xm.comment.annotation.LoginUser;
@@ -7,6 +8,9 @@ import com.xm.comment_feign.module.mall.feign.MallFeignClient;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
 import com.xm.comment_serialize.module.mall.ex.SmProductEntityEx;
 import com.xm.comment_serialize.module.mall.form.*;
+import com.xm.comment_serialize.module.mall.vo.SmProductVo;
+import com.xm.comment_serialize.module.user.form.DelUserProductForm;
+import com.xm.comment_serialize.module.user.vo.SuProductHistoryVo;
 import com.xm.comment_utils.mybatis.PageBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -26,10 +30,6 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
-    @Autowired
-    private ShareService shareService;
-    @Autowired
-    private MallFeignClient mallFeignClient;
 
     /**
      * 商品是否被收藏
@@ -56,24 +56,15 @@ public class ProductController {
     }
 
     /**
-     * 删除一条历史记录
-     * @param userId
-     * @param id
+     * 删除一条记录
      * @return
      */
-    @DeleteMapping("/history/{id}")
-    public void delHistory(@LoginUser Integer userId, @PathVariable Integer id){
-        productService.delHistory(userId,id,false);
-    }
-
-    /**
-     * 删除所有历史记录
-     * @param userId
-     * @return
-     */
-    @DeleteMapping("/history")
-    public void delHistory(@LoginUser Integer userId){
-        productService.delHistory(userId,null,true);
+    @PostMapping("/del")
+    public void delHistory(@Valid @LoginUser @RequestBody DelUserProductForm delUserProductForm,BindingResult bindingResult){
+        productService.delHistory(
+                delUserProductForm.getUserId(),
+                delUserProductForm.getId(),
+                delUserProductForm.getProductType());
     }
 
     /**
@@ -84,28 +75,12 @@ public class ProductController {
      * @return
      */
     @GetMapping
-    public PageBean<SmProductEntityEx> get(@LoginUser Integer userId, @Valid GetProductForm getProductForm,BindingResult bindingResult){
-        getProductForm.setPageSize(10);
-        PageBean<SmProductEntity> pageBean = productService.getUserProduct(
+    public PageBean<SuProductHistoryVo> get(@LoginUser Integer userId, @Valid GetProductForm getProductForm, BindingResult bindingResult){
+        return productService.getUserProduct(
                 userId,
                 getProductForm.getPageNum(),
                 getProductForm.getPageSize(),
                 getProductForm.getSuProductType());
-        Map<String,Integer> shareUserMap = pageBean.getList().stream().filter(o->{return ((SmProductEntityEx)o).getShareUserId() != null;}).collect(Collectors.toMap(SmProductEntity::getGoodsId,o->{return  ((SmProductEntityEx)o).getShareUserId();}));
-
-        CalcProfitForm calcProfitForm = new CalcProfitForm();
-        calcProfitForm.setUserId(userId);
-        calcProfitForm.setSmProductEntities(pageBean.getList());
-        List<SmProductEntityEx> smProductEntityExes = mallFeignClient.calc(calcProfitForm);
-        smProductEntityExes.stream().forEach(o->{
-            o.setShareUserId(shareUserMap.get(o.getGoodsId()));
-        });
-        PageBean<SmProductEntityEx> smProductEntityExPageBean = new PageBean<>();
-        smProductEntityExPageBean.setList(smProductEntityExes);
-        smProductEntityExPageBean.setPageNum(pageBean.getPageNum());
-        smProductEntityExPageBean.setPageSize(pageBean.getPageSize());
-        smProductEntityExPageBean.setTotal(pageBean.getTotal());
-        return smProductEntityExPageBean;
     }
 
     /**
@@ -113,16 +88,16 @@ public class ProductController {
      * @param userId
      * @return
      */
-    @PostMapping("/history")
-    public void get(@LoginUser Integer userId,@RequestBody @Valid AddUserHistoryForm addUserHistoryForm,BindingResult bindingResult){
-        if(userId != null) {
-            Integer shareUserId = addUserHistoryForm.getShareUserId()== null?null:userId.equals(addUserHistoryForm.getShareUserId())?null:addUserHistoryForm.getShareUserId();
-            productService.addHistory(userId,addUserHistoryForm.getPlatformType(),addUserHistoryForm.getGoodsId(),shareUserId);
-        }
-        //添加分享记录
-        if(addUserHistoryForm.getShareUserId() != null && !addUserHistoryForm.getShareUserId().equals(userId)){
-            shareService.show(addUserHistoryForm.getShareUserId(),addUserHistoryForm.getGoodsId(),addUserHistoryForm.getPlatformType());
-        }
-    }
+//    @PostMapping("/history")
+//    public void get(@LoginUser Integer userId,@RequestBody @Valid AddUserHistoryForm addUserHistoryForm,BindingResult bindingResult){
+//        if(userId != null) {
+//            Integer shareUserId = addUserHistoryForm.getShareUserId()== null?null:userId.equals(addUserHistoryForm.getShareUserId())?null:addUserHistoryForm.getShareUserId();
+//            productService.addHistory(userId,addUserHistoryForm.getPlatformType(),addUserHistoryForm.getGoodsId(),shareUserId,addUserHistoryForm.getSmProductVo());
+//        }
+//        //添加分享记录
+//        if(addUserHistoryForm.getShareUserId() != null && !addUserHistoryForm.getShareUserId().equals(userId)){
+//            shareService.show(addUserHistoryForm.getShareUserId(),addUserHistoryForm.getGoodsId(),addUserHistoryForm.getPlatformType());
+//        }
+//    }
 
 }

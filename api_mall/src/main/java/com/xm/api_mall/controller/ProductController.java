@@ -13,6 +13,7 @@ import com.xm.comment.annotation.AppType;
 import com.xm.comment.annotation.LoginUser;
 import com.xm.comment.annotation.Pid;
 import com.xm.comment.annotation.PlatformType;
+import com.xm.comment_feign.module.wind.feign.WindFeignClient;
 import com.xm.comment_serialize.form.BaseForm;
 import com.xm.comment_serialize.module.mall.bo.ShareLinkBo;
 import com.xm.comment_serialize.module.mall.constant.PlatformTypeConstant;
@@ -34,6 +35,7 @@ import javax.annotation.Resource;
 import javax.lang.model.element.NestingKind;
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -45,15 +47,16 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/product")
 public class ProductController {
-
     @Autowired
     private GoodsService goodsService;
-
+    @Autowired
+    private ProductController productController;
     @Autowired
     private DispatchServiceAspect dispatchServiceAspect;
-
     @Resource(name = "myExecutor")
     private ThreadPoolTaskExecutor executor;
+    @Autowired
+    private WindFeignClient windFeignClient;
 
     /**
      * 商品列表
@@ -66,6 +69,7 @@ public class ProductController {
                 params,
                 GoodsListService.class,
                 OptGoodsListService.class);
+        pageBean.setList(windFeignClient.productCheck(pageBean.getList()));
         List<SmProductVo> list = pageBean.getList().stream().map(o->{
             SmProductVo smProductVo = new SmProductVo();
             BeanUtil.copyProperties(o,smProductVo);
@@ -79,17 +83,26 @@ public class ProductController {
         return productVoPageBean;
     }
 
+
+
     /**
      * 获取商品详情
      * @return
      */
     @GetMapping("/detail")
     public SmProductVo getProductDetail(@Valid @PlatformType @LoginUser(necessary = false) @Pid(necessary = false) GoodsDetailForm goodsDetailForm, BindingResult bindingResult) throws Exception {
-        return getDetailVo(goodsDetailForm);
+        return praseDetailVo(productController.getDetailEx(goodsDetailForm));
     }
 
-    private SmProductVo getDetailVo(GoodsDetailForm goodsDetailForm) throws Exception {
+    public SmProductEntityEx getDetailEx(GoodsDetailForm goodsDetailForm) throws Exception {
         SmProductEntityEx smProductEntityEx = goodsService.detail(goodsDetailForm);
+        return smProductEntityEx;
+    }
+
+    private SmProductVo praseDetailVo(SmProductEntityEx smProductEntityEx){
+        List<SmProductEntityEx> smProductEntityExes = windFeignClient.productCheck(Arrays.asList(smProductEntityEx));
+        if(smProductEntityExes != null && !smProductEntityExes.isEmpty())
+            smProductEntityEx = smProductEntityExes.get(0);
         SmProductVo smProductVo = new SmProductVo();
         BeanUtil.copyProperties(smProductEntityEx,smProductVo);
         return smProductVo;
@@ -165,21 +178,21 @@ public class ProductController {
                     BeanUtil.copyProperties(urlParseForm,goodsDetailForm);
                     goodsDetailForm.setGoodsId(goodsSpec.getGoodsId());
                     goodsDetailForm.setPlatformType(goodsSpec.getPlatformType());
-                    goodsSpec.setGoodsInfo(getDetailVo(goodsDetailForm));
+                    goodsSpec.setGoodsInfo(praseDetailVo(productController.getDetailEx(goodsDetailForm)));
                 }catch (ApiCallException e){
-                    goodsSpec.setParseType(2);
-                    BaseGoodsDetailForm baseGoodsDetailForm = new BaseGoodsDetailForm();
-                    BeanUtil.copyProperties(urlParseForm,baseGoodsDetailForm);
-                    baseGoodsDetailForm.setGoodsId(goodsSpec.getGoodsId());
-                    goodsSpec.setSimpleInfo(goodsService.basicDetail(baseGoodsDetailForm));
+                    goodsSpec.setParseType(4);
+//                    BaseGoodsDetailForm baseGoodsDetailForm = new BaseGoodsDetailForm();
+//                    BeanUtil.copyProperties(urlParseForm,baseGoodsDetailForm);
+//                    baseGoodsDetailForm.setGoodsId(goodsSpec.getGoodsId());
+//                    goodsSpec.setSimpleInfo(goodsService.basicDetail(baseGoodsDetailForm));
                 }
-            }else if(goodsSpec.getPlatformType() == PlatformTypeConstant.MGJ){
+            }else if(Arrays.asList(PlatformTypeConstant.MGJ,PlatformTypeConstant.WPH).contains(goodsSpec.getPlatformType())){
                 try {
                     GoodsDetailForm goodsDetailForm = new GoodsDetailForm();
                     BeanUtil.copyProperties(urlParseForm,goodsDetailForm);
                     goodsDetailForm.setGoodsId(goodsSpec.getGoodsId());
                     goodsDetailForm.setPlatformType(goodsSpec.getPlatformType());
-                    goodsSpec.setGoodsInfo(getDetailVo(goodsDetailForm));
+                    goodsSpec.setGoodsInfo(praseDetailVo(productController.getDetailEx(goodsDetailForm)));
                 }catch (Exception e){
                     goodsSpec.setParseType(4);
                 }

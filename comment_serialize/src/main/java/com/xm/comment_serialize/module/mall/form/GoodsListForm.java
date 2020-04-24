@@ -7,8 +7,6 @@ import lombok.Data;
  * 商品列表表单
  */
 @Data
-public class GoodsListForm extends BaseForm {
-    private Integer pageNum;
-    private Integer pageSize;
+public class GoodsListForm extends ListForm {
     private String listType;
 }
