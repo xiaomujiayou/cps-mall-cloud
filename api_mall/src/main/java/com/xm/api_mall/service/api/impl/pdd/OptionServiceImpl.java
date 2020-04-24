@@ -1,9 +1,10 @@
-package com.xm.api_mall.service.impl;
+package com.xm.api_mall.service.api.impl.pdd;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.xm.api_mall.mapper.SmOptMapper;
 import com.xm.api_mall.service.ConfigService;
-import com.xm.api_mall.service.OptionService;
+import com.xm.api_mall.service.api.OptionService;
+import com.xm.comment_serialize.module.mall.form.OptionForm;
 import com.xm.comment_feign.module.user.feign.UserFeignClient;
 import com.xm.comment_serialize.module.mall.constant.ConfigEnmu;
 import com.xm.comment_serialize.module.mall.constant.ConfigTypeConstant;
@@ -13,7 +14,6 @@ import com.xm.comment_serialize.module.user.constant.UserTypeConstant;
 import com.xm.comment_serialize.module.user.entity.SuUserEntity;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Example;
 import tk.mybatis.orderbyhelper.OrderByHelper;
@@ -23,20 +23,17 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Service("optionService")
+@Service("pddOptionService")
 public class OptionServiceImpl implements OptionService {
-
     @Autowired
     private SmOptMapper smOptMapper;
-
     @Autowired
     private ConfigService configService;
-
     @Autowired
     private UserFeignClient userFeignClient;
 
     @Override
-    public List<OptEx> getOption(){
+    public List<OptEx> list(OptionForm optionForm) {
         OrderByHelper.orderBy("sort asc");
         SmOptEntity criteria = new SmOptEntity();
         criteria.setLevel(1);
@@ -61,13 +58,13 @@ public class OptionServiceImpl implements OptionService {
     }
 
     @Override
-    public List<SmOptEntity> getChildOption(Integer userId,Integer parentId) {
+    public List<SmOptEntity> childList(OptionForm optionForm) {
         SuUserEntity suUserEntity = null;
-        if(userId != null)
-            suUserEntity = userFeignClient.superUser(userId, UserTypeConstant.SELF);
+        if(optionForm.getUserId() != null)
+            suUserEntity = userFeignClient.superUser(optionForm.getUserId(), UserTypeConstant.SELF);
         List<SmOptEntity> smOptEntities = null;
         Example example = new Example(SmOptEntity.class);
-        if(parentId == null || parentId == 0){
+        if(optionForm.getTargetOptId() == null || optionForm.getTargetOptId() == 0){
             example.createCriteria()
                     .andEqualTo("level",1)
                     .andEqualTo("disable",1);
@@ -75,9 +72,9 @@ public class OptionServiceImpl implements OptionService {
 
             String sortStr = null;
             if(suUserEntity == null || suUserEntity.getSex() == 0){
-                sortStr = configService.getConfig(userId, ConfigEnmu.MAIN_OPTION_SORT, ConfigTypeConstant.PROXY_CONFIG).getVal();
+                sortStr = configService.getConfig(optionForm.getUserId(), ConfigEnmu.MAIN_OPTION_SORT, ConfigTypeConstant.PROXY_CONFIG).getVal();
             }else {
-                sortStr = configService.getConfig(userId, suUserEntity.getSex() == 1?ConfigEnmu.MAIN_OPTION_SORT_MAN:ConfigEnmu.MAIN_OPTION_SORT_WOMAN, ConfigTypeConstant.PROXY_CONFIG).getVal();
+                sortStr = configService.getConfig(optionForm.getUserId(), suUserEntity.getSex() == 1?ConfigEnmu.MAIN_OPTION_SORT_MAN:ConfigEnmu.MAIN_OPTION_SORT_WOMAN, ConfigTypeConstant.PROXY_CONFIG).getVal();
             }
 
             List<Integer> sort = Arrays.asList(sortStr.split(",")).stream().map(o->{return Integer.valueOf(o);}).collect(Collectors.toList());
@@ -91,16 +88,16 @@ public class OptionServiceImpl implements OptionService {
             smOptEntities = sorted;
         }else{
             OrderByHelper.orderBy("sort asc");
-            example.createCriteria().andEqualTo("parentId",parentId);
+            example.createCriteria().andEqualTo("parentId",optionForm.getTargetOptId());
             smOptEntities = smOptMapper.selectByExample(example);
         }
         return smOptEntities;
     }
 
     @Override
-    public List<SmOptEntity> getAllParentOption(Integer userId, Integer childOptId) {
+    public List<SmOptEntity> allParentList(OptionForm optionForm) {
         List<SmOptEntity> smOptEntities = new ArrayList<>();
-        SmOptEntity smOptEntity = smOptMapper.selectByPrimaryKey(childOptId);
+        SmOptEntity smOptEntity = smOptMapper.selectByPrimaryKey(optionForm.getTargetOptId());
         while (ObjectUtil.isNotEmpty(smOptEntity) && smOptEntity.getLevel() >= 1){
             smOptEntities.add(smOptEntity);
             if(smOptEntity.getParentId() == null || smOptEntity.getParentId() == 0)
@@ -110,13 +107,8 @@ public class OptionServiceImpl implements OptionService {
         return smOptEntities;
     }
 
-    /**
-     * 校验类目是否合法
-     * @param optId
-     * @return
-     */
-    @Cacheable("opt.check.pdd")
-    public boolean checkOpt(String optId){
+    @Override
+    public boolean check(String optId) {
         Example example = new Example(SmOptEntity.class);
         example.createCriteria()
                 .andEqualTo("pddOptId",optId)
