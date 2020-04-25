@@ -122,6 +122,7 @@ public class MgjTaskServiceImpl extends AbsTask {
         }
     }
 
+
     private List<OrderWithResBo> convertOrder(JSONObject item){
 
         JSONArray products = item.getJSONArray("products");

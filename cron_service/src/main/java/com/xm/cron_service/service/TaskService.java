@@ -37,4 +37,10 @@ public interface TaskService {
      * @return
      */
     public Date getTime() throws Exception;
+
+
+    /**
+     * 测试
+     */
+    public void test(String orderJsonStr);
 }

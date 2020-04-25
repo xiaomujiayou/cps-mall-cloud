@@ -135,4 +135,11 @@ public abstract class AbsTask implements TaskService {
         PddTimeGetResponse response = popHttpClient.syncInvoke(request);
         return DateUtils.parseDate(response.getTimeGetResponse().getTime(),"yyyy-MM-dd HH:mm:ss");
     }
+
+    /**
+     * 测试
+     */
+    public void test(String orderJsonStr){
+
+    }
 }

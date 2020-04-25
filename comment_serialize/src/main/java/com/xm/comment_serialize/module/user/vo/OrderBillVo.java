@@ -63,6 +63,11 @@ public class OrderBillVo {
      * 2-3-2：即将返现至微信零钱
      * 2-3-3：返现完成
      * 2-4-4：--失败原因--
+     *
+     * 0-1-0: 无佣金
+     * 0-2-0: 无佣金
+     * 0-3-0: 无佣金
+     * 0-4-0: 退单、售后，订单取消
      */
     public Long getCountDown() {
         if(checkState("1-2-1") || checkState("1-2-2")){
@@ -86,7 +91,8 @@ public class OrderBillVo {
         }else if(checkState("0-3-3")){
             return "返现完成";
         }else if(checkState("0-4-4")){
-            return failReason;
+//            return failReason;
+            return "退单、售后，订单取消";
         }else if(checkState("1-1-1")){
             return "根据您的信用，确认收货即可返现";
         }else if(checkState("1-2-3")){
@@ -97,7 +103,8 @@ public class OrderBillVo {
             return "返现后 退单、取消订单将影响您的信用";
 //            return "恶意退款(将影响您的信用)";
         }else if(checkState("1-4-4")){
-            return failReason;
+//            return failReason;
+            return "退单、售后，订单取消";
         }else if(checkState("2-2-1")){
             return "由于信用下降，返现需要等待交易彻底结束，请耐心等待";
         }else if(checkState("2-3-2")){
@@ -105,7 +112,12 @@ public class OrderBillVo {
         }else if(checkState("2-3-3")){
             return "返现完成";
         }else if(checkState("2-4-4")){
-            return failReason;
+//            return failReason;
+            return "退单、售后，订单取消";
+        }else if(checkState("0-1-0") || checkState("0-2-0") || checkState("0-3-0")){
+            return "无佣金";
+        }else if(checkState("0-4-0")){
+            return "退单、售后，订单取消";
         }
         return null;
     }
@@ -119,6 +131,8 @@ public class OrderBillVo {
         String[] states = stateStr.split("-");
         if(creditState == null)
             creditState = 0;
+        if(billState == null)
+            billState = 0;
         if(Integer.valueOf(states[0]).equals(creditState) && Integer.valueOf(states[1]).equals(orderState) && Integer.valueOf(states[2]).equals(billState))
             return true;
         return false;

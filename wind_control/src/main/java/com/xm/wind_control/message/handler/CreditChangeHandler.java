@@ -91,11 +91,13 @@ public class CreditChangeHandler implements MessageHandler {
              * 订单结束，解除绑定
              */
             if(orderStateChangeMessage.getNewState() == OrderStateConstant.ALREADY_SETTLED || orderStateChangeMessage.getNewState() == OrderStateConstant.FAIL_SETTLED){
-                creditBillService.creditUnBindBill(
-                        orderStateChangeMessage.getSuBillEntity(),
-                        creditBillService.getUserCredit(orderStateChangeMessage.getUserId()),
-                        1,
-                        "订单结束");
+                if(orderStateChangeMessage.getSuBillEntity() != null){
+                    creditBillService.creditUnBindBill(
+                            orderStateChangeMessage.getSuBillEntity(),
+                            creditBillService.getUserCredit(orderStateChangeMessage.getUserId()),
+                            1,
+                            "订单结束");
+                }
             }
         }else if(message instanceof UserBillStateChangeMessage){
             /**

@@ -117,6 +117,18 @@ public class WphTaskServiceImpl extends AbsTask {
         return suOrderEntities;
     }
 
+    @Override
+    public void test(String orderJsonStr) {
+        OrderInfo orderInfo = JSON.parseObject(orderJsonStr,OrderInfo.class);
+        System.out.println(JSON.toJSONString(orderInfo));
+        List<OrderWithResBo> orderWithResBos = convertOrder(orderInfo);
+        System.out.println(JSON.toJSONString(orderWithResBos));
+        for (OrderWithResBo orderWithResBo : orderWithResBos) {
+            System.out.println(JSON.toJSONString(orderWithResBo));
+            rabbitTemplate.convertAndSend(OrderMqConfig.EXCHANGE,OrderMqConfig.KEY,orderWithResBo.getSuOrderEntity());
+        }
+    }
+
     private List<OrderWithResBo> convertOrder(OrderInfo orderInfo){
         String cart = orderInfo.getDetailList().stream().map(OrderDetailInfo::getGoodsId).collect(Collectors.joining(","));
         int i = 0;

@@ -106,6 +106,7 @@ public class UserActionMessageAspect {
     /**
      * 生成
      * OrderStateChangeMessage
+     * UserMaliceCreditBillMessage
      * @param joinPoint
      * @return
      * @throws Throwable
@@ -124,8 +125,8 @@ public class UserActionMessageAspect {
             PageHelper.startPage(1,1).count(false);
             suBillEntity = suBillMapper.selectOne(example);
         }
-        rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE,"",new OrderStateChangeMessage(suBillEntity.getUserId(),oldOrder,newOrder.getState(),suBillEntity));
-        if(suBillEntity.getState().equals(BillStateConstant.ALREADY) && newOrder.getState().equals(OrderStateConstant.FAIL_SETTLED))
+        rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE,"",new OrderStateChangeMessage(oldOrder.getUserId(),oldOrder,newOrder.getState(),suBillEntity));
+        if(suBillEntity != null && suBillEntity.getState().equals(BillStateConstant.ALREADY) && newOrder.getState().equals(OrderStateConstant.FAIL_SETTLED))
             rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE,"",new UserMaliceCreditBillMessage(suBillEntity.getUserId(),suBillEntity,oldOrder,newOrder));
         return obj;
     }

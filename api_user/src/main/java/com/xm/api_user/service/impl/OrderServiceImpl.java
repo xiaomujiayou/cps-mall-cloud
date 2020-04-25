@@ -109,6 +109,8 @@ public class OrderServiceImpl implements OrderService {
      * @return      :null标识该订单未曾收录
      */
     private SuOrderEntity getOldOrder(SuOrderEntity order){
+        if(StrUtil.isBlank(order.getOrderSubSn()) || order.getPlatformType() == null)
+            throw new GlobleException( MsgEnum.DATA_INVALID_ERROR,"订单数据异常：{}",JSON.toJSONString(order));
         PageHelper.startPage(1,1,false);
         SuOrderEntity example = new SuOrderEntity();
         example.setOrderSubSn(order.getOrderSubSn());

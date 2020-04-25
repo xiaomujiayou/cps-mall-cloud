@@ -50,4 +50,5 @@ public interface BillPayService {
      * @return
      */
     public PageBean<ScBillPayVo> list(Integer userId, Integer pageNum, Integer pageSize);
+
 }

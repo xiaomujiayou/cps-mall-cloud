@@ -100,6 +100,7 @@ public class PddTaskServiceImpl extends AbsTask {
         return CollUtil.newArrayList(orderEntity);
     }
 
+
     private OrderWithResBo convertOrderDetail(PddDdkOrderDetailGetResponse.OrderDetailResponse item){
 
         Map<String,Object> stateMap = OrderStateParseUtil.parse(PlatformTypeConstant.PDD,item.getOrderStatus().toString());
