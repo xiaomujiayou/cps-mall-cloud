@@ -1,6 +1,7 @@
 package com.xm.cron_service.mapper.custom;
 
 import com.xm.comment_serialize.module.cron.entity.ScBillPayEntity;
+import com.xm.comment_serialize.module.cron.form.BillPayForm;
 import com.xm.cron_service.utils.MyMapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -13,4 +14,8 @@ public interface ScBillPayMapperEx extends MyMapper<ScBillPayEntity> {
 
     List<ScBillPayEntity> genPayBill(Integer minMoney,Integer start, Integer end, Date timeline);
 
+    /**
+     * 查询账单支付金额
+     */
+    Integer getBillProfit(BillPayForm billPayForm);
 }

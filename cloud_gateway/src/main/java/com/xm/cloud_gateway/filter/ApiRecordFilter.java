@@ -58,8 +58,12 @@ public class ApiRecordFilter extends ZuulFilter {
         String userId = getUserId();
         entity.setUserId(userId != null ? Integer.valueOf(userId) : null);
         //设置appType
-        String appType = getHeader(RequestHeaderConstant.APP_TYPE);
-        entity.setAppType(appType != null ? Integer.valueOf(appType) : null);
+        if(request.getRequestURL().toString().contains("/manage/")){
+            entity.setAppType(9);
+        }else {
+            String appType = getHeader(RequestHeaderConstant.APP_TYPE);
+            entity.setAppType(appType != null ? Integer.valueOf(appType) : null);
+        }
         //设置IP
         entity.setIp(IpUtil.getIp(request));
         //设置URI

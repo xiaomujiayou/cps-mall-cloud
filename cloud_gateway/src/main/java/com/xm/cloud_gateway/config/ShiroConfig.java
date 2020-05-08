@@ -1,10 +1,10 @@
 package com.xm.cloud_gateway.config;
 
 import com.xm.cloud_gateway.shiro.filter.ShiroUserFilter;
-import com.xm.cloud_gateway.shiro.realm.CustomRealm;
+import com.xm.cloud_gateway.shiro.realm.ManageRealm;
+import com.xm.cloud_gateway.shiro.realm.WechatRealm;
 import com.xm.cloud_gateway.shiro.session.TokenSessionManager;
 import lombok.Data;
-import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Configuration;
 import org.apache.shiro.mgt.SecurityManager;
 
 import javax.servlet.Filter;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -86,13 +87,25 @@ public class ShiroConfig {
         return manager;
     }
 
+    /**
+     * 重写系统自带的Realm管理，主要针对多realm
+     */
+//    @Bean
+//    public ModularRealmAuthenticator modularRealmAuthenticator(UserModularRealmAuthenticator userModularRealmAuthenticator) {
+//        //设置realm认证通过策略
+//        userModularRealmAuthenticator.setAuthenticationStrategy(new AtLeastOneSuccessfulStrategy());
+//        return userModularRealmAuthenticator;
+//    }
+
     @Bean
-    public SecurityManager defaultWebSecurityManager(SessionManager sessionManager,CustomRealm customRealm){
+    public SecurityManager defaultWebSecurityManager(SessionManager sessionManager, WechatRealm wechatRealm, ManageRealm manageRealm){
         DefaultWebSecurityManager securityManager =  new DefaultWebSecurityManager();
         securityManager.setSessionManager(sessionManager);
-        securityManager.setRealm(customRealm);
+        securityManager.setRealms(Arrays.asList(wechatRealm,manageRealm));
         return securityManager;
     }
+
+
 
     @Bean
     public ShiroFilterFactoryBean shirFilter(SecurityManager securityManager) {

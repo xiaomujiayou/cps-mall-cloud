@@ -154,9 +154,9 @@ public class TbSdkComponent {
         smProductEntity.setOptId(o.getCategoryId().toString());
         smProductEntity.setTbBuyUrl(StrUtil.isNotBlank(o.getCouponShareUrl()) ? "https:" + o.getCouponShareUrl() : o.getItemUrl());
         smProductEntity.setGoodsGalleryUrls(o.getSmallImages() == null ? o.getPictUrl() : o.getSmallImages().stream().collect(Collectors.joining(",")));
-        if(smProductEntity.getName().contains("口罩") || smProductEntity.getName().contains("医") || smProductEntity.getName().contains("药")){
-            return null;
-        }
+//        if(smProductEntity.getName().contains("口罩") || smProductEntity.getName().contains("医") || smProductEntity.getName().contains("药")){
+//            return null;
+//        }
         smProductEntity.setCreateTime(new Date());
         return smProductEntity;
     }
@@ -179,9 +179,9 @@ public class TbSdkComponent {
         smProductEntity.setTbBuyUrl(StrUtil.isNotBlank(o.getCouponShareUrl()) ? "https:" + o.getCouponShareUrl() : o.getClickUrl());
         System.out.println(JSON.toJSONString(o,SerializerFeature.PrettyFormat));
         smProductEntity.setGoodsGalleryUrls(o.getSmallImages() == null ? o.getPictUrl() : o.getSmallImages().stream().collect(Collectors.joining(",")));
-        if(smProductEntity.getName().contains("口罩") || smProductEntity.getName().contains("医") || smProductEntity.getName().contains("药")){
-            return null;
-        }
+//        if(smProductEntity.getName().contains("口罩") || smProductEntity.getName().contains("医") || smProductEntity.getName().contains("药")){
+//            return null;
+//        }
         smProductEntity.setCreateTime(new Date());
         return smProductEntity;
     }

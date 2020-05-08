@@ -3,6 +3,7 @@ package com.xm.comment_serialize.module.user.vo;
 
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.xm.comment_serialize.module.user.constant.BillStateConstant;
 import com.xm.comment_serialize.module.user.constant.OrderStateConstant;
@@ -74,14 +75,21 @@ public class OrderBillVo {
             if(payTime == null)
                 return null;
             //返现倒计时
-            if(payTime.getTime() > new Date().getTime())
+            if(payTime.getTime() > new Date().getTime()) {
                 return payTime.getTime() - new Date().getTime();
-            return 0L;
+            }else {
+                //倒计时结束，还没返现（准备发放金额小于0.3）
+                stateDesc = "由于微信限制单次打款最少0.3元，您可以继续下单，累计超出0.3元将自动发放。";
+                return 0L;
+            }
+
         }
         return null;
     }
 
     public String getStateDesc() {
+        if(StrUtil.isNotBlank(stateDesc))
+            return stateDesc;
         if(checkState("0-1-1")){
             return "等待确认收货";
         }else if(checkState("0-2-1")){
@@ -91,20 +99,17 @@ public class OrderBillVo {
         }else if(checkState("0-3-3")){
             return "返现完成";
         }else if(checkState("0-4-4")){
-//            return failReason;
-            return "退单、售后，订单取消";
+            return "订单已取消";
         }else if(checkState("1-1-1")){
-            return "根据您的信用，确认收货即可返现";
+            return "根据您的信用 确认收货即可返现";
         }else if(checkState("1-2-3")){
             return "返现完成(退单将影响信用)";
         }else if(checkState("1-3-3")){
             return "返现完成(守约，信用增加)";
         }else if(checkState("1-4-3")){
-            return "返现后 退单、取消订单将影响您的信用";
-//            return "恶意退款(将影响您的信用)";
+            return "返现后取消订单将影响您的信用";
         }else if(checkState("1-4-4")){
-//            return failReason;
-            return "退单、售后，订单取消";
+            return "订单已取消";
         }else if(checkState("2-2-1")){
             return "由于信用下降，返现需要等待交易彻底结束，请耐心等待";
         }else if(checkState("2-3-2")){
@@ -112,12 +117,11 @@ public class OrderBillVo {
         }else if(checkState("2-3-3")){
             return "返现完成";
         }else if(checkState("2-4-4")){
-//            return failReason;
-            return "退单、售后，订单取消";
+            return "订单已取消";
         }else if(checkState("0-1-0") || checkState("0-2-0") || checkState("0-3-0")){
             return "无佣金";
         }else if(checkState("0-4-0")){
-            return "退单、售后，订单取消";
+            return "订单已取消";
         }
         return null;
     }

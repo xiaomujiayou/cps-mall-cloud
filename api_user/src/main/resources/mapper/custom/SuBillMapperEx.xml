@@ -193,4 +193,19 @@
             </foreach>
         </where>
     </select>
+
+    <select id="getBillProfit" resultType="java.lang.Integer">
+        SELECT
+            SUM(money)
+        FROM
+            su_bill
+        <where>
+            <if test="state != null ">
+                AND state = #{state}
+            </if>
+            <if test="createStart != null and createEnd != null">
+                AND create_time BETWEEN #{createStart} AND #{createEnd}
+            </if>
+        </where>
+    </select>
 </mapper>

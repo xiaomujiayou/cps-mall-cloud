@@ -6,7 +6,9 @@ import com.xm.comment_serialize.module.user.bo.SuBillToPayBo;
 import com.xm.comment_serialize.module.user.dto.BillOrderDto;
 import com.xm.comment_serialize.module.user.dto.OrderBillDto;
 import com.xm.comment_serialize.module.user.entity.SuPidEntity;
+import com.xm.comment_serialize.module.user.form.AdminLoginForm;
 import com.xm.comment_serialize.module.user.vo.MenuTipVo;
+import com.xm.comment_serialize.module.user.vo.SuAdminVo;
 import com.xm.comment_utils.exception.GlobleException;
 import com.xm.comment_utils.response.MsgEnum;
 import com.xm.comment_serialize.module.user.entity.SuConfigEntity;
@@ -98,6 +100,11 @@ public class UserFeignClientFallBack implements UserFeignClient {
 
     @Override
     public List<MenuTipVo> get(Integer userId, List<Integer> menuIds) {
+        throw new GlobleException(MsgEnum.SERVICE_AVAILABLE);
+    }
+
+    @Override
+    public SuAdminVo adminInfo(AdminLoginForm adminLoginForm) {
         throw new GlobleException(MsgEnum.SERVICE_AVAILABLE);
     }
 }

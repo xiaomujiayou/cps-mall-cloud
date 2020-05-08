@@ -19,8 +19,6 @@ public class TokenSessionManager extends DefaultWebSessionManager {
     @Autowired
     private ShiroConfig shiroConfig;
 
-    private static final String AUTHORIZATION = "token";
-
     private static final String REFERENCED_SESSION_ID_SOURCE = "Stateless request";
 
     public TokenSessionManager() {

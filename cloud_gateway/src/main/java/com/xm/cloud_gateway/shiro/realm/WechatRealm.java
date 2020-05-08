@@ -21,8 +21,11 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 前台登录realm
+ */
 @Component
-public class CustomRealm extends AuthorizingRealm {
+public class WechatRealm extends AuthorizingRealm {
 
     @Autowired
     @Lazy
@@ -57,7 +60,6 @@ public class CustomRealm extends AuthorizingRealm {
         GetUserInfoForm form = new GetUserInfoForm();
         form.setOpenId(openId);
         SuUserEntity userInfoMsg = userFeignClient.getUserInfo(form);
-
         SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(userInfoMsg,"",getName());
         return authenticationInfo;
     }

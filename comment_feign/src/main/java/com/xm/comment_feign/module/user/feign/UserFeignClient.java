@@ -10,11 +10,16 @@ import com.xm.comment_serialize.module.user.entity.SuPidEntity;
 import com.xm.comment_serialize.module.user.entity.SuUserEntity;
 import com.xm.comment_serialize.module.user.ex.RolePermissionEx;
 import com.xm.comment_serialize.module.user.form.AddSearchForm;
+import com.xm.comment_serialize.module.user.form.AdminLoginForm;
 import com.xm.comment_serialize.module.user.form.GetUserInfoForm;
+import com.xm.comment_serialize.module.user.form.WechatLoginForm;
 import com.xm.comment_serialize.module.user.vo.MenuTipVo;
+import com.xm.comment_serialize.module.user.vo.SuAdminVo;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @FeignClient(value = "api-user",fallback = UserFeignClientFallBack.class)
@@ -67,4 +72,7 @@ public interface UserFeignClient {
 
     @GetMapping("/menu/tips")
     public List<MenuTipVo> get(@RequestParam Integer userId, @RequestParam List<Integer> menuIds);
+
+    @PostMapping(value = "/manage/info",consumes = "application/json")
+    public SuAdminVo adminInfo(@RequestBody AdminLoginForm adminLoginForm);
 }

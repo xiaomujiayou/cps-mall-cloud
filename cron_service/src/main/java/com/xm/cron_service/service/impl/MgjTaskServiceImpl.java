@@ -154,7 +154,7 @@ public class MgjTaskServiceImpl extends AbsTask {
             orderEntity.setOriginalPrice(new Double(goodsInfo.getDouble("price") * 100d).intValue());
             orderEntity.setQuantity(goodsInfo.getInteger("amount"));
             orderEntity.setAmount(orderEntity.getOriginalPrice());
-            orderEntity.setPromotionRate(new Double(Double.valueOf(goodsInfo.getString("commission").replace("%",""))*1000d).intValue());
+            orderEntity.setPromotionRate(new Double(Double.valueOf(goodsInfo.getString("commission").replace("%",""))*100d).intValue());
             orderEntity.setPromotionAmount(goodsInfo.getInteger("expense"));
             orderEntity.setType(0);
             orderEntity.setOrderModifyAt(new Date(item.getInteger("updateTime") * 1000));

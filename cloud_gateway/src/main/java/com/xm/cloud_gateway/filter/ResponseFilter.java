@@ -14,6 +14,7 @@ import org.apache.http.protocol.ResponseContent;
 import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -47,6 +48,10 @@ public class ResponseFilter extends ZuulFilter {
 //        });
 //        return context.getThrowable() == null
 //                && should.get();
+
+        //放过后台接口
+//        HttpServletRequest request = RequestContext.getCurrentContext().getRequest();
+//        return !request.getRequestURL().toString().contains("/manage/");
         return true;
     }
 

@@ -6,6 +6,7 @@ import com.xm.comment_serialize.module.user.dto.OrderBillDto;
 import com.xm.comment_serialize.module.user.entity.SuBillEntity;
 import com.xm.comment_serialize.module.user.entity.SuRoleEntity;
 import com.xm.comment_serialize.module.user.ex.RolePermissionEx;
+import com.xm.comment_serialize.module.user.form.BillProfitSearchForm;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -28,5 +29,12 @@ public interface SuBillMapperEx extends MyMapper<SuBillEntity> {
      * @return
      */
     List<BillOrderDto> getBillInfo(Integer userId, List<String> billIds);
+
+    /**
+     * 获取相关账单金额
+     * @param billProfitSearchForm
+     * @return
+     */
+    Integer getBillProfit(BillProfitSearchForm billProfitSearchForm);
 
 }

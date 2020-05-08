@@ -23,7 +23,7 @@ import java.lang.reflect.Parameter;
 @Aspect
 public class ParamValidAspect {
 
-    @Pointcut("execution(public * com.xm.*.controller.*.*(..,org.springframework.validation.BindingResult,..))")
+    @Pointcut("execution(public * com.xm.*.controller..*.*(..,org.springframework.validation.BindingResult,..))")
     public void pointCut(){}
 
     @Around("pointCut()")

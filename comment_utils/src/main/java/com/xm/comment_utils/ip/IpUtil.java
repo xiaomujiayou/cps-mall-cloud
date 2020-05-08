@@ -65,6 +65,6 @@ public class IpUtil {
     }
 
     public static void main(String[] args) {
-        System.out.println(getCityInfo("127.0.0.1"));
+        System.out.println(getCityInfo("175.24.97.149"));
     }
 }

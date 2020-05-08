@@ -164,9 +164,9 @@ public class WphSdkComponent {
         smProductEntity.setGoodsGalleryUrls(goodsInfo.getGoodsDetailPictures() != null ? goodsInfo.getGoodsDetailPictures().stream().collect(Collectors.joining(",")) : null);
         if(goodsInfo.getJoinedActivities() != null)
             smProductEntity.setServiceTags(goodsInfo.getJoinedActivities().stream().map(ActivityInfo::getActName).collect(Collectors.joining(",")));
-        if(smProductEntity.getName().contains("口罩") || smProductEntity.getName().contains("医") || smProductEntity.getName().contains("药")){
-            return null;
-        }
+//        if(smProductEntity.getName().contains("口罩") || smProductEntity.getName().contains("医") || smProductEntity.getName().contains("药")){
+//            return null;
+//        }
         smProductEntity.setCreateTime(new Date());
         return smProductEntity;
     }

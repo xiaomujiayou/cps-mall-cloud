@@ -333,9 +333,9 @@ public class PddSdkComponent {
         smProductEntity.setCashPrice(GoodsPriceUtil.type(PlatformTypeConstant.PDD).calcProfit(smProductEntity).intValue());
         smProductEntity.setOptId(pddGoodsListItem.getOptId().toString());
 //        if(smProductEntity.getName().contains("口罩") || smProductEntity.getName().contains("医") || smProductEntity.getName().contains("药") || !optionService.checkOpt(smProductEntity.getOptId())){
-        if(smProductEntity.getName().contains("口罩") || smProductEntity.getName().contains("医") || smProductEntity.getName().contains("药")){
-            return null;
-        }
+//        if(smProductEntity.getName().contains("口罩") || smProductEntity.getName().contains("医") || smProductEntity.getName().contains("药")){
+//            return null;
+//        }
         smProductEntity.setCreateTime(new Date());
         return smProductEntity;
     }

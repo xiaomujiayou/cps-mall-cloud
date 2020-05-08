@@ -43,7 +43,7 @@ public class ExecTimeAspect {
 
     public static final String EXEC_TIME_HEADER = "exec-time";
 
-    @Pointcut("execution(public * com.xm.*.controller.*.*(..))")
+    @Pointcut("execution(public * com.xm.*.controller..*.*(..))")
     public void pointCut(){}
 
     @Around("pointCut()")

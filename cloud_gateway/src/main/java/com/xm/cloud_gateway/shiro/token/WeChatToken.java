@@ -2,6 +2,9 @@ package com.xm.cloud_gateway.shiro.token;
 
 import org.apache.shiro.authc.AuthenticationToken;
 
+/**
+ * 前台登录token
+ */
 public class WeChatToken implements AuthenticationToken {
 
     private String openId;
