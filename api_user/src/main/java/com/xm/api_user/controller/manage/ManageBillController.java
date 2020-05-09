@@ -59,6 +59,8 @@ public class ManageBillController {
     private Example formToExample(BillSearchForm form) {
         Example example = new Example(SuBillEntity.class);
         Example.Criteria criteria = example.createCriteria();
+        if (form.getId() != null)
+            criteria.andEqualTo("id", form.getId());
         if (form.getUserId() != null)
             criteria.andEqualTo("userId", form.getUserId());
         if (form.getFromUserId() != null)

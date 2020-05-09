@@ -59,10 +59,20 @@ public class DelayController {
     private Example formToExample(DelayForm form) {
         Example example = new Example(SwApiRecordEntity.class);
         Example.Criteria criteria = example.createCriteria();
+        if (form.getUserId() != null)
+            criteria.andEqualTo("userId", form.getUserId());
+        if (form.getAppType() != null)
+            criteria.andEqualTo("appType", form.getAppType());
         if (StrUtil.isNotBlank(form.getUrl()))
             criteria.andEqualTo("url", form.getUrl());
+        if (StrUtil.isNotBlank(form.getIpAddr()))
+            criteria.andLike("ipAddr", "%" + form.getIpAddr() + "%");
         if (StrUtil.isNotBlank(form.getMethod()))
             criteria.andEqualTo("method", form.getMethod());
+        if (form.getTimeMin() != null)
+            criteria.andGreaterThanOrEqualTo("time", form.getTimeMin());
+        if (form.getTimeMax() != null)
+            criteria.andLessThanOrEqualTo("time", form.getTimeMax());
         if (ObjectUtil.isAllNotEmpty(form.getCreateStart(), form.getCreateEnd()))
             criteria.andBetween("createTime", form.getCreateStart(), form.getCreateEnd());
         return example;

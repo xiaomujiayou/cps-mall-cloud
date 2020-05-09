@@ -7,6 +7,7 @@ import java.util.Date;
 
 @Data
 public class OrderSearchForm extends ListForm {
+    private Integer id;
     private Integer userId;
     private Integer shareUserId;
     private String orderSn;

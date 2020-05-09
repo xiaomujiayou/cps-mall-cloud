@@ -7,6 +7,7 @@ import java.util.Date;
 
 @Data
 public class BillSearchForm extends ListForm {
+    private Integer id;
     private Integer userId;
     private String billSn;
     private Integer fromUserId;

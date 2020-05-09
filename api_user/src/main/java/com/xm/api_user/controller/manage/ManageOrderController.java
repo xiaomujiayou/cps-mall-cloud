@@ -45,6 +45,8 @@ public class ManageOrderController {
     private Example formToExample(OrderSearchForm form) {
         Example example = new Example(SuOrderEntity.class);
         Example.Criteria criteria = example.createCriteria();
+        if (form.getId() != null)
+            criteria.andEqualTo("id", form.getId());
         if (form.getUserId() != null)
             criteria.andEqualTo("userId", form.getUserId());
         if (form.getShareUserId() != null)
