@@ -27,6 +27,7 @@ import com.xm.comment_utils.response.MsgEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -219,6 +220,7 @@ public class PddSdkComponent {
      * @return
      * @throws Exception
      */
+    @Cacheable(value = "pdd.getTopGoodsList",key = "#type + '_' + #pageNum + '_' + #pageSize ")
     public PageBean<SmProductEntity> getTopGoodsList(Integer type,String pid, Integer pageNum, Integer pageSize) throws Exception {
         PddDdkTopGoodsListQueryRequest request = new PddDdkTopGoodsListQueryRequest();
         request.setOffset(PageUtil.getStart(pageNum,pageSize));
@@ -240,6 +242,7 @@ public class PddSdkComponent {
      * 获取主题推广类型
      * @return
      */
+    @Cacheable(value = "pdd.getThemeList")
     public List<PddThemeBo> getThemeList() throws Exception {
         PddDdkThemeListGetRequest request = new PddDdkThemeListGetRequest();
         PddDdkThemeListGetResponse response = popHttpClient.syncInvoke(request);
@@ -259,6 +262,7 @@ public class PddSdkComponent {
      * @param themeId
      * @return
      */
+    @Cacheable(value = "pdd.getThemeGoodsList",key = "#themeId")
     public PageBean<SmProductEntity> getThemeGoodsList(Integer themeId,String pid) throws Exception {
         PddDdkThemeGoodsSearchRequest request = new PddDdkThemeGoodsSearchRequest();
         request.setThemeId(themeId.longValue());
@@ -279,6 +283,7 @@ public class PddSdkComponent {
      * @return
      * @throws Exception
      */
+    @Cacheable(value = "pdd.getRecommendGoodsList",key = "#channelType + '_' + #pageNum + '_' + #pageSize")
     public PageBean<SmProductEntity> getRecommendGoodsList(String pid,Integer channelType,Integer pageNum,Integer pageSize) throws Exception {
         PddDdkGoodsRecommendGetRequest request = new PddDdkGoodsRecommendGetRequest();
         request.setChannelType(channelType);

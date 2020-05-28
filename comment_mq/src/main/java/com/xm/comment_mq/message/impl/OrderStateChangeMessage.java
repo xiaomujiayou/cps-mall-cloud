@@ -12,15 +12,17 @@ public class OrderStateChangeMessage extends AbsUserActionMessage {
 
     public OrderStateChangeMessage() {}
 
-    public OrderStateChangeMessage(Integer userId, SuOrderEntity suOrderEntity, Integer newState,SuBillEntity suBillEntity) {
+    public OrderStateChangeMessage(Integer userId, SuOrderEntity oldOrder, SuOrderEntity newOrder,SuBillEntity suBillEntity) {
         super(userId);
-        this.suOrderEntity = suOrderEntity;
-        this.newState = newState;
+        this.oldOrder = oldOrder;
+        this.newOrder = newOrder;
+        this.newState = newOrder.getState();
         this.suBillEntity = suBillEntity;
     }
     private final UserActionEnum userActionEnum = UserActionEnum.ORDER_STATE_CHANGE;
     //相关订单
-    private SuOrderEntity suOrderEntity;
+    private SuOrderEntity oldOrder;
+    private SuOrderEntity newOrder;
     //相关账单（购买者账单）
     private SuBillEntity suBillEntity;
     //新的状态(OrderStateContanst)

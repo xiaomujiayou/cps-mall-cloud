@@ -3,6 +3,8 @@ package com.xm.comment_serialize.module.mall.ex;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class SmProductEntityEx extends SmProductEntity {
     //用户id
@@ -19,4 +21,7 @@ public class SmProductEntityEx extends SmProductEntity {
     private Integer shareUserId;
     //是否支持急速返现
     private Boolean creditPay;
+
+    //活动数据
+    private List<ActiveInfo> activeInfos;
 }

@@ -3,6 +3,7 @@ package com.xm.api_mall.controller;
 import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.xm.api_mall.aspect.DispatchServiceAspect;
 import com.xm.api_mall.exception.ApiCallException;
 import com.xm.api_mall.service.api.GoodsListService;
@@ -13,6 +14,7 @@ import com.xm.comment.annotation.AppType;
 import com.xm.comment.annotation.LoginUser;
 import com.xm.comment.annotation.Pid;
 import com.xm.comment.annotation.PlatformType;
+import com.xm.comment_feign.module.active.feign.ActiveFeignClient;
 import com.xm.comment_feign.module.wind.feign.WindFeignClient;
 import com.xm.comment_serialize.form.BaseForm;
 import com.xm.comment_serialize.module.mall.bo.ShareLinkBo;
@@ -27,6 +29,7 @@ import com.xm.comment_utils.mybatis.PageBean;
 import com.xm.comment_utils.response.MsgEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -69,6 +72,7 @@ public class ProductController {
                 params,
                 GoodsListService.class,
                 OptGoodsListService.class);
+        //信用支付
         pageBean.setList(windFeignClient.productCheck(pageBean.getList()));
         List<SmProductVo> list = pageBean.getList().stream().map(o->{
             SmProductVo smProductVo = new SmProductVo();

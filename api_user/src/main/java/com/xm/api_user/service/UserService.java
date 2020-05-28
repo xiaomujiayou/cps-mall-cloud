@@ -29,7 +29,7 @@ public interface UserService {
      * @param shareUserId
      * @return
      */
-    public SuUserEntity addNewUser(String openId,Integer shareUserId);
+    public SuUserEntity addNewUser(String openId,String ip,Integer shareUserId,String from);
 
     /**
      * 更新一个用户资料

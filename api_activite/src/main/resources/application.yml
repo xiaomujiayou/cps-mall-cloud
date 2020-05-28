@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: api-active
+  profiles:
+    active: dev,plugin,cloud-dev,assembly-dev,api-dev,seata-dev
+

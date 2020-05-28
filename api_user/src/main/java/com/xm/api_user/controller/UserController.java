@@ -70,7 +70,7 @@ public class UserController{
      * @return
      * @throws WxErrorException
      */
-    @GetMapping("/info/detail")
+    @GetMapping("/detail")
     public SuUserEntity infoDetail(Integer userId) throws WxErrorException {
         if(userId != null)
             return suUserMapper.selectByPrimaryKey(userId);
@@ -123,7 +123,7 @@ public class UserController{
         result.add(new UserProfitVo("今日收益",DateUtil.today().equals(suSummaryEntity.getProfitTodayLastUpdate()) ? NumberUtils.fen2yuan(suSummaryEntity.getProfitToday()) : "0.00","/pages/my-bill/index"));
         result.add(new UserProfitVo("历史收益",NumberUtils.fen2yuan(suSummaryEntity.getProfitHistory()),"/pages/my-bill/index"));
         result.add(new UserProfitVo("等待确认",NumberUtils.fen2yuan(suSummaryEntity.getProfitWait()),"/pages/my-bill/index?type=0&state=1"));
-        if(suSummaryEntity.getProfitReady() >= 30){
+        if(suSummaryEntity.getProfitReady() == null || suSummaryEntity.getProfitReady() >= 30){
             result.add(new UserProfitVo("准备发放",NumberUtils.fen2yuan(suSummaryEntity.getProfitReady()),"/pages/my-bill/index?type=0&state=2"));
         }else {
             result.add(new UserProfitVo("准备发放",NumberUtils.fen2yuan(suSummaryEntity.getProfitReady()),"/pages/my-bill/index?type=0&state=2",true,"由于微信单次打款限额0.3元，不足0.3元将在累计超出0.3元后自动发放。"));

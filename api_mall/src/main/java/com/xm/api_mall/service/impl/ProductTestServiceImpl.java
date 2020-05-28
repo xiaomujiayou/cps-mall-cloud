@@ -43,28 +43,28 @@ public class ProductTestServiceImpl implements ProductTestService {
         SmProductEntityEx smProductEntityEx = goodsService.detail(goodsDetailForm);
         SuOrderEntity suOrderEntity = createSuOrderEntity(smProductEntityEx,pid,userId,productSaleInfoForm);
         rabbitTemplate.convertAndSend(OrderMqConfig.EXCHANGE,OrderMqConfig.KEY,suOrderEntity);
-        new Thread(()->{
-            try {
-                //发货
-                Thread.sleep(1000 * 60);
-                suOrderEntity.setState(OrderStateConstant.CONFIRM_RECEIPT);
-                suOrderEntity.setOrderModifyAt(new Date());
-                rabbitTemplate.convertAndSend(OrderMqConfig.EXCHANGE,OrderMqConfig.KEY,suOrderEntity);
-                //已结算
-                Thread.sleep(1000 * 90);
-                suOrderEntity.setOrderModifyAt(new Date());
-                suOrderEntity.setState(OrderStateConstant.ALREADY_SETTLED);
-                rabbitTemplate.convertAndSend(OrderMqConfig.EXCHANGE,OrderMqConfig.KEY,suOrderEntity);
-                //已退单
-//                Thread.sleep(1000 * 90);
-//                suOrderEntity.setOrderModifyAt(new Date());
-//                suOrderEntity.setState(OrderStateConstant.FAIL_SETTLED);
-//                suOrderEntity.setFailReason("订单已取消");
-//                rabbitTemplate.convertAndSend(OrderMqConfig.EXCHANGE,OrderMqConfig.KEY,suOrderEntity);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }).start();
+//        new Thread(()->{
+//            try {
+//                //确认收货
+////                Thread.sleep(1000 * 30);
+////                suOrderEntity.setState(OrderStateConstant.CONFIRM_RECEIPT);
+////                suOrderEntity.setOrderModifyAt(new Date());
+////                rabbitTemplate.convertAndSend(OrderMqConfig.EXCHANGE,OrderMqConfig.KEY,suOrderEntity);
+////                //已结算
+////                Thread.sleep(1000 * 60);
+////                suOrderEntity.setOrderModifyAt(new Date());
+////                suOrderEntity.setState(OrderStateConstant.ALREADY_SETTLED);
+////                rabbitTemplate.convertAndSend(OrderMqConfig.EXCHANGE,OrderMqConfig.KEY,suOrderEntity);
+//                //已退单
+////                Thread.sleep(1000 * 90);
+////                suOrderEntity.setOrderModifyAt(new Date());
+////                suOrderEntity.setState(OrderStateConstant.FAIL_SETTLED);
+////                suOrderEntity.setFailReason("订单已取消");
+////                rabbitTemplate.convertAndSend(OrderMqConfig.EXCHANGE,OrderMqConfig.KEY,suOrderEntity);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }).start();
         return shareLinkBo;
     }
 

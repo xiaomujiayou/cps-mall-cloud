@@ -30,6 +30,8 @@ import com.xm.comment_mq.message.impl.PayOrderSucessMessage;
 import com.xm.comment_serialize.module.pay.entity.SpWxEntPayOrderInEntity;
 import com.xm.comment_serialize.module.pay.entity.SpWxOrderInEntity;
 import com.xm.comment_serialize.module.pay.entity.SpWxOrderNotifyEntity;
+import com.xm.comment_serialize.module.pay.message.ActiveAutoEntPayMessage;
+import com.xm.comment_serialize.module.pay.message.ActiveEntPayMessage;
 import com.xm.comment_serialize.module.pay.message.EntPayMessage;
 import com.xm.comment_serialize.module.pay.vo.WxPayOrderResultVo;
 import com.xm.comment_serialize.module.user.bo.SuBillToPayBo;
@@ -83,55 +85,57 @@ public class WxPayApiServiceImpl implements WxPayApiService {
         SpWxOrderInEntity spWxOrderInEntity = null;
         WxPayOrderResultVo wxPayOrderResultVo = null;
         res = wxService.createOrder(request);
-        if(StrUtil.isBlank(res.getPackageValue()) || !res.getPackageValue().contains("prepay_id"))
+        if (StrUtil.isBlank(res.getPackageValue()) || !res.getPackageValue().contains("prepay_id"))
             throw new GlobleException(MsgEnum.WX_PAY_ORDER_CREATE_FAIL);
-        spWxOrderInEntity = saveOrder(suBillToPayBo,request,null,null,null,res.getPackageValue());
+        spWxOrderInEntity = saveOrder(suBillToPayBo, request, null, null, null, res.getPackageValue());
         wxPayOrderResultVo = new WxPayOrderResultVo();
         wxPayOrderResultVo.setPackageValue(res.getPackageValue());
         wxPayOrderResultVo.setNonceStr(res.getNonceStr());
         wxPayOrderResultVo.setPaySign(res.getPaySign());
         wxPayOrderResultVo.setTimeStamp(res.getTimeStamp());
-        rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE,"",new PayOrderCreateMessage(suBillToPayBo.getUserId(),suBillToPayBo,spWxOrderInEntity,suBillToPayBo,wxPayOrderResultVo));
+        rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE, "", new PayOrderCreateMessage(suBillToPayBo.getUserId(), suBillToPayBo, spWxOrderInEntity, suBillToPayBo, wxPayOrderResultVo));
         return wxPayOrderResultVo;
     }
 
     /**
      * 保存记录
+     *
      * @param request
      * @param returnMsg
      * @param errCode
      * @param errCodeDes
      */
-    private SpWxOrderInEntity saveOrder(SuBillToPayBo suBillToPayBo,WxPayUnifiedOrderRequest request, String returnMsg, String errCode, String errCodeDes,String packageVal) {
+    private SpWxOrderInEntity saveOrder(SuBillToPayBo suBillToPayBo, WxPayUnifiedOrderRequest request, String returnMsg, String errCode, String errCodeDes, String packageVal) {
         SpWxOrderInEntity spWxOrderInEntity = new SpWxOrderInEntity();
         spWxOrderInEntity.setReqBo(JSON.toJSONString(suBillToPayBo));
-        BeanUtil.copyProperties(request,spWxOrderInEntity);
+        BeanUtil.copyProperties(request, spWxOrderInEntity);
         spWxOrderInEntity.setState(0);
         spWxOrderInEntity.setPackageVal(packageVal);
         JSONObject errMsgJson = new JSONObject();
-        errMsgJson.put("returnMsg",returnMsg);
-        errMsgJson.put("errCode",errCode);
-        errMsgJson.put("errCodeDes",errCodeDes);
-        spWxOrderInEntity.setErrMsg(errMsgJson.isEmpty()?null:errMsgJson.toJSONString());
+        errMsgJson.put("returnMsg", returnMsg);
+        errMsgJson.put("errCode", errCode);
+        errMsgJson.put("errCodeDes", errCodeDes);
+        spWxOrderInEntity.setErrMsg(errMsgJson.isEmpty() ? null : errMsgJson.toJSONString());
         spWxOrderInEntity.setCreateTime(new Date());
         spWxOrderInMapper.insertSelective(spWxOrderInEntity);
-        return  spWxOrderInEntity;
+        return spWxOrderInEntity;
     }
 
 
     /**
      * 根据账单生成同一下单订单
+     *
      * @param suBillToPayBo
      * @return
      */
-    private WxPayUnifiedOrderRequest createWxOrderRequest(SuBillToPayBo suBillToPayBo){
+    private WxPayUnifiedOrderRequest createWxOrderRequest(SuBillToPayBo suBillToPayBo) {
         WxPayUnifiedOrderRequest wxPayUnifiedOrderRequest = new WxPayUnifiedOrderRequest();
         wxPayUnifiedOrderRequest.setAppid(wxPayPropertiesEx.getAppId());
         wxPayUnifiedOrderRequest.setMchId(wxPayPropertiesEx.getMchId());
         wxPayUnifiedOrderRequest.setBody(suBillToPayBo.getDes());
-        Map<String,Object> attach = new HashMap<>();
-        attach.put("billId",suBillToPayBo.getId());
-        attach.put("userId",suBillToPayBo.getUserId());
+        Map<String, Object> attach = new HashMap<>();
+        attach.put("billId", suBillToPayBo.getId());
+        attach.put("userId", suBillToPayBo.getUserId());
         wxPayUnifiedOrderRequest.setAttach(JSON.toJSONString(attach));
         wxPayUnifiedOrderRequest.setOutTradeNo(GenNumUtil.genOrderNum());
         wxPayUnifiedOrderRequest.setTotalFee(suBillToPayBo.getMoney());
@@ -146,8 +150,9 @@ public class WxPayApiServiceImpl implements WxPayApiService {
     @Override
     public void payment(EntPayMessage entPayMessage) throws WxPayException {
         SpWxEntPayOrderInEntity record = new SpWxEntPayOrderInEntity();
+        record.setType(1);
         record.setBillPayId(entPayMessage.getScBillPayEntity().getId());
-        if(spWxEntPayOrderInMapper.selectCount(record) > 0)
+        if (spWxEntPayOrderInMapper.selectCount(record) > 0)
             return;
         EntPayRequest request = new EntPayRequest();
         request.setMchAppid(wxPayPropertiesEx.getAppId());
@@ -161,35 +166,118 @@ public class WxPayApiServiceImpl implements WxPayApiService {
         EntPayResult result = null;
         SpWxEntPayOrderInEntity spWxEntPayOrderInEntity = null;
         try {
-            if(CollUtil.newArrayList(active.split(",")).contains("dev")){
+            if (CollUtil.newArrayList(active.split(",")).contains("dev")) {
                 result = new EntPayResult();
             }
-            if(CollUtil.newArrayList(active.split(",")).contains("prod")){
+            if (CollUtil.newArrayList(active.split(",")).contains("prod")) {
                 result = wxService.getEntPayService().entPay(request);
             }
-            spWxEntPayOrderInEntity = entPay(entPayMessage,request,result,null);
+            spWxEntPayOrderInEntity = entPay(1,entPayMessage,null,null, request, result, null);
         } catch (WxPayException e) {
-            spWxEntPayOrderInEntity = entPay(entPayMessage,request,null,e);
-            log.error("微信企业付款失败 信息：{} error：{}",JSON.toJSONString(spWxEntPayOrderInEntity),e);
+            spWxEntPayOrderInEntity = entPay(1,entPayMessage,null,null, request, null, e);
+            log.error("微信企业付款失败 信息：{} error：{}", JSON.toJSONString(spWxEntPayOrderInEntity), e);
         } finally {
-            rabbitTemplate.convertAndSend(PayMqConfig.EXCHANGE_ENT,"",spWxEntPayOrderInEntity);
+            rabbitTemplate.convertAndSend(PayMqConfig.EXCHANGE_ENT, "", spWxEntPayOrderInEntity);
         }
     }
 
-    //保存企业付款记录
-    private SpWxEntPayOrderInEntity entPay(EntPayMessage entPayMessage,EntPayRequest request,EntPayResult result,WxPayException e){
+    @GlobalTransactional(rollbackFor = Exception.class)
+    @Override
+    public void paymentActive(ActiveEntPayMessage activeEntPayMessage) {
+        SpWxEntPayOrderInEntity record = new SpWxEntPayOrderInEntity();
+        record.setType(2);
+        record.setBillPayId(activeEntPayMessage.getSaCashOutRecordEntity().getId());
+        if (spWxEntPayOrderInMapper.selectCount(record) > 0)
+            return;
+        EntPayRequest request = new EntPayRequest();
+        request.setMchAppid(wxPayPropertiesEx.getAppId());
+        request.setMchId(wxPayPropertiesEx.getMchId());
+        request.setPartnerTradeNo(StrUtil.isBlank(activeEntPayMessage.getRetryTradeNo()) ? GenNumUtil.genWxEntPayOrderNum() : activeEntPayMessage.getRetryTradeNo());
+        request.setOpenid(activeEntPayMessage.getSaCashOutRecordEntity().getOpenId());
+        request.setCheckName("NO_CHECK");
+        request.setDescription(activeEntPayMessage.getDesc());
+        request.setSpbillCreateIp(activeEntPayMessage.getIp());
+        request.setAmount(activeEntPayMessage.getSaCashOutRecordEntity().getMoney());
+        EntPayResult result = null;
+        SpWxEntPayOrderInEntity spWxEntPayOrderInEntity = null;
+        try {
+            if (CollUtil.newArrayList(active.split(",")).contains("dev")) {
+                result = new EntPayResult();
+            }
+            if (CollUtil.newArrayList(active.split(",")).contains("prod")) {
+                result = wxService.getEntPayService().entPay(request);
+            }
+            spWxEntPayOrderInEntity = entPay(2,null,activeEntPayMessage,null, request, result, null);
+        } catch (WxPayException e) {
+            spWxEntPayOrderInEntity = entPay(2,null,activeEntPayMessage,null, request, null, e);
+            log.error("微信企业付款失败 信息：{} error：{}", JSON.toJSONString(spWxEntPayOrderInEntity), e);
+        } finally {
+            rabbitTemplate.convertAndSend(PayMqConfig.EXCHANGE_ENT, "", spWxEntPayOrderInEntity);
+        }
+    }
+
+    @Override
+    public void paymentActiveAuto(ActiveAutoEntPayMessage activeAutoEntPayMessage) {
+        SpWxEntPayOrderInEntity record = new SpWxEntPayOrderInEntity();
+        record.setType(3);
+        record.setBillPayId(activeAutoEntPayMessage.getSaBillEntity().getId());
+        if (spWxEntPayOrderInMapper.selectCount(record) > 0)
+            return;
+        EntPayRequest request = new EntPayRequest();
+        request.setMchAppid(wxPayPropertiesEx.getAppId());
+        request.setMchId(wxPayPropertiesEx.getMchId());
+        request.setPartnerTradeNo(StrUtil.isBlank(activeAutoEntPayMessage.getRetryTradeNo()) ? GenNumUtil.genWxEntPayOrderNum() : activeAutoEntPayMessage.getRetryTradeNo());
+        request.setOpenid(activeAutoEntPayMessage.getSaBillEntity().getOpenId());
+        request.setCheckName("NO_CHECK");
+        request.setDescription(activeAutoEntPayMessage.getDesc());
+        request.setSpbillCreateIp(activeAutoEntPayMessage.getIp());
+        request.setAmount(activeAutoEntPayMessage.getSaBillEntity().getMoney());
+        EntPayResult result = null;
+        SpWxEntPayOrderInEntity spWxEntPayOrderInEntity = null;
+        try {
+            if (CollUtil.newArrayList(active.split(",")).contains("dev")) {
+                result = new EntPayResult();
+            }
+            if (CollUtil.newArrayList(active.split(",")).contains("prod")) {
+                result = wxService.getEntPayService().entPay(request);
+            }
+            spWxEntPayOrderInEntity = entPay(3,null,null,activeAutoEntPayMessage, request, result, null);
+        } catch (WxPayException e) {
+            spWxEntPayOrderInEntity = entPay(3,null,null,activeAutoEntPayMessage, request, null, e);
+            log.error("微信企业付款失败 信息：{} error：{}", JSON.toJSONString(spWxEntPayOrderInEntity), e);
+        } finally {
+            rabbitTemplate.convertAndSend(PayMqConfig.EXCHANGE_ENT, "", spWxEntPayOrderInEntity);
+        }
+    }
+
+    //保存付款记录
+    private SpWxEntPayOrderInEntity entPay(Integer type, EntPayMessage entPayMessage, ActiveEntPayMessage activeEntPayMessage,ActiveAutoEntPayMessage activeAutoEntPayMessage, EntPayRequest request, EntPayResult result, WxPayException e) {
         SpWxEntPayOrderInEntity entity = new SpWxEntPayOrderInEntity();
-        BeanUtil.copyProperties(request,entity);
-        entity.setUserId(entPayMessage.getScBillPayEntity().getUserId());
-        entity.setBillPayId(entPayMessage.getScBillPayEntity().getId());
-        entity.setBillIds(entPayMessage.getScBillPayEntity().getBillIds());
+        BeanUtil.copyProperties(request, entity);
+        entity.setType(type);
+        if (type == 1) {
+            //订单返现
+            entity.setUserId(entPayMessage.getScBillPayEntity().getUserId());
+            entity.setBillPayId(entPayMessage.getScBillPayEntity().getId());
+            entity.setBillIds(entPayMessage.getScBillPayEntity().getBillIds());
+        } else if (type == 2) {
+            //活动提现
+            entity.setUserId(activeEntPayMessage.getUserId());
+            entity.setBillPayId(activeEntPayMessage.getSaCashOutRecordEntity().getId());
+            entity.setBillIds(activeEntPayMessage.getSaCashOutRecordEntity().getBillIds());
+        } else if(type == 3){
+            //活动自动返现
+            entity.setUserId(activeAutoEntPayMessage.getUserId());
+            entity.setBillPayId(activeAutoEntPayMessage.getSaBillEntity().getId());
+            entity.setBillIds(activeAutoEntPayMessage.getSaBillEntity().getId().toString());
+        }
         entity.setDes(request.getDescription());
         entity.setCreateTime(new Date());
-        if(!(result == null)) {
+        if (!(result == null)) {
             BeanUtil.copyProperties(result, entity);
             entity.setState(1);
         }
-        if(e != null){
+        if (e != null) {
             entity.setReturnCode(e.getReturnCode());
             entity.setReturnMsg(e.getReturnMsg());
             entity.setResultCode(e.getResultCode());
@@ -201,33 +289,34 @@ public class WxPayApiServiceImpl implements WxPayApiService {
         return entity;
     }
 
+
     @Override
     public void orderNotify(WxPayOrderNotifyResult notifyResult) {
         //判断是否已处理
         SpWxOrderNotifyEntity record = new SpWxOrderNotifyEntity();
         record.setOutTradeNo(notifyResult.getOutTradeNo());
-        if(spWxOrderNotifyMapper.selectCount(record) > 0){
-            log.debug("微信支付回调：该支付信息已被处理 单号：[{}]",notifyResult.getOutTradeNo());
+        if (spWxOrderNotifyMapper.selectCount(record) > 0) {
+            log.debug("微信支付回调：该支付信息已被处理 单号：[{}]", notifyResult.getOutTradeNo());
             return;
         }
         SpWxOrderNotifyEntity spWxOrderNotifyEntity = new SpWxOrderNotifyEntity();
-        BeanUtil.copyProperties(notifyResult,spWxOrderNotifyEntity);
+        BeanUtil.copyProperties(notifyResult, spWxOrderNotifyEntity);
         spWxOrderNotifyEntity.setCreateTime(new Date());
         spWxOrderNotifyMapper.insertSelective(spWxOrderNotifyEntity);
-        rabbitTemplate.convertAndSend(PayMqConfig.EXCHANGE,PayMqConfig.KEY_WX_NOTIFY,spWxOrderNotifyEntity);
+        rabbitTemplate.convertAndSend(PayMqConfig.EXCHANGE, PayMqConfig.KEY_WX_NOTIFY, spWxOrderNotifyEntity);
     }
 
     @GlobalTransactional(rollbackFor = Exception.class)
     @Override
     public void onPaySucess(SpWxOrderNotifyEntity spWxOrderNotifyEntity) {
         Integer userId = JSON.parseObject(spWxOrderNotifyEntity.getAttach()).getInteger("userId");
-        PageHelper.startPage(1,1).count(false);
+        PageHelper.startPage(1, 1).count(false);
         SpWxOrderInEntity spWxOrderInEntity = new SpWxOrderInEntity();
         spWxOrderInEntity.setOutTradeNo(spWxOrderNotifyEntity.getOutTradeNo());
         spWxOrderInEntity = spWxOrderInMapper.selectOne(spWxOrderInEntity);
-        SuBillToPayBo suBillToPayBo = JSON.parseObject(spWxOrderInEntity.getReqBo(),SuBillToPayBo.class);
-        rabbitTemplate.convertAndSend(BillMqConfig.EXCHANGE,BillMqConfig.KEY_PAY_SUCESS,suBillToPayBo);
-        rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE,"",new PayOrderSucessMessage(userId,suBillToPayBo,spWxOrderNotifyEntity));
+        SuBillToPayBo suBillToPayBo = JSON.parseObject(spWxOrderInEntity.getReqBo(), SuBillToPayBo.class);
+        rabbitTemplate.convertAndSend(BillMqConfig.EXCHANGE, BillMqConfig.KEY_PAY_SUCESS, suBillToPayBo);
+        rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE, "", new PayOrderSucessMessage(userId, suBillToPayBo, spWxOrderNotifyEntity));
     }
 
 }

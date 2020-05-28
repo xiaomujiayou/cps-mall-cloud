@@ -49,7 +49,7 @@ public class UserShareGoodsHistoryHandler implements MessageHandler {
             }else if(message instanceof OrderStateChangeMessage){
                 OrderStateChangeMessage orderStateChangeMessage = (OrderStateChangeMessage)message;
                 if(orderStateChangeMessage.getNewState() == OrderStateConstant.FAIL_SETTLED){
-                    shareService.buyFail(orderStateChangeMessage.getSuOrderEntity());
+                    shareService.buyFail(orderStateChangeMessage.getOldOrder());
                 }
             }
         });

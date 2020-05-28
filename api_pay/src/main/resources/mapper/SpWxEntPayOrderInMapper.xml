@@ -5,6 +5,7 @@
     <result column="id" property="id" jdbcType="INTEGER" />
     <result column="bill_pay_id" property="billPayId" jdbcType="INTEGER" />
     <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="INTEGER" />
     <result column="bill_ids" property="billIds" jdbcType="VARCHAR" />
     <result column="mch_appid" property="mchAppid" jdbcType="VARCHAR" />
     <result column="mchid" property="mchid" jdbcType="VARCHAR" />

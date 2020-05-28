@@ -5,6 +5,8 @@ import com.xm.api_pay.service.WxPayApiService;
 import com.xm.comment_mq.constant.RabbitMqConstant;
 import com.xm.comment_mq.message.config.PayMqConfig;
 import com.xm.comment_serialize.module.pay.entity.SpWxOrderNotifyEntity;
+import com.xm.comment_serialize.module.pay.message.ActiveAutoEntPayMessage;
+import com.xm.comment_serialize.module.pay.message.ActiveEntPayMessage;
 import com.xm.comment_serialize.module.pay.message.EntPayMessage;
 import com.xm.comment_serialize.module.user.entity.SuOrderEntity;
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +54,7 @@ public class WxPayReceiver {
 
 
     /**
-     * 微信企业付款
+     * 订单返现付款
      * @param entPayMessage
      * @param channel
      * @param message
@@ -67,6 +69,54 @@ public class WxPayReceiver {
         Long msgId = message.getMessageProperties().getDeliveryTag();
         try{
             wxPayApiService.payment(entPayMessage);
+        }catch (Exception e){
+            channel.basicReject(msgId,false);
+            log.error("消息：{} 微信支付企业付款 处理失败 error：{}",msgId,e);
+        } finally {
+            channel.basicAck(msgId,false);
+        }
+    }
+
+    /**
+     * 活动提现付款
+     * @param activeEntPayMessage
+     * @param channel
+     * @param message
+     * @throws IOException
+     */
+    @RabbitListener(bindings = @QueueBinding(
+            exchange = @Exchange(PayMqConfig.EXCHANGE),
+            key = PayMqConfig.KEY_WX_ENT_PAY_ACTIVE,
+            value = @Queue(value = PayMqConfig.QUEUE_WX_ENT_PAY_ACTIVE)
+    ))
+    public void onActiveEntPayMessage(ActiveEntPayMessage activeEntPayMessage, Channel channel, Message message) throws IOException {
+        Long msgId = message.getMessageProperties().getDeliveryTag();
+        try{
+            wxPayApiService.paymentActive(activeEntPayMessage);
+        }catch (Exception e){
+            channel.basicReject(msgId,false);
+            log.error("消息：{} 微信支付企业付款 处理失败 error：{}",msgId,e);
+        } finally {
+            channel.basicAck(msgId,false);
+        }
+    }
+
+    /**
+     * 活动直接付款
+     * @param activeAutoEntPayMessage
+     * @param channel
+     * @param message
+     * @throws IOException
+     */
+    @RabbitListener(bindings = @QueueBinding(
+            exchange = @Exchange(PayMqConfig.EXCHANGE),
+            key = PayMqConfig.KEY_WX_ENT_PAY_ACTIVE_AUTO,
+            value = @Queue(value = PayMqConfig.QUEUE_WX_ENT_PAY_ACTIVE_AUTO)
+    ))
+    public void onActiveEntPayMessage(ActiveAutoEntPayMessage activeAutoEntPayMessage, Channel channel, Message message) throws IOException {
+        Long msgId = message.getMessageProperties().getDeliveryTag();
+        try{
+            wxPayApiService.paymentActiveAuto(activeAutoEntPayMessage);
         }catch (Exception e){
             channel.basicReject(msgId,false);
             log.error("消息：{} 微信支付企业付款 处理失败 error：{}",msgId,e);

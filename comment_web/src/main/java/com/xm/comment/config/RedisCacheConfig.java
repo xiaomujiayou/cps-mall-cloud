@@ -46,11 +46,16 @@ public class RedisCacheConfig extends CachingConfigurerSupport {
 
     private Map<String, RedisCacheConfiguration> getRedisCacheConfigurationMap() {
         Map<String, RedisCacheConfiguration> redisCacheConfigurationMap = new HashMap<>();
+        //pdd商品列表缓存时间
+        int goodsListTime = 60 * 60 * 12;
+        redisCacheConfigurationMap.put("pdd.getTopGoodsList", this.getRedisCacheConfigurationWithTtl(goodsListTime));
+        redisCacheConfigurationMap.put("pdd.getThemeGoodsList", this.getRedisCacheConfigurationWithTtl(goodsListTime));
+        redisCacheConfigurationMap.put("pdd.getRecommendGoodsList", this.getRedisCacheConfigurationWithTtl(goodsListTime));
+        //pdd banner 缓存
+        redisCacheConfigurationMap.put("pdd.getThemeList", this.getRedisCacheConfigurationWithTtl(60 * 60 * 24));
         //蘑菇街商品详情缓存30分钟
-        redisCacheConfigurationMap.put("share.goods.detail.mgj", this.getRedisCacheConfigurationWithTtl(30 * 60));
+//        redisCacheConfigurationMap.put("share.goods.detail.mgj", this.getRedisCacheConfigurationWithTtl(30 * 60));
 
-        //拼多多商品类目校验
-        redisCacheConfigurationMap.put("opt.check.pdd", this.getRedisCacheConfigurationWithTtl(30 * 60));
         return redisCacheConfigurationMap;
     }
 

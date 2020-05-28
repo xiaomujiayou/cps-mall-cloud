@@ -3,6 +3,7 @@ package com.xm.cloud_gateway.controller;
 import cn.hutool.core.util.StrUtil;
 import com.xm.cloud_gateway.shiro.token.ManageToken;
 import com.xm.cloud_gateway.shiro.token.WeChatToken;
+import com.xm.cloud_gateway.util.IpUtil;
 import com.xm.comment_feign.module.user.feign.UserFeignClient;
 import com.xm.comment_serialize.module.user.form.AdminLoginForm;
 import com.xm.comment_serialize.module.user.vo.SuAdminVo;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,10 +38,12 @@ public class LoginController {
      * @return
      */
     @PostMapping("/login")
-    public Object login(@Valid @RequestBody WechatLoginForm wechatLoginForm, BindingResult bindingResult){
+    public Object login(@Valid @RequestBody WechatLoginForm wechatLoginForm, BindingResult bindingResult, HttpServletRequest request){
         GetUserInfoForm form = new GetUserInfoForm();
         form.setCode(wechatLoginForm.getCode());
         form.setShareUserId(wechatLoginForm.getShareUserId());
+        form.setFrom(wechatLoginForm.getFrom());
+        form.setIp(IpUtil.getIp(request));
         SuUserEntity msg = null;
         try {
             msg = userFeignClient.getUserInfo(form);

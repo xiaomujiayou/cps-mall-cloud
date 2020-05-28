@@ -10,8 +10,8 @@ pdd:
   client-secret: 702bee4684121e512392cb0405b9292fbc624234
 
 mgj:
-  app-key: 102139
-  app-secret: FF7E20C91590054EACEFC1D645C8C5AE
+  app-key: 102480
+  app-secret: 9700B7ED5BF900C468ACF3AC5935BC42
   url: https://openapi.mogujie.com/invoke
   redirect-uri: http://share.xiaomujiayou.com/api-mall/api/mgj/token
   uid: 1et2402

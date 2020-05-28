@@ -1,6 +1,7 @@
 package com.xm.comment_serialize.module.pay.entity;
 
 import lombok.Data;
+import tk.mybatis.mapper.annotation.Version;
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -18,6 +19,11 @@ public class SpWxEntPayOrderInEntity implements Serializable{
 	 * 所属用户
 	 */
 	private Integer userId;
+
+	/**
+	 * 记录类型(1:订单,2:活动)
+	 */
+	private Integer type;
 
 	/**
 	 * 包含的订单id

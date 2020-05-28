@@ -41,8 +41,11 @@ public enum  MsgEnum {
 
     /* 支付相关 */
     WX_PAY_ORDER_CREATE_FAIL(100601,"微信支付统一订单生成失败"),
-
-    ORDER_INVALID_ERROR(100701,"无效订单");
+    /* 订单相关 */
+    ORDER_INVALID_ERROR(100701,"无效订单"),
+    /* 活动相关 */
+    ACTIVE_NOTFOUND_ERROR(100801,"活动不存在"),
+    ACTIVE_ALREADY_USE(100802,"活动已参加"),
     ;
     private Integer code;
     private String msg;

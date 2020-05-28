@@ -91,19 +91,19 @@ public class CreditBillProcessHandler implements MessageHandler {
              * 用户确认收货 -> 重新考核账单是否满足信用支付 -> 计算返现时间
              */
             OrderStateChangeMessage orderStateChangeMessage = (OrderStateChangeMessage) message;
-            if (!orderStateChangeMessage.getSuOrderEntity().getState().equals(OrderStateConstant.PAY) || !orderStateChangeMessage.getNewState().equals(OrderStateConstant.CONFIRM_RECEIPT))
+            if (!orderStateChangeMessage.getOldOrder().getState().equals(OrderStateConstant.PAY) || !orderStateChangeMessage.getNewState().equals(OrderStateConstant.CONFIRM_RECEIPT))
                 return;
             SuBillEntity suBillEntity = orderStateChangeMessage.getSuBillEntity();
             if (suBillEntity == null || suBillEntity.getId() == null) {
                 log.warn("用户：{} 订单：{} 相关账单不存在!",
                         orderStateChangeMessage.getUserId(),
-                        orderStateChangeMessage.getSuOrderEntity().getOrderSubSn(),
+                        orderStateChangeMessage.getOldOrder().getOrderSubSn(),
                         suBillEntity.getBillSn());
                 return;
             } else if (!suBillEntity.getState().equals(BillStateConstant.WAIT)) {
                 log.warn("用户：{} 订单：{} 相关账单:{} 账单状态异常!",
                         orderStateChangeMessage.getUserId(),
-                        orderStateChangeMessage.getSuOrderEntity().getOrderSubSn(),
+                        orderStateChangeMessage.getOldOrder().getOrderSubSn(),
                         suBillEntity.getBillSn());
                 return;
             }

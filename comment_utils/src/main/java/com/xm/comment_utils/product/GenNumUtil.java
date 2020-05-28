@@ -30,7 +30,14 @@ public class GenNumUtil {
     public static String genBillNum(){
         return DateUtil.format(new Date(),"yyyyMMddHHmmss")+ RandomUtil.randomNumbers(5);
     }
-    
+    /**
+     * 生成账单号
+     * @return
+     */
+    public static String genActiveBillNum(){
+        return DateUtil.format(new Date(),"yyyyMMddHHmmss")+ RandomUtil.randomNumbers(3);
+    }
+
     public static void main(String[] args){
         System.out.println(genBillNum());
     }

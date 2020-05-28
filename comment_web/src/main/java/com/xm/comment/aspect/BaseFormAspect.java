@@ -67,10 +67,13 @@ public class BaseFormAspect {
             if(baseForm.getUserId() == null){
                 Annotation annotation = parameters[i].getAnnotation(LoginUser.class);
                 String userId = request.getHeader(RequestHeaderConstant.USER_ID);
+                SuUserEntity suUserEntity = JSON.parseObject(Base64.decodeStr(request.getHeader(RequestHeaderConstant.USER_INFO)),SuUserEntity.class);
+
                 if(annotation != null && ((LoginUser)annotation).necessary() && StrUtil.isBlank(userId)){
                     throw new GlobleException(MsgEnum.SYSTEM_INVALID_USER_ERROR);
                 }else {
                     baseForm.setUserId(userId != null ? Integer.valueOf(userId) : null);
+                    baseForm.setOpenId(suUserEntity.getOpenId());
                 }
             }
 

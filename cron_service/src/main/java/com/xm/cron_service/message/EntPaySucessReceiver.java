@@ -31,7 +31,8 @@ public class EntPaySucessReceiver {
     public void onSucessMessage(SpWxEntPayOrderInEntity spWxEntPayOrderInEntity, Channel channel, Message message) throws IOException {
         Long msgId = message.getMessageProperties().getDeliveryTag();
         try{
-            billPayService.onEntPayResult(spWxEntPayOrderInEntity);
+            if(spWxEntPayOrderInEntity.getType() == 1)
+                billPayService.onEntPayResult(spWxEntPayOrderInEntity);
         }catch (Exception e){
             channel.basicReject(msgId,false);
             log.error("消息：{} 企业付款失败 处理失败 billPayId：{} wxEntPayId：{} error：{}",msgId,spWxEntPayOrderInEntity.getBillPayId(),spWxEntPayOrderInEntity.getId(),e);

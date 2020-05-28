@@ -15,6 +15,7 @@ import com.xm.comment_utils.exception.GlobleException;
 import com.xm.comment_utils.mybatis.PageBean;
 import com.xm.comment_utils.response.MsgEnum;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.stream.Collectors;
@@ -30,23 +31,23 @@ public class GoodsListServiceImpl implements GoodsListService {
 
     @Override
     public PageBean<SmProductEntityEx> index(GoodsListForm goodsListForm) throws Exception {
-        //热销榜
         return pddSdkComponent.convertSmProductEntityEx(
                 goodsListForm.getUserId(),
-                pddSdkComponent.getTopGoodsList(
-                        2,
+                pddSdkComponent.getRecommendGoodsList(
                         goodsListForm.getPid(),
+                        0,
                         goodsListForm.getPageNum(),
                         goodsListForm.getPageSize()));
     }
 
     @Override
     public PageBean<SmProductEntityEx> recommend(GoodsListForm goodsListForm) throws Exception {
+        //热销榜
         return pddSdkComponent.convertSmProductEntityEx(
                 goodsListForm.getUserId(),
-                pddSdkComponent.getRecommendGoodsList(
+                pddSdkComponent.getTopGoodsList(
+                        2,
                         goodsListForm.getPid(),
-                        0,
                         goodsListForm.getPageNum(),
                         goodsListForm.getPageSize()));
     }

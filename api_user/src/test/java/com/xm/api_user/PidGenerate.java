@@ -13,8 +13,8 @@
 //import javax.sql.RowSet;
 //import java.sql.Date;
 //import java.sql.SQLException;
-//import java.util.ArrayList;
-//import java.util.List;
+//import java.utils.ArrayList;
+//import java.utils.List;
 //
 //public class PidGenerate {
 //    private static String clientId = "022c61074e3d46dd946a45f3024a75d8";

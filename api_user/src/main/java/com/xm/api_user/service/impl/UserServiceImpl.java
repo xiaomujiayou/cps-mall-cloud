@@ -21,6 +21,9 @@ import com.xm.comment_serialize.module.user.constant.BillStateConstant;
 import com.xm.comment_serialize.module.user.constant.BillTypeConstant;
 import com.xm.comment_utils.exception.GlobleException;
 import com.xm.comment_feign.module.mall.feign.MallFeignClient;
+import com.xm.comment_utils.lock.DoWork;
+import com.xm.comment_utils.lock.DoWorkWithResult;
+import com.xm.comment_utils.lock.LockUtil;
 import com.xm.comment_utils.response.MsgEnum;
 import com.xm.comment_serialize.module.mall.constant.ConfigEnmu;
 import com.xm.comment_serialize.module.mall.constant.ConfigTypeConstant;
@@ -39,6 +42,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.integration.redis.util.RedisLockRegistry;
 import org.springframework.stereotype.Service;
 import tk.mybatis.orderbyhelper.OrderByHelper;
 
@@ -46,6 +50,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
 
 @Service("userService")
 public class UserServiceImpl implements UserService {
@@ -60,36 +65,39 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private SuRoleMapperEx suRoleMapperEx;
     @Autowired
-    private SuPermissionMapper suPermissionMapper;
-    @Autowired
-    private SuUserRoleMapMapper suUserRoleMapMapper;
-    @Autowired
-    private SuRolePermissionMapMapper suRolePermissionMapMapper;
-    @Autowired
     private WxMaService wxMaService;
     @Autowired
     private MallFeignClient mallFeignClient;
     @Autowired
     private PidService pidService;
     @Autowired
-    private SuOrderMapper suOrderMapper;
+    private RedisLockRegistry redisLockRegistry;
     @Autowired
     private SuOrderMapperEx suOrderMapperEx;
-    @Autowired
-    private RabbitTemplate rabbitTemplate;
-    @Autowired
-    private SummaryService summaryService;
+
 
     @Override
     public SuUserEntity getUserInfo(GetUserInfoForm getUserInfoForm) throws WxErrorException {
         if(StringUtils.isNotBlank(getUserInfoForm.getCode())){
             WxMaJscode2SessionResult wxMaJscode2SessionResult = wxMaService.getUserService().getSessionInfo(getUserInfoForm.getCode());
-            SuUserEntity record = new SuUserEntity();
-            record.setOpenId(wxMaJscode2SessionResult.getOpenid());
-            record = suUserMapper.selectOne(record);
-            if(record != null)
-                return record;
-            return userService.addNewUser(wxMaJscode2SessionResult.getOpenid(),getUserInfoForm.getShareUserId());
+            final SuUserEntity[] record = {new SuUserEntity()};
+            record[0].setOpenId(wxMaJscode2SessionResult.getOpenid());
+            Lock lock = redisLockRegistry.obtain(this.getClass().getSimpleName() + ":" + wxMaJscode2SessionResult.getOpenid());
+            return (SuUserEntity)LockUtil.lock(lock, new DoWorkWithResult<SuUserEntity>() {
+                @Override
+                public SuUserEntity dowork() {
+                    record[0] = suUserMapper.selectOne(record[0]);
+                    if(record[0] != null) {
+                        record[0].setCurrentIp(getUserInfoForm.getIp());
+                        SuUserEntity user = new SuUserEntity();
+                        user.setId(record[0].getId());
+                        user.setCurrentIp(getUserInfoForm.getIp());
+                        suUserMapper.updateByPrimaryKeySelective(user);
+                        return record[0];
+                    }
+                    return userService.addNewUser(wxMaJscode2SessionResult.getOpenid(),getUserInfoForm.getIp(),getUserInfoForm.getShareUserId(),getUserInfoForm.getFrom());
+                }
+            }).get();
         }else if(StringUtils.isNotBlank(getUserInfoForm.getOpenId())){
             SuUserEntity record = new SuUserEntity();
             record.setOpenId(getUserInfoForm.getOpenId());
@@ -108,15 +116,18 @@ public class UserServiceImpl implements UserService {
      * @param openId
      * @return
      */
-    public SuUserEntity addNewUser(String openId,Integer shareUserId){
+    public SuUserEntity addNewUser(String openId,String ip,Integer shareUserId,String from){
         SuPidEntity suPidEntity = pidService.generatePid();
         SuUserEntity user = new SuUserEntity();
         if(shareUserId != null)
             user.setParentId(shareUserId);
+        user.setRegisterIp(ip);
+        user.setCurrentIp(ip);
         user.setOpenId(openId);
         user.setUserSn(MD5.md5(openId,""));
         user.setNickname("Su_"+ user.getUserSn().substring(0,5));
         user.setSex(0);
+        user.setFromWhare(from);
         user.setCreateTime(new Date());
         user.setLastLogin(new Date());
         user.setPid(suPidEntity.getId());

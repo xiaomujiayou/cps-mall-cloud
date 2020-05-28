@@ -17,6 +17,9 @@
     <result column="country" property="country" jdbcType="VARCHAR" />
     <result column="language" property="language" jdbcType="VARCHAR" />
     <result column="pid" property="pid" jdbcType="INTEGER" />
+    <result column="from_whare" property="fromWhare" jdbcType="VARCHAR" />
+    <result column="register_ip" property="registerIp" jdbcType="VARCHAR" />
+    <result column="current_ip" property="currentIp" jdbcType="VARCHAR" />
     <result column="last_login" property="lastLogin" jdbcType="TIMESTAMP" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
   </resultMap>

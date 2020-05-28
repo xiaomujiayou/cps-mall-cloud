@@ -6,6 +6,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.xm.api_mall.service.ConfigService;
 import com.xm.api_mall.service.ProfitService;
 import com.xm.comment.utils.GoodsPriceUtil;
+import com.xm.comment_feign.module.active.feign.ActiveFeignClient;
 import com.xm.comment_serialize.module.mall.constant.ConfigEnmu;
 import com.xm.comment_serialize.module.mall.constant.ConfigTypeConstant;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
@@ -21,6 +22,8 @@ public class ProfitServiceImpl implements ProfitService {
 
     @Autowired
     private ConfigService configService;
+    @Autowired
+    private ActiveFeignClient activeFeignClient;
 
     @Override
     public SmProductEntityEx calcProfit(SmProductEntity smProductEntity, Integer userId,Boolean isShare,Integer shareUserId) {
@@ -33,7 +36,10 @@ public class ProfitServiceImpl implements ProfitService {
         Integer configType = ConfigTypeConstant.PROXY_CONFIG;
         Integer buyRate = Integer.valueOf(configService.getConfig(isShare?shareUserId:userId, isShare?ConfigEnmu.PRODUCT_SHARE_BUY_RATE:ConfigEnmu.PRODUCT_BUY_RATE,isShare?ConfigTypeConstant.SELF_CONFIG: configType).getVal());
         Integer shareRate = Integer.valueOf(configService.getConfig(userId, ConfigEnmu.PRODUCT_SHARE_USER_RATE, configType).getVal());
-        return calcProfit(userId,smProductEntity,buyRate,shareRate);
+        SmProductEntityEx result = calcProfit(userId,smProductEntity,buyRate,shareRate);
+        //添加活动信息
+        result =activeFeignClient.goodsActiveInfo(userId,result);
+        return result;
     }
 
     @Override
@@ -41,9 +47,12 @@ public class ProfitServiceImpl implements ProfitService {
         Integer configType = ConfigTypeConstant.PROXY_CONFIG;
         Integer buyRate = Integer.valueOf(configService.getConfig(userId, ConfigEnmu.PRODUCT_BUY_RATE,configType).getVal());
         Integer shareRate = Integer.valueOf(configService.getConfig(userId, ConfigEnmu.PRODUCT_SHARE_USER_RATE, configType).getVal());
-        return smProductEntitys.stream().map(o->{
+        List<SmProductEntityEx> list = smProductEntitys.stream().map(o->{
             return calcProfit(userId,o,buyRate,shareRate);
         }).collect(Collectors.toList());
+        //添加活动信息
+        list = activeFeignClient.goodsActiveInfo(userId,list);
+        return list;
     }
 
     private SmProductEntityEx calcProfit(Integer userId,SmProductEntity smProductEntity,Integer buyRate,Integer shareRate){

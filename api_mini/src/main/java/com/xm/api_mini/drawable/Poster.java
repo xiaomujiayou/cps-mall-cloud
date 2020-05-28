@@ -145,7 +145,7 @@ public class Poster {
      *
      * @return String
      */
-    public String key() {
-        return DigestUtils.md5DigestAsHex(this.toString().getBytes());
-    }
+//    public String key() {
+//        return DigestUtils.md5DigestAsHex(this.toString().getBytes());
+//    }
 }

@@ -9,4 +9,5 @@ public class BaseForm {
     private Integer userId;
     private String pid;
     private String ip;
+    private String openId;
 }

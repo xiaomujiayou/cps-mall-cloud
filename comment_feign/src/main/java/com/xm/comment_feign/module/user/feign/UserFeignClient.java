@@ -28,14 +28,14 @@ public interface UserFeignClient {
     @PostMapping(value = "/user/info",consumes = "application/json")
     public SuUserEntity getUserInfo(@RequestBody GetUserInfoForm getUserInfoForm);
 
-    @GetMapping(value = "/user/info/detail")
-    public SuUserEntity getInfoDetail(Integer userId);
+    @GetMapping("/user/detail")
+    public SuUserEntity getInfoDetail(@RequestParam Integer userId);
 
     @GetMapping("/role")
-    public List<RolePermissionEx> role(Integer userId);
+    public List<RolePermissionEx> role(@RequestParam Integer userId);
 
     @GetMapping("/config/all")
-    public List<SuConfigEntity> getAllConfig(Integer userId);
+    public List<SuConfigEntity> getAllConfig(@RequestParam Integer userId);
 
     @GetMapping("/config/one")
     public SuConfigEntity getOneConfig(@RequestParam Integer userId, @RequestParam String key);

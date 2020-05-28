@@ -2,7 +2,7 @@
 //
 //import cn.hutool.core.codec.Base64;
 //import cn.hutool.core.io.IoUtil;
-//import cn.hutool.core.util.StrUtil;
+//import cn.hutool.core.utils.StrUtil;
 //import com.alibaba.fastjson.JSON;
 //import com.xm.comment.annotation.LoginUser;
 //import com.xm.comment_feign.module.user.feign.UserFeignClient;

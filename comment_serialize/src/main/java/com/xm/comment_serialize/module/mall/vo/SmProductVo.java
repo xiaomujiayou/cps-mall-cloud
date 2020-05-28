@@ -3,6 +3,7 @@ package com.xm.comment_serialize.module.mall.vo;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
+import com.xm.comment_serialize.module.mall.ex.ActiveInfo;
 import lombok.Data;
 
 import java.util.Arrays;
@@ -40,6 +41,8 @@ public class SmProductVo {
     private String brandName;
     //是否支持急速返现
     private Boolean creditPay;
+    //活动
+    private List<ActiveInfo> activeInfos;
 
     public String getServiceTags() {
         if(creditPay == null || !creditPay)

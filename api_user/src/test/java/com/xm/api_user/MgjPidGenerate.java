@@ -14,12 +14,12 @@
 //import org.springframework.beans.factory.annotation.Autowired;
 //import tk.mybatis.mapper.entity.Example;
 //
-//import java.util.List;
-//import java.util.concurrent.Executors;
-//import java.util.concurrent.LinkedBlockingQueue;
-//import java.util.concurrent.ThreadPoolExecutor;
-//import java.util.concurrent.TimeUnit;
-//import java.util.stream.Collectors;
+//import java.utils.List;
+//import java.utils.concurrent.Executors;
+//import java.utils.concurrent.LinkedBlockingQueue;
+//import java.utils.concurrent.ThreadPoolExecutor;
+//import java.utils.concurrent.TimeUnit;
+//import java.utils.stream.Collectors;
 //
 //public class MgjPidGenerate extends ApiMallApplicationTests {
 //

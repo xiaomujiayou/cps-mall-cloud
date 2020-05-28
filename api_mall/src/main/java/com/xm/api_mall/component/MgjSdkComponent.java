@@ -1,5 +1,6 @@
 package com.xm.api_mall.component;
 
+import cn.hutool.core.codec.Base64;
 import cn.hutool.core.collection.CollUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -144,8 +145,16 @@ public class MgjSdkComponent {
         JSONObject shareBean = JSON.parseObject(myMogujieClient.execute(mgjRequest).getResult().getData());
         ShareLinkBo shareLinkBo = new ShareLinkBo();
 //        shareLinkBo.setWePagePath(shareBean.getString("path") + "&feedback=" + customParams);
-        shareLinkBo.setWePagePath(shareBean.getString("path") + "&feedback=mogujie");
+        shareLinkBo.setWePagePath(shareBean.getString("path"));
         shareLinkBo.setWeAppId(mgjApiConfig.getWeAppId());
+        //生成短链接
+        String url = "https://union.mogujie.com/jump?userid=" + mgjApiConfig.getUid() +
+                "&itemid=" + goodsId +
+                "&promid=" + couponId +
+                "&feedback=" + Base64.encode(customParams);
+        MgjRequest<XiaodianCpsdataUrlShortenResponse> shotReq = new XiaodianCpsdataUrlShortenRequest(url);
+        String shotUrl = myMogujieClient.execute(shotReq).getResult().getData();
+        shareLinkBo.setShotUrl(shotUrl);
         return shareLinkBo;
     }
 

@@ -22,7 +22,13 @@ public class ShareController {
 
     @GetMapping(value = "/goods",produces = MediaType.IMAGE_PNG_VALUE)
     public void goods(SmProductEntityEx smProductEntityEx, HttpServletResponse res) throws IOException {
-        BufferedImage image = new GoodsPoster(smProductEntityEx).draw();
-        ImgUtil.writePng(image,res.getOutputStream());
+        BufferedImage image = null;
+        try {
+            image = new GoodsPoster(smProductEntityEx).draw();
+            ImgUtil.writePng(image, res.getOutputStream());
+        }finally {
+            if(image != null)
+                image.getGraphics().dispose();
+        }
     }
 }

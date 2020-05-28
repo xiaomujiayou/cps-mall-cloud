@@ -78,6 +78,21 @@ public class SuUserEntity implements Serializable{
 	private Integer pid;
 
 	/**
+	 * 用户来源
+	 */
+	private String fromWhare;
+
+	/**
+	 * 注册ip
+	 */
+	private String registerIp;
+
+	/**
+	 * 当前IP
+	 */
+	private String currentIp;
+
+	/**
 	 * 最后登录时间
 	 */
 	private java.util.Date lastLogin;

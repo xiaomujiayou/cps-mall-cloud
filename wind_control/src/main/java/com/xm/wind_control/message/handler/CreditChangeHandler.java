@@ -84,8 +84,8 @@ public class CreditChangeHandler implements MessageHandler {
              * 订单完成奖励
              */
             OrderStateChangeMessage orderStateChangeMessage = (OrderStateChangeMessage)message;
-            if(orderStateChangeMessage.getSuOrderEntity().getState() == OrderStateConstant.CONFIRM_RECEIPT && orderStateChangeMessage.getNewState() == OrderStateConstant.ALREADY_SETTLED)
-                userCreditService.changeCredit(orderStateChangeMessage.getUserId(), ChangeCreditEnum.ORDER_COMPLETE, orderStateChangeMessage.getSuOrderEntity().getProductName());
+            if(orderStateChangeMessage.getOldOrder().getState() == OrderStateConstant.CONFIRM_RECEIPT && orderStateChangeMessage.getNewState() == OrderStateConstant.ALREADY_SETTLED)
+                userCreditService.changeCredit(orderStateChangeMessage.getUserId(), ChangeCreditEnum.ORDER_COMPLETE, orderStateChangeMessage.getOldOrder().getProductName());
 
             /**
              * 订单结束，解除绑定

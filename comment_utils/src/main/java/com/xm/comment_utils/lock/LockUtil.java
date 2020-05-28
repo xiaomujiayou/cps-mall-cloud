@@ -3,8 +3,16 @@ package com.xm.comment_utils.lock;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 
+/**
+ * 锁的模板工具
+ */
 public class LockUtil {
 
+    /**
+     * 无返回值模板
+     * @param lock
+     * @param doWork
+     */
     public static void lock(Lock lock,DoWork doWork){
         try {
             if(lock == null)
@@ -17,6 +25,13 @@ public class LockUtil {
         }
     }
 
+    /**
+     * 有返回值
+     * @param lock
+     * @param doWork
+     * @param <T>
+     * @return
+     */
     public static <T> Optional<T> lock(Lock lock,DoWorkWithResult doWork) {
         Optional<T> optional = null;
         try {
