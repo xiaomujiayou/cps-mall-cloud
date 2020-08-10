@@ -73,7 +73,7 @@ public class BaseFormAspect {
                     throw new GlobleException(MsgEnum.SYSTEM_INVALID_USER_ERROR);
                 }else {
                     baseForm.setUserId(userId != null ? Integer.valueOf(userId) : null);
-                    baseForm.setOpenId(suUserEntity.getOpenId());
+                    baseForm.setOpenId(suUserEntity != null ? suUserEntity.getOpenId() : null);
                 }
             }
 

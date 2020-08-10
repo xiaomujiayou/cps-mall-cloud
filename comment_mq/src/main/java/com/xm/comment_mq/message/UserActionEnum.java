@@ -51,8 +51,12 @@ public enum UserActionEnum {
     //支付相关事件
     PAY_ORDER_CRREATE(10401,"支付订单创建","api-pay",PayOrderCreateMessage.class,true),
     PAY_ORDER_NOTIFY_SUCESS(10402,"支付订单付款成功消息","api-pay",PayOrderSucessMessage.class,true),
-    ;
 
+
+    //活动相关
+    USER_ACTIVE_BILL_CREATE(10501,"用户活动账单创建","api-active",UserActiveBillCreateMessage.class,true),
+
+    ;
     UserActionEnum(Integer type, String name, String from, Class messageType, boolean ready) {
         this.type = type;
         this.name = name;

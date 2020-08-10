@@ -36,7 +36,8 @@ public class MenuTipsHandler implements MessageHandler {
                 UserShareGoodsMessage.class,
                 UserAddProxyMessage.class,
                 UserPaymentSucessMessage.class,
-                UserCreditChangeMessage.class
+                UserCreditChangeMessage.class,
+                UserActiveBillCreateMessage.class
         );
     }
 
@@ -85,6 +86,11 @@ public class MenuTipsHandler implements MessageHandler {
         //信用变更
         if(message instanceof UserCreditChangeMessage){
             addMenuDot(message.getUserId(), 15, PARENT_MENU_MY);
+        }
+
+        //活动账单
+        if(message instanceof UserActiveBillCreateMessage){
+            addMenuTipNum(message.getUserId(), 16, PARENT_MENU_MY);
         }
     }
 

@@ -10,6 +10,8 @@ import com.xm.api_activite.service.ConfigService;
 import com.xm.api_activite.service.manage.CashoutService;
 import com.xm.comment_feign.module.user.feign.UserFeignClient;
 import com.xm.comment_mq.message.config.PayMqConfig;
+import com.xm.comment_mq.message.config.UserActionConfig;
+import com.xm.comment_mq.message.impl.UserActiveBillCreateMessage;
 import com.xm.comment_serialize.module.active.bo.BillActiveBo;
 import com.xm.comment_serialize.module.active.entity.SaBillEntity;
 import com.xm.comment_serialize.module.active.entity.SaCashOutRecordEntity;
@@ -99,6 +101,7 @@ public class BillServiceImpl implements BillService {
         saBillEntity.setFailReason(failReason);
         saBillEntity.setCreateTime(new Date());
         saBillMapper.insertSelective(saBillEntity);
+        rabbitTemplate.convertAndSend(UserActionConfig.EXCHANGE,"",new UserActiveBillCreateMessage(userId,saBillEntity));
         return saBillEntity;
     }
 
