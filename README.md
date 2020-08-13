@@ -184,6 +184,7 @@ config {
 9. cron_service
 10. wind_control
 
+####部分依赖可能无法下载：
 
 ```
     <!--淘宝sdk-->
@@ -224,7 +225,7 @@ config {
     </dependency>
 ```
 
-以上依赖打包：
+依赖已打包：
 
 `链接：https://pan.baidu.com/s/1VDY0n9SEIK3T0VY_hsFYyw 提取码：ug5y`
 
