@@ -12,10 +12,12 @@ gen
 .rebel.xml.bak
 .rebel-remote.xml.bak
 */target/
-
+rebel.xml
 
 api_proxy
-cert
+# 证书文件
+*.p12
+# 配置文件
 application-dev.yml
 application-prod.yml
 application-api-dev.yml
