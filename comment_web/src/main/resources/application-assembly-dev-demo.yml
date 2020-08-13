@@ -2,11 +2,11 @@
 eureka:
   client:
     service-url:
-      defaultZone: http://eureka-server:8101/eureka/
-#    registry-fetch-interval-seconds: 3      #eureka client刷新本地缓存时间,默认30s
-#  instance:
-#    lease-renewal-interval-in-seconds: 1    #每间隔1s，向服务端发送一次心跳，证明自己依然”存活“，默认30秒
-#    lease-expiration-duration-in-seconds: 2 #告诉服务端，如果我2s之内没有给你发心跳，就代表我“死”了，将我踢出掉。默认为90秒
+      defaultZone: http://127.0.0.1:8101/eureka/  #eureka服务器地址
+    registry-fetch-interval-seconds: 3      #eureka client刷新本地缓存时间,默认30s
+  instance:
+    lease-renewal-interval-in-seconds: 1    #每间隔1s，向服务端发送一次心跳，证明自己依然”存活“，默认30秒
+    lease-expiration-duration-in-seconds: 2 #告诉服务端，如果我2s之内没有给你发心跳，就代表我“死”了，将我踢出掉。默认为90秒
 
 
 spring:
@@ -32,20 +32,22 @@ spring:
       stat-view-servlet:
         enabled: true
         reset-enable: true                          # 是否能够重置数据
-        login-username: druidadmin
-        login-password: '!kxy521yu'
+        login-username: druid监控账号
+        login-password: druid监控密码
         url-pattern: /druid/*                       #访问路径为/druid时，跳转到StatViewServlet
 
+
+
   rabbitmq:
-    host: rabbitmq
-    port: 5672
-    virtual-host: /share
-    username: xiaomujiayou
-    password: '!kxy521yu'
+    host: 127.0.0.1 #rabbitmq服务地址
+    port: 5672  #端口
+    virtual-host: /share  #所属空间
+    username: guest
+    password: guest
     connection-timeout: 15000     #连接超时时间
     type: simple
-    #    publisher-confirms: true
-    #    publisher-returns: true
+#    publisher-confirms: true
+#    publisher-returns: true
     listener:
       simple:
         acknowledge-mode: manual  #消费确认置为手动
@@ -59,26 +61,25 @@ spring:
           initial-interval: 10000 # 消息多次消费的间隔10秒
 
   redis:
-    host: redis
-    port: 6379
-    password: '!kxy521yu'
+    host: 127.0.0.1 #redis服务地址
+    password: 密码
+    port: 6379  #端口
     database: 0
-    timeout: 25000
+    timeout: 2000
     jedis:
       pool:
         max-active: 8
         max-wait: -1
         max-idle: 8
         min-idle: 0
+
   #链路追踪服务配置
+  #不需要可以去除依赖删除配置
   zipkin:
-    base-url: http://zipkin:9411
+    base-url: http://127.0.0.1:9411
     sender:
       type: web
   sleuth:
     sampler:
       probability: 1
-
-
-
 

@@ -1,0 +1,34 @@
+# 文件上传配置
+oss:
+  ali:
+    endpoint: oss-cn-shanghai.aliyuncs.com
+    access-key-id: 阿里OSS key
+    access-key-secret: 阿里OSS secret
+    bucket-name: 阿里OSS bucket
+
+# cps平台API配置
+# 可以帮忙申请
+pdd:  #拼多多
+  client-id: 拼多多开放平台client-id
+  client-secret: 拼多多开放平台client-secret
+
+mgj: #蘑菇街
+  app-key: 蘑菇街开放平台key
+  app-secret: 蘑菇街开放平台secret
+  url: https://openapi.mogujie.com/invoke
+  redirect-uri: http://网关/api-mall/api/mgj/token  #蘑菇街开放平台回调地址
+  uid: 蘑菇街开放平台uid
+  we-app-Id: 蘑菇街小程序appid
+
+wph: #唯品会
+  app-key: 唯品会开放平台key
+  app-secret: 唯品会开放平台
+  url: https://gw.vipapis.com/
+  we-app-Id: 唯品会小程序appId
+
+tb: #淘宝联盟
+  app-key: key
+  app-secret: secret
+  url: http://gw.api.taobao.com/router/rest
+  adzone-id: adzone
+

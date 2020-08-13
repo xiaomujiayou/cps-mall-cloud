@@ -3,18 +3,3 @@ spring:
     name: api-mini
   profiles:
     active: dev,plugin,cloud-dev,assembly-dev,api-dev
-
-
-wx:
-  miniapp:
-    configs:
-      - appid: wx77c95d4a2f1bfab0
-        secret: 149a2853db7a9aa718aca580b0883fbb
-        token: 8c8fa3529ee34d4e69a0baafb7069da3
-        aesKey: OCO8pFpEdFK4zkBNm7lb2MY6P8zeNTX5y6hxYfgYqqq
-        msgDataFormat: JSON
-      - appid: wxd14f92d77787943c
-        secret: 94da25d907a63e22cf0a0061f6547cce
-        token: 056f32ee5cf49404607e368bd8d3f2af
-        aesKey: eZ1IpzRPxBTX3X3V4q14pin5dWicShQwvdmxm920Zjb
-        msgDataFormat: JSON

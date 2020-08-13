@@ -1,0 +1,17 @@
+server:
+  port: 8107
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://数据库/share_user?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: 账户
+    password: 密码
+
+wx:
+  appId: 微信小程序appid
+  secret: 微信小程序secret
+
+logging:
+  logPath: D:\java\data\log\share\api-user
+  logLevel: debug

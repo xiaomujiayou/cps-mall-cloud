@@ -4,8 +4,4 @@ spring:
   profiles:
     active: dev,plugin,cloud-dev,assembly-dev,api-dev,seata-dev
 
-wx:
-#  appId: wx77c95d4a2f1bfab0
-#  secret: 149a2853db7a9aa718aca580b0883fbb
-  appId: wxd14f92d77787943c
-  secret: 94da25d907a63e22cf0a0061f6547cce
+

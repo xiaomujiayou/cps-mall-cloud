@@ -1,0 +1,22 @@
+server:
+  port: 8112
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://数据库/share_pay?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: 账号
+    password: 密码
+
+wx:
+  pay:
+    appId: 微信支付APPID
+    mchId: 微信支付mchId
+    mchKey: 微信支付mchKey
+    keyPath: classpath:cert/支付证书 #新建cert存访微信支付证书
+    notifyUrl: http://网关/api-pay/pay/wx/order/notify
+
+logging:
+  logPath: D:\java\data\log\share\api-pay
+  logLevel: debug

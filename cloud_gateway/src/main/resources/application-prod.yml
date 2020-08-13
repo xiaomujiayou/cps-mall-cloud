@@ -1,7 +1,0 @@
-server:
-  port: 8102
-
-logging:
-  logPath: /data/share/gateway-server
-  logLevel: debug
-

@@ -25,8 +25,8 @@ seata:
   service:
     vgroup-mapping:
       fsp_tx_group: seata-server
-#    grouplist:
-#      default: 172.19.0.6:8091
+    grouplist:
+      default: 127.0.0.1:8101
     enable-degrade: false
     disable-global-transaction: false
   transport:
@@ -54,4 +54,4 @@ seata:
     eureka:
       application: seata-server
       weight: 1
-      service-url: http://eureka-server:8101/eureka/
+      service-url: http://127.0.0.1:8101/eureka/  #修改为eureka地址

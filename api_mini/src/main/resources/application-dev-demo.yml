@@ -1,0 +1,29 @@
+server:
+  port: 8110
+
+spring:
+  datasource:
+    druid:
+      min-idle: 1
+      test-on-borrow: true
+      stat-view-servlet:
+        allow: true
+      max-active: 10
+      initial-size: 1
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://数据库地址/share_mini?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: 账号
+    password: 密码
+
+wx:
+  miniapp:
+    configs:
+      - appid: 微信小程序appid
+        secret: 微信小程序secret
+        token: 微信小程序token
+        aesKey: 微信小程序aesKey
+        msgDataFormat: JSON
+
+logging:
+  logPath: D:\java\data\log\share\api-mini
+  logLevel: debug

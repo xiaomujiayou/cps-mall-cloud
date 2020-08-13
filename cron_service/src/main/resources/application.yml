@@ -3,9 +3,3 @@ spring:
     name: cron-service
   profiles:
     active: dev,plugin,cloud-dev,assembly-dev,api-dev,seata-dev
-
-profit:
-  min-money: 30
-  ip: 127.0.0.1
-  page-size: 5
-  pay-desc: 截至到 {time} 新增有效佣金

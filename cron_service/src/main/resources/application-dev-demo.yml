@@ -1,0 +1,20 @@
+server:
+  port: 8109
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://数据库地址/share_cron?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: 账号
+    password: 密码
+
+profit:   #微信打款配置
+  min-money: 30   #最小打款额度（分）
+  ip: 127.0.0.1   #客户端ip (无需修改)
+  page-size: 5    #一次处理订单数量
+  pay-desc: 截至到 {time} 新增有效佣金   #微信企业付款打款提示
+
+logging:
+  logPath: D:\java\data\log\share\cron-service
+  logLevel: debug

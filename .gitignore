@@ -2,6 +2,7 @@
 ### Example user template template
 ### Example user template
 
+
 # IntelliJ project files
 .idea
 *.iml
@@ -10,20 +11,17 @@ gen
 .txlcn
 .rebel.xml.bak
 .rebel-remote.xml.bak
-api_lottery/target/
-api_mall/target/
-api_mini/target/
-api_pay/target/
-api_proxy/target/
-api_user/target/
-cloud_eureka/target/
-cloud_gateway/target/
-comment_api/target/
-comment_feign/target/
-comment_mq/target/
-comment_seata/target/
-comment_serialize/target/
-comment_utils/target/
-comment_web/target/
-cron_service/target/
-wind_control/target/
+*/target/
+
+
+api_proxy
+cert
+application-dev.yml
+application-prod.yml
+application-api-dev.yml
+application-api-prod.yml
+application-assembly-dev.yml
+application-assembly-prod.yml
+application-cloud-prod.yml
+application-seata-dev.yml
+application-seata-prod.yml
