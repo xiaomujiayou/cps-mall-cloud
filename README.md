@@ -184,7 +184,7 @@ config {
 9. cron_service
 10. wind_control
 
-####部分依赖可能无法下载：
+#### 部分依赖可能无法下载：
 
 ```
     <!--淘宝sdk-->
