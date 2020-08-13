@@ -34,6 +34,7 @@
   - [HanLP：分词工具](https://github.com/hankcs/HanLP "HanLP：分词工具")
   - [PageHelper：MyBatis分页插件](https://github.com/pagehelper/Mybatis-PageHelper "PageHelper：MyBatis分页插件")
   - [weixin-java-miniapp：微信开发工具包](https://github.com/Wechat-Group/WxJava "weixin-java-miniapp：微信开发工具包")
+
 #### 模块功能简介：
 - api_mall: 商城模块，整合淘宝、拼多多、唯品会、蘑菇街平台的SDK，抹除各个平台间的差异，提供了统一的API
 - api_user：用户模块，包含的具体内容如下：
@@ -81,6 +82,7 @@
 - 下载Seata源码修改server模块配置文件并编译，具体操作如下：（Seata版本：1.1.0）
 
 1. 修改seata Server模块配置文件file.conf
+
 ```
 store {
   ## store mode: file、db
@@ -119,6 +121,7 @@ store {
   }
 }
 ```
+
 2. 修改seata Server模块配置文件registry.conf
 
 ```
@@ -180,6 +183,7 @@ config {
 8. api_mini
 9. cron_service
 10. wind_control
+
 
 ```
     <!--淘宝sdk-->
