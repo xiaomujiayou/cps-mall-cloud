@@ -137,11 +137,17 @@
 
             <!--拼多多sdk-->
             <!-- ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓-->
+<!--            <dependency>-->
+<!--                <groupId>com.xm.pdd</groupId>-->
+<!--                <artifactId>pop-sdk</artifactId>-->
+<!--                <classifier>all</classifier>-->
+<!--                <version>1.6.1</version>-->
+<!--            </dependency>-->
             <dependency>
                 <groupId>com.xm.pdd</groupId>
                 <artifactId>pop-sdk</artifactId>
                 <classifier>all</classifier>
-                <version>1.6.1</version>
+                <version>1.9.72</version>
             </dependency>
 
             <!--分页相关-->

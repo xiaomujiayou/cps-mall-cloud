@@ -5,15 +5,12 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.PageUtil;
 import com.alibaba.fastjson.JSON;
 import com.pdd.pop.sdk.http.PopHttpClient;
-import com.pdd.pop.sdk.http.api.request.*;
-import com.pdd.pop.sdk.http.api.response.*;
+import com.pdd.pop.sdk.http.api.pop.request.*;
+import com.pdd.pop.sdk.http.api.pop.response.*;
 import com.xm.api_mall.service.ConfigService;
 import com.xm.api_mall.service.ProfitService;
 import com.xm.comment.utils.GoodsPriceUtil;
-import com.xm.comment_serialize.module.mall.bo.PddGoodsListItem;
-import com.xm.comment_serialize.module.mall.bo.PddThemeBo;
-import com.xm.comment_serialize.module.mall.bo.ProductCriteriaBo;
-import com.xm.comment_serialize.module.mall.bo.ShareLinkBo;
+import com.xm.comment_serialize.module.mall.bo.*;
 import com.xm.comment_serialize.module.mall.constant.*;
 import com.xm.comment_serialize.module.mall.entity.SmConfigEntity;
 import com.xm.comment_serialize.module.mall.entity.SmProductEntity;
@@ -55,6 +52,14 @@ public class PddSdkComponent {
         SmConfigEntity shopTypeConfig = configService.getConfig(criteria.getUserId(), ConfigEnmu.PDD_PRODUCT_BEST_LIST_SHOP_TYPE,ConfigTypeConstant.PROXY_CONFIG);
         PddDdkGoodsSearchRequest request = new PddDdkGoodsSearchRequest();
         request.setPid(criteria.getPid());
+        Map<String,Object> params = new HashMap<>();
+        params.put("uid",criteria.getUserId());
+        if(!isRecord(criteria.getPid(),JSON.toJSONString(params))){
+            //尚未备案
+            throw new GlobleException(MsgEnum.PDD_AUTH_ERROR);
+        }
+
+        request.setCustomParameters(JSON.toJSONString(params));
         request.setSortType(sortConfig.getVal() == null?null:Integer.valueOf(sortConfig.getVal()));
         request.setMerchantType(shopTypeConfig.getVal()==null?null:Integer.valueOf(shopTypeConfig.getVal()));
         request.setPage(criteria.getPageNum());
@@ -66,18 +71,23 @@ public class PddSdkComponent {
         request.setActivityTags(criteria.getActivityTags());
         request.setWithCoupon(criteria.getHasCoupon());
         //筛选器
-        List<Map<String,Object>> rangeList = new ArrayList<>();
+        List<PddDdkGoodsSearchRequest.RangeListItem> rangeList = new ArrayList<>();
         //价格区间
         if(criteria.getMaxPrice() != null && criteria.getMinPrice() != null){
-            Map<String,Object> range = new HashMap<>();
-            range.put("range_id",0);
-            range.put("range_from",criteria.getMinPrice());
-            range.put("range_to",criteria.getMaxPrice().equals(0)?10000000:criteria.getMaxPrice());
-            rangeList.add(range);
+//            Map<String,Object> range = new HashMap<>();
+//            range.put("range_id",0);
+//            range.put("range_from",criteria.getMinPrice());
+//            range.put("range_to",criteria.getMaxPrice().equals(0)?10000000:criteria.getMaxPrice());
+//            rangeList.add(range);
+            PddDdkGoodsSearchRequest.RangeListItem rangeListItem = new PddDdkGoodsSearchRequest.RangeListItem();
+            rangeListItem.setRangeId(0);
+            rangeListItem.setRangeFrom(criteria.getMinPrice().longValue());
+            rangeListItem.setRangeTo(criteria.getMaxPrice().equals(0)?10000000l:criteria.getMaxPrice().longValue());
+            rangeList.add(rangeListItem);
         }
 
         if(!rangeList.isEmpty()){
-            request.setRangeList(JSON.toJSONString(rangeList));
+            request.setRangeList(rangeList);
         }
         PddDdkGoodsSearchResponse response = popHttpClient.syncInvoke(request);
         List<PddDdkGoodsSearchResponse.GoodsSearchResponseGoodsListItem> goodsList = response.getGoodsSearchResponse().getGoodsList();
@@ -170,7 +180,7 @@ public class PddSdkComponent {
         PddDdkGoodsPromotionUrlGenerateRequest request = new PddDdkGoodsPromotionUrlGenerateRequest();
         request.setPId(pId);
         request.setGoodsIdList(Arrays.asList(Long.valueOf(goodsId)));
-        request.setCustomParameters(customParams);
+//        request.setCustomParameters(customParams);
         request.setGenerateShortUrl(true);
         request.setGenerateWeApp(true);
         PddDdkGoodsPromotionUrlGenerateResponse response = popHttpClient.syncInvoke(request);
@@ -301,6 +311,37 @@ public class PddSdkComponent {
                 pageSize);
     }
 
+    /**
+     * 获取拼多多授权信息
+     * @param pid
+     * @param userId
+     * @return
+     */
+    public PddAuthBo getAuthInfo(String pid, Integer userId) throws Exception{
+        PddDdkRpPromUrlGenerateRequest request = new PddDdkRpPromUrlGenerateRequest();
+        request.setChannelType(10);
+        request.setPIdList(CollUtil.newArrayList(pid));
+        Map<String,Object> params = new HashMap<>();
+        params.put("uid",userId);
+        request.setCustomParameters(JSON.toJSONString(params));
+        request.setGenerateWeApp(true);
+        PddDdkRpPromUrlGenerateResponse response = popHttpClient.syncInvoke(request);
+        PddDdkRpPromUrlGenerateResponse.RpPromotionUrlGenerateResponseUrlListItem item = response.getRpPromotionUrlGenerateResponse().getUrlList().get(0);
+        PddAuthBo pddAuthBo = new PddAuthBo();
+        pddAuthBo.setMobileUrl(item.getMobileUrl());
+        pddAuthBo.setUrl(item.getUrl());
+        PddAuthBo.WeAppInfoBean weAppInfoBean = new PddAuthBo.WeAppInfoBean();
+        weAppInfoBean.setAppId(item.getWeAppInfo().getAppId());
+        weAppInfoBean.setDesc(item.getWeAppInfo().getDesc());
+        weAppInfoBean.setPagePath(item.getWeAppInfo().getPagePath());
+        weAppInfoBean.setSourceDisplayName(item.getWeAppInfo().getSourceDisplayName());
+        weAppInfoBean.setTitle(item.getWeAppInfo().getTitle());
+        weAppInfoBean.setUserName(item.getWeAppInfo().getUserName());
+        weAppInfoBean.setWeAppIconUrl(item.getWeAppInfo().getWeAppIconUrl());
+        pddAuthBo.setWeAppInfo(weAppInfoBean);
+        return pddAuthBo;
+    }
+
     public PageBean<SmProductEntityEx> convertSmProductEntityEx(Integer userId, PageBean<SmProductEntity> pageBean){
         List<SmProductEntityEx> list = profitService.calcProfit(pageBean.getList(),userId);
         PageBean<SmProductEntityEx> productEntityExPageBean = new PageBean<>();
@@ -396,6 +437,27 @@ public class PddSdkComponent {
         }
         return null;
     }
+
+    /**
+     * 查询是否备案
+     * @param pid
+     * @param customParamters
+     * @return
+     */
+    private Boolean isRecord(String pid,String customParamters) throws Exception {
+        PddDdkMemberAuthorityQueryRequest request = new PddDdkMemberAuthorityQueryRequest();
+        request.setPid(pid);
+        request.setCustomParameters(customParamters);
+        PddDdkMemberAuthorityQueryResponse response = popHttpClient.syncInvoke(request);
+        return response.getAuthorityQueryResponse().getBind() == 1;
+    }
+
+    public Boolean isRecord(String pid,Integer userId) throws Exception {
+        Map<String,Object> params = new HashMap<>();
+        params.put("uid",userId);
+        return isRecord(pid,JSON.toJSONString(params));
+    }
+
 
 
 }

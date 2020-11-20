@@ -16,7 +16,7 @@ public enum  MsgEnum {
     SYSTEM_AUTH_ERROR(100105,"没有权限"),
     SYSTEM_AUTH_EXPIRE_ERROR(100106,"账户已过期"),
 
-
+    PDD_AUTH_ERROR(100110,"拼多多尚未授权"),
     /*错误系列（100200）*/
 
 

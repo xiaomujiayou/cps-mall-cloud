@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 
 /**
@@ -39,19 +40,31 @@ public class DefaultExceptionHandler {
         response.setCharacterEncoding("UTF-8");
         if(e instanceof GlobleException) {
             //自定义异常，或内层服务的包装异常
-            GlobleException ge = (GlobleException)e;
-            //处理zuul -> 服务之间的异常
-            MsgEnum msgEnum = ge.getMsgEnum();
-            if (msgEnum == null)
-                msgEnum = MsgEnum.UNKNOWN_ERROR;
-            Msg msg = R.error(msgEnum);
-            if (ge.getMsgEnum() != null && StrUtil.isNotBlank(ge.getMsg()))
-                msg.setMsg(ge.getMsg());
-            return msg;
+            GlobleException ge = (GlobleException) e;
+            return praseGlobleException(ge);
+        }else if((e instanceof InvocationTargetException && ((InvocationTargetException) e).getTargetException() instanceof GlobleException)){
+            GlobleException ge = (GlobleException)((InvocationTargetException) e).getTargetException();
+            return praseGlobleException(ge);
         }else {
             //最外层服务发生系统异常，避免代码级异常泄露。
             return R.error(MsgEnum.UNKNOWN_ERROR);
         }
 
+    }
+
+    /**
+     * 处理自定义异常
+     * @param e
+     * @return
+     */
+    private Msg praseGlobleException(GlobleException e){
+        //处理zuul -> 服务之间的异常
+        MsgEnum msgEnum = e.getMsgEnum();
+        if (msgEnum == null)
+            msgEnum = MsgEnum.UNKNOWN_ERROR;
+        Msg msg = R.error(msgEnum);
+        if (e.getMsgEnum() != null && StrUtil.isNotBlank(e.getMsg()))
+            msg.setMsg(e.getMsg());
+        return msg;
     }
 }
