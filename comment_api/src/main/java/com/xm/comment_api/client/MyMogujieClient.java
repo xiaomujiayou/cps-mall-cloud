@@ -46,7 +46,7 @@ public class MyMogujieClient extends MogujieClient {
         }
         return (R)response;
     }
-    private String refreshToken(){
+    public String refreshToken(){
         //刷新token
         String refreshToken = stringRedisTemplate.opsForValue().get(MgjApiConfig.MGJ_API_REFRESH_TOKEN_REDIS_KEY);
         if(StrUtil.isBlank(refreshToken))

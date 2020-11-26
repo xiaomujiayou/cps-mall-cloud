@@ -1,6 +1,30 @@
 package com.xm.comment_utils.string;
 
+import com.xm.comment_utils.exception.GlobleException;
+
 public class StringUtils {
+
+    /**
+     * 获取字符串最大字节长度
+     * @param targetStr     ：目标文本
+     * @param legnth        ：待取的最大长度
+     * @return
+     */
+    public static String getMaxByteLength(String targetStr,Integer legnth){
+        if(legnth < 3)
+            throw new GlobleException("最小长度为3！");
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < targetStr.length(); i++) {
+            legnth -= new String(new char[]{targetStr.charAt(i)}).getBytes().length;
+            if(legnth - 3 >= 0) {
+                sb.append(targetStr.charAt(i));
+            }else{
+                sb.append("...");
+                break;
+            }
+        }
+        return sb.toString();
+    }
 
     /**
      * 取出中间文本

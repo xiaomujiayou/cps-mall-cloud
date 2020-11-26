@@ -2,9 +2,13 @@ package com.xm.api_pay.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.CharsetUtil;
+import cn.hutool.core.util.HexUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.druid.sql.visitor.functions.Char;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.binarywang.wxpay.bean.entpay.EntPayRequest;
@@ -39,6 +43,7 @@ import com.xm.comment_serialize.module.user.entity.SuBillEntity;
 import com.xm.comment_utils.exception.GlobleException;
 import com.xm.comment_utils.product.GenNumUtil;
 import com.xm.comment_utils.response.MsgEnum;
+import com.xm.comment_utils.string.StringUtils;
 import io.seata.core.context.RootContext;
 import io.seata.spring.annotation.GlobalTransactional;
 import io.seata.tm.api.transaction.TransactionHook;
@@ -52,10 +57,7 @@ import org.springframework.transaction.support.TransactionSynchronizationAdapter
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -154,15 +156,14 @@ public class WxPayApiServiceImpl implements WxPayApiService {
         record.setBillPayId(entPayMessage.getScBillPayEntity().getId());
         if (spWxEntPayOrderInMapper.selectCount(record) > 0)
             return;
-        EntPayRequest request = new EntPayRequest();
-        request.setMchAppid(wxPayPropertiesEx.getAppId());
-        request.setMchId(wxPayPropertiesEx.getMchId());
-        request.setPartnerTradeNo(StrUtil.isBlank(entPayMessage.getRetryTradeNo()) ? GenNumUtil.genWxEntPayOrderNum() : entPayMessage.getRetryTradeNo());
-        request.setOpenid(entPayMessage.getScBillPayEntity().getOpenId());
-        request.setCheckName("NO_CHECK");
-        request.setDescription(entPayMessage.getDesc());
-        request.setSpbillCreateIp(entPayMessage.getIp());
-        request.setAmount(entPayMessage.getScBillPayEntity().getTotalMoney());
+        EntPayRequest request = createEntPayRequest(
+                wxPayPropertiesEx.getAppId(),
+                wxPayPropertiesEx.getMchId(),
+                StrUtil.isBlank(entPayMessage.getRetryTradeNo()) ? GenNumUtil.genWxEntPayOrderNum() : entPayMessage.getRetryTradeNo(),
+                entPayMessage.getScBillPayEntity().getOpenId(),
+                entPayMessage.getDesc(),
+                entPayMessage.getIp(),
+                entPayMessage.getScBillPayEntity().getTotalMoney());
         EntPayResult result = null;
         SpWxEntPayOrderInEntity spWxEntPayOrderInEntity = null;
         try {
@@ -189,15 +190,14 @@ public class WxPayApiServiceImpl implements WxPayApiService {
         record.setBillPayId(activeEntPayMessage.getSaCashOutRecordEntity().getId());
         if (spWxEntPayOrderInMapper.selectCount(record) > 0)
             return;
-        EntPayRequest request = new EntPayRequest();
-        request.setMchAppid(wxPayPropertiesEx.getAppId());
-        request.setMchId(wxPayPropertiesEx.getMchId());
-        request.setPartnerTradeNo(StrUtil.isBlank(activeEntPayMessage.getRetryTradeNo()) ? GenNumUtil.genWxEntPayOrderNum() : activeEntPayMessage.getRetryTradeNo());
-        request.setOpenid(activeEntPayMessage.getSaCashOutRecordEntity().getOpenId());
-        request.setCheckName("NO_CHECK");
-        request.setDescription(activeEntPayMessage.getDesc());
-        request.setSpbillCreateIp(activeEntPayMessage.getIp());
-        request.setAmount(activeEntPayMessage.getSaCashOutRecordEntity().getMoney());
+        EntPayRequest request = createEntPayRequest(
+                wxPayPropertiesEx.getAppId(),
+                wxPayPropertiesEx.getMchId(),
+                StrUtil.isBlank(activeEntPayMessage.getRetryTradeNo()) ? GenNumUtil.genWxEntPayOrderNum() : activeEntPayMessage.getRetryTradeNo(),
+                activeEntPayMessage.getSaCashOutRecordEntity().getOpenId(),
+                activeEntPayMessage.getDesc(),
+                activeEntPayMessage.getIp(),
+                activeEntPayMessage.getSaCashOutRecordEntity().getMoney());
         EntPayResult result = null;
         SpWxEntPayOrderInEntity spWxEntPayOrderInEntity = null;
         try {
@@ -216,6 +216,19 @@ public class WxPayApiServiceImpl implements WxPayApiService {
         }
     }
 
+    private EntPayRequest createEntPayRequest(String appId,String mchId,String tradeNo,String openId,String desc,String billCreateIp,Integer money){
+        EntPayRequest request = new EntPayRequest();
+        request.setMchAppid(appId);
+        request.setMchId(mchId);
+        request.setPartnerTradeNo(tradeNo);
+        request.setOpenid(openId);
+        request.setCheckName("NO_CHECK");
+        request.setDescription(StringUtils.getMaxByteLength(desc,100));
+        request.setSpbillCreateIp(billCreateIp);
+        request.setAmount(money);
+        return request;
+    }
+
     @Override
     public void paymentActiveAuto(ActiveAutoEntPayMessage activeAutoEntPayMessage) {
         SpWxEntPayOrderInEntity record = new SpWxEntPayOrderInEntity();
@@ -223,15 +236,14 @@ public class WxPayApiServiceImpl implements WxPayApiService {
         record.setBillPayId(activeAutoEntPayMessage.getSaBillEntity().getId());
         if (spWxEntPayOrderInMapper.selectCount(record) > 0)
             return;
-        EntPayRequest request = new EntPayRequest();
-        request.setMchAppid(wxPayPropertiesEx.getAppId());
-        request.setMchId(wxPayPropertiesEx.getMchId());
-        request.setPartnerTradeNo(StrUtil.isBlank(activeAutoEntPayMessage.getRetryTradeNo()) ? GenNumUtil.genWxEntPayOrderNum() : activeAutoEntPayMessage.getRetryTradeNo());
-        request.setOpenid(activeAutoEntPayMessage.getSaBillEntity().getOpenId());
-        request.setCheckName("NO_CHECK");
-        request.setDescription(activeAutoEntPayMessage.getDesc());
-        request.setSpbillCreateIp(activeAutoEntPayMessage.getIp());
-        request.setAmount(activeAutoEntPayMessage.getSaBillEntity().getMoney());
+        EntPayRequest request = createEntPayRequest(
+                wxPayPropertiesEx.getAppId(),
+                wxPayPropertiesEx.getMchId(),
+                StrUtil.isBlank(activeAutoEntPayMessage.getRetryTradeNo()) ? GenNumUtil.genWxEntPayOrderNum() : activeAutoEntPayMessage.getRetryTradeNo(),
+                activeAutoEntPayMessage.getSaBillEntity().getOpenId(),
+                activeAutoEntPayMessage.getDesc(),
+                activeAutoEntPayMessage.getIp(),
+                activeAutoEntPayMessage.getSaBillEntity().getMoney());
         EntPayResult result = null;
         SpWxEntPayOrderInEntity spWxEntPayOrderInEntity = null;
         try {

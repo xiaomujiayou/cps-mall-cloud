@@ -69,6 +69,7 @@ public class GoodsServiceImpl implements GoodsService {
         }
         if(CollUtil.newArrayList(active.split(",")).contains("prod")){
             OrderCustomParameters parameters = new OrderCustomParameters();
+            parameters.setUid(saleInfoForm.getUserId());
             parameters.setUserId(saleInfoForm.getUserId());
             parameters.setShareUserId(saleInfoForm.getShareUserId());
             parameters.setFromApp(saleInfoForm.getAppType());
