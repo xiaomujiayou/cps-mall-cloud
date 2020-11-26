@@ -28,7 +28,6 @@ import java.util.concurrent.locks.Lock;
 
 /**
  * 高温补贴活动
- *
  */
 @Slf4j
 @Component
@@ -55,15 +54,15 @@ public class GaoWenActiveMessageHandler implements MessageHandler {
 
     @Override
     public void handle(AbsUserActionMessage message) {
-        if(message instanceof OrderCreateMessage){
+        if (message instanceof OrderCreateMessage) {
             //创建高温补贴
             SaActiveEntity gaoWen = saActiveMapper.selectByPrimaryKey(ActiveConstant.GAO_WEN_BU_TIE_ACTIVE_ID);
-            if(gaoWen == null || gaoWen.getState() != 1)
+            if (gaoWen == null || gaoWen.getState() != 1)
                 return;
-            OrderCreateMessage orderCreateMessage = (OrderCreateMessage)message;
-            createBillByOrder(orderCreateMessage,gaoWen);
-        }else if(message instanceof OrderStateChangeMessage){
-            OrderStateChangeMessage orderStateChangeMessage = (OrderStateChangeMessage)message;
+            OrderCreateMessage orderCreateMessage = (OrderCreateMessage) message;
+            createBillByOrder(orderCreateMessage, gaoWen);
+        } else if (message instanceof OrderStateChangeMessage) {
+            OrderStateChangeMessage orderStateChangeMessage = (OrderStateChangeMessage) message;
             SaBillEntity example = new SaBillEntity();
             example.setUserId(orderStateChangeMessage.getUserId());
             example.setState(6);
@@ -71,12 +70,13 @@ public class GaoWenActiveMessageHandler implements MessageHandler {
             example.setAttach(orderStateChangeMessage.getOldOrder().getOrderSubSn());
             example.setUserId(orderStateChangeMessage.getUserId());
             SaBillEntity saBillEntity = saBillMapper.selectOne(example);
-            if(saBillEntity == null || saBillEntity.getId() == null)
+            if (saBillEntity == null || saBillEntity.getId() == null)
                 return;
-            if(orderStateChangeMessage.getOldOrder().getState().equals(OrderStateConstant.PAY) && orderStateChangeMessage.getNewState().equals(OrderStateConstant.CONFIRM_RECEIPT)){
+            if (orderStateChangeMessage.getOldOrder().getState().equals(OrderStateConstant.PAY) && orderStateChangeMessage.getNewState().equals(OrderStateConstant.CONFIRM_RECEIPT)) {
+                SaActiveEntity gaoWen = saActiveMapper.selectByPrimaryKey(ActiveConstant.GAO_WEN_BU_TIE_ACTIVE_ID);
                 //发放高温补贴
-                billService.cashOut(saBillEntity,"粉饰生活-高温补贴活动-"+saBillEntity.getAttachDes());
-            }else if(Arrays.asList(OrderStateConstant.FAIL,OrderStateConstant.FAIL_SETTLED).contains(orderStateChangeMessage.getNewState())){
+                billService.cashOut(saBillEntity, "粉饰生活-" + gaoWen == null ? "" : gaoWen.getName() + "活动-" + saBillEntity.getAttachDes());
+            } else if (Arrays.asList(OrderStateConstant.FAIL, OrderStateConstant.FAIL_SETTLED).contains(orderStateChangeMessage.getNewState())) {
                 //订单异常，结算失败
                 saBillEntity.setState(4);
                 saBillEntity.setFailReason(orderStateChangeMessage.getNewOrder().getFailReason());
@@ -85,18 +85,18 @@ public class GaoWenActiveMessageHandler implements MessageHandler {
         }
     }
 
-    private void createBillByOrder(OrderCreateMessage orderCreateMessage,SaActiveEntity gaoWen){
-        if(StrUtil.isBlank(orderCreateMessage.getSuOrderEntity().getOrderSubSn())){
-            log.error("高温补贴活动 订单单号不存在，创建活动奖励失败：{}",orderCreateMessage);
+    private void createBillByOrder(OrderCreateMessage orderCreateMessage, SaActiveEntity gaoWen) {
+        if (StrUtil.isBlank(orderCreateMessage.getSuOrderEntity().getOrderSubSn())) {
+            log.error("高温补贴活动 订单单号不存在，创建活动奖励失败：{}", orderCreateMessage);
             return;
         }
-        Lock lock = redisLockRegistry.obtain(this.getClass().getSimpleName()+":"+orderCreateMessage.getSuOrderEntity().getOrderSubSn());
-        LockUtil.lock(lock,()->{
+        Lock lock = redisLockRegistry.obtain(this.getClass().getSimpleName() + ":" + orderCreateMessage.getSuOrderEntity().getOrderSubSn());
+        LockUtil.lock(lock, () -> {
             SaBillEntity saBillEntity = new SaBillEntity();
             saBillEntity.setAttach(orderCreateMessage.getSuOrderEntity().getOrderSubSn());
             int count = saBillMapper.selectCount(saBillEntity);
-            if(count > 0){
-                log.error("高温补贴活动 订单单号:{} 相关活动奖励已存在",orderCreateMessage.getSuOrderEntity().getOrderSubSn());
+            if (count > 0) {
+                log.error("高温补贴活动 订单单号:{} 相关活动奖励已存在", orderCreateMessage.getSuOrderEntity().getOrderSubSn());
                 return;
             }
             billService.createBill(
@@ -111,7 +111,6 @@ public class GaoWenActiveMessageHandler implements MessageHandler {
             );
         });
     }
-
 
 
     @Override
