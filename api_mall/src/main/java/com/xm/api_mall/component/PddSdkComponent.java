@@ -26,7 +26,10 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -367,6 +370,13 @@ public class PddSdkComponent {
 
     private PageBean<SmProductEntity> packageToPageBean(List<SmProductEntity> list, Integer total, Integer pageNum, Integer pageSize) {
         list = CollUtil.removeNull(list);
+
+        //苹果机不支持虚拟类目
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        String ua = request.getHeader("User-Agent");
+        if(ua != null && ua.contains("iPhone")) {
+            list = list.stream().filter(o -> !CollUtil.newHashSet("10141","23154").contains(o.getOptId())).collect(Collectors.toList());
+        }
         PageBean<SmProductEntity> pageBean = new PageBean<>(list);
         pageBean.setTotal(total);
         pageBean.setPageNum(pageNum);
