@@ -374,8 +374,31 @@ public class PddSdkComponent {
         //苹果机不支持虚拟类目
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         String ua = request.getHeader("User-Agent");
+        System.out.println(ua);
         if(ua != null && ua.contains("iPhone")) {
-            list = list.stream().filter(o -> !CollUtil.newHashSet("10141","23154").contains(o.getOptId())).collect(Collectors.toList());
+            list = list.stream()
+                    .filter(o -> !CollUtil.newHashSet("10141","23154","590","10696","23905").contains(o.getOptId()))
+                    .filter(o -> !o.getName().contains("会员"))
+                    .filter(o -> !o.getName().contains("充值"))
+                    .filter(o -> !o.getName().contains("年卡"))
+                    .filter(o -> !o.getName().contains("月卡"))
+                    .filter(o -> !o.getName().contains("一天"))
+                    .filter(o -> !o.getName().contains("代金券"))
+                    .filter(o -> !o.getName().contains("优惠券"))
+                    .filter(o -> !o.getName().contains("网盘"))
+                    .filter(o -> !o.getName().contains("下载"))
+                    .filter(o -> !o.getName().contains("激活"))
+                    .filter(o -> !o.getName().contains("兑换"))
+                    .filter(o -> !o.getName().contains("许可证"))
+                    .filter(o -> !o.getName().contains("电子书"))
+                    .filter(o -> !o.getName().toLowerCase().contains("vip"))
+                    .filter(o -> !o.getName().toLowerCase().contains("txt"))
+                    .filter(o -> !o.getName().toLowerCase().contains("office"))
+                    .filter(o -> !o.getName().toLowerCase().contains("wps"))
+                    .collect(Collectors.toList());
+            list.forEach(o -> {
+                System.out.println(o.getName()+":"+o.getOptId());
+            });
         }
         PageBean<SmProductEntity> pageBean = new PageBean<>(list);
         pageBean.setTotal(total);
