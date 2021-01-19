@@ -1,6 +1,6 @@
 # cps-mall-cloud (微服务版) 
 
-### 另有单体版，简化部署 👉👉 [cps-mall](https://github.com/xiaomujiayou/cps-mall "cps-mall")
+### 另有单体版，简化部署 👉👉 [cps-mall](https://gitee.com/xiaomujiayou/cps-mall "cps-mall")
 优惠券商城后台，支持淘宝、拼多多、京东、唯品会、蘑菇街，预留接口，可以很方便的扩展其他优惠券平台。
 精力有限前端仅适配了微信小程序，可根据接口自行适配小程序、PC、H5、App等平台。
 
