@@ -6,8 +6,8 @@
 
 
 
-##### 微信扫码预览：
-![微信扫码预览](https://mall-share.oss-cn-shanghai.aliyuncs.com/share/untitled.png?x-oss-process=image/resize,h_200,w_200 "微信扫码预览")
+##### 微信预览：
+![微信预览](https://mall-share.oss-cn-shanghai.aliyuncs.com/share/untitled.png?x-oss-process=image/resize,h_200,w_200 "微信预览")
 
 
 ------------
