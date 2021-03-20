@@ -21,6 +21,19 @@
         <spring-cloud.version>Greenwich.SR2</spring-cloud.version>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>alimaven</id>
+            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+            <layout>default</layout>
+        </repository>
+        <!-- 私有仓库，速度较慢，拥有全部jar包 -->
+        <repository>
+            <id>nexus</id>
+            <url>http://129.226.118.240:8081/repository/maven-public/</url>
+        </repository>
+    </repositories>
+
     <modules>
         <module>cloud_eureka</module>
         <module>cloud_gateway</module>
